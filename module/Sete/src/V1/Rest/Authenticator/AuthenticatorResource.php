@@ -63,8 +63,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      */
     public function fetchAll($params = []) {
         $headers = apache_request_headers();
-        if(key_exists('access_token', $headers)){
-            $accessToken = $headers['access_token'];
+        if(key_exists('Access-Token', $headers)){
+            $accessToken = $headers['Access-Token'];
             if(!empty($accessToken)){
                 $valido = $this->_model->validarAccessToken($accessToken);
                 if($valido){
@@ -73,10 +73,10 @@ class AuthenticatorResource extends AbstractResourceListener{
                     return ['result' => false, 'messages' => 'Access Token inválido!'];
                 }
             }else{
-                return new ApiProblem(406, 'Cabeçalho access_token vazio.');
+                return new ApiProblem(406, 'Cabeçalho Access-Token vazio.');
             }
         }else{
-            return new ApiProblem(406, 'Cabeçalho access_token ausente.');
+            return new ApiProblem(406, 'Cabeçalho Access-Token ausente.');
         }
     }
 
