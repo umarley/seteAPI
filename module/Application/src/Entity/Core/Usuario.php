@@ -77,7 +77,7 @@ class Usuario extends AbstractDatabase {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("usuario = '{$username}'");
+                ->where("email = '{$username}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         $row = $execute->current();
@@ -98,12 +98,12 @@ class Usuario extends AbstractDatabase {
     public function getIdUsuarioByUsername($usuario){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id_usuario'])
-                ->where("usuario = '{$usuario}'");
+                ->columns(['id'])
+                ->where("email = '{$usuario}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         $row = $execute->current();
-        return $row['id_usuario'];
+        return $row['id'];
     }
     
     public function usuarioIsTrocarSenha($usuario){
@@ -330,8 +330,7 @@ class Usuario extends AbstractDatabase {
     public function checkUsuarioAndPasswordPortal($usuario, $pass) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
-                ->columns(['usuario', 'senha'])
-                ->join(['ps' => new TableIdentifier("glb_pessoa")], "us.id_pessoa = ps.id_pessoa", ['id_segmento_cadastro'])
+                ->columns(['usuario', 'senha', 'email'])
                 ->where("email = '{$usuario}'")
                 ->where("senha = '{$pass}'")
                 ->where("is_ativo = 'S'");
@@ -347,11 +346,10 @@ class Usuario extends AbstractDatabase {
     public function checkUsuarioAndPassword($usuario, $pass) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
-                ->columns(['usuario', 'senha'])
-                ->join(['ps' => new TableIdentifier("glb_pessoa")], "us.id_pessoa = ps.id_pessoa", ['id_segmento_cadastro'])
+                ->columns(['email', 'senha'])
                 ->where("email = '{$usuario}'")
                 ->where("senha = '{$pass}'")
-                ->where("is_ativo = 'S' AND ps.id_segmento_cadastro = 3");
+                ->where("is_ativo = 'S'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         if ($execute->count() > 0) {

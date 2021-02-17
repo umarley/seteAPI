@@ -100,7 +100,8 @@ class AbstractDatabase extends TableGateway {
         } catch (\PDOException $ex) {
             $bool = false;
             $message = "Falha ao atualizar o registro. " . $ex->getMessage();
-            echo $ex->getMessage();die();
+            echo $ex->getMessage();
+            die();
             //$this->rollback();
         } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
             $bool = false;
@@ -159,11 +160,11 @@ class AbstractDatabase extends TableGateway {
     }
 
     private function montaConfiguracaoAdapter($configName) {
-        if (AMBIENTE_EXEC === AMBIENTE_PRODUCAO) {
-            $config = new \Laminas\Config\Config(include realpath('config/autoload/global.php'));
-        } else {
-            $config = new \Laminas\Config\Config(include realpath('config/autoload/local.php'));
-        }
+        /* if (AMBIENTE_EXEC === AMBIENTE_PRODUCAO) {
+          $config = new \Laminas\Config\Config(include realpath('config/autoload/global.php'));
+          } */
+        $config = new \Laminas\Config\Config(include realpath('config/autoload/local.php'));
+
         $arConfig = [];
         foreach ($config->db->adapters->$configName as $key => $value) {
             $arConfig[$key] = $value;

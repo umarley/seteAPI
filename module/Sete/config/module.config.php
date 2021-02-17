@@ -20,7 +20,7 @@ return [
             'sete.rest.authenticator' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/authenticator[/:authenticator_id]',
+                    'route' => '/authenticator',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Authenticator\\Controller',
                     ],
@@ -62,12 +62,7 @@ return [
             'route_name' => 'sete.rest.authenticator',
             'route_identifier_name' => 'authenticator_id',
             'collection_name' => 'authenticator',
-            'entity_http_methods' => [
-                0 => 'GET',
-                1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
-            ],
+            'entity_http_methods' => [],
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
@@ -133,6 +128,51 @@ return [
                 'route_name' => 'sete.rest.authenticator',
                 'route_identifier_name' => 'authenticator_id',
                 'is_collection' => true,
+            ],
+        ],
+    ],
+    'api-tools-content-validation' => [
+        'Sete\\V1\\Rest\\Authenticator\\Controller' => [
+            'input_filter' => 'Sete\\V1\\Rest\\Authenticator\\Validator',
+        ],
+    ],
+    'input_filter_specs' => [
+        'Sete\\V1\\Rest\\Authenticator\\Validator' => [
+            0 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'usuario',
+                'description' => 'Campo que deve ser informado o usuário para o login no sistema.',
+                'error_message' => 'Preencha o campo usuário para continuar!',
+            ],
+            1 => [
+                'required' => true,
+                'validators' => [],
+                'filters' => [],
+                'name' => 'senha',
+                'description' => 'Campo com a senha do usuário. Deve ser enviado o hash md5 da senha informada pelo usuário do sistema.',
+                'error_message' => 'Campo obrigatório!',
+            ],
+        ],
+    ],
+    'api-tools-mvc-auth' => [
+        'authorization' => [
+            'Sete\\V1\\Rest\\Authenticator\\Controller' => [
+                'collection' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+                'entity' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
             ],
         ],
     ],
