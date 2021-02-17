@@ -1,234 +1,243 @@
-# laminas-mvc-skeleton
+Laminas API Tools Skeleton Application
+======================================
 
-## Introduction
+Requirements
+------------
 
-This is a skeleton application using the Laminas MVC layer and module
-systems. This application is meant to be used as a starting place for those
-looking to get their feet wet with Laminas MVC.
+Please see the [composer.json](composer.json) file.
 
-## Installation using Composer
+Installation
+------------
 
-The easiest way to create a new Laminas MVC project is to use
-[Composer](https://getcomposer.org/). If you don't have it already installed,
-then please install as per the [documentation](https://getcomposer.org/doc/00-intro.md).
+### Via release tarball
 
-To create your new Laminas MVC project:
+Grab the latest release via the [Laminas API Tools website](https://api-tools.getlaminas.org/)
+and/or the [releases page](https://github.com/laminas-api-tools/api-tools-skeleton/releases); each release
+has distribution tarballs and zipballs available.
+
+Untar it:
 
 ```bash
-$ composer create-project -sdev laminas/laminas-mvc-skeleton path/to/install
+$ tar xzf api-tools-skeleton-{version}.tgz
 ```
 
-Once installed, you can test it out immediately using PHP's built-in web server:
+(Where `{version}` is the version you downloaded.)
+
+Or unzip, if you chose the zipball:
+
+```bash
+$ unzip api-tools-skeleton-{version}.zip
+```
+
+(Where `{version}` is the version you downloaded.)
+
+### Via Composer (create-project)
+
+You can use the `create-project` command from [Composer](https://getcomposer.org/)
+to create the project in one go (you need to install [composer](https://getcomposer.org/doc/00-intro.md#downloading-the-composer-executable)):
+
+```bash
+$ curl -s https://getcomposer.org/installer | php -- --filename=composer
+$ composer create-project -sdev laminas-api-tools/api-tools-skeleton path/to/install
+```
+
+### Via Git (clone)
+
+First, clone the repository:
+
+```bash
+# git clone https://github.com/laminas-api-tools/api-tools-skeleton.git # optionally, specify the directory in which to clone
+$ cd path/to/install
+```
+
+At this point, you need to use [Composer](https://getcomposer.org/) to install
+dependencies. Assuming you already have Composer:
+
+```bash
+$ composer install
+```
+
+### All methods
+
+Once you have the basic installation, you need to put it in development mode:
 
 ```bash
 $ cd path/to/install
-$ php -S 0.0.0.0:8080 -t public
+$ composer development-enable
+```
+
+Now, fire it up! Do one of the following:
+
+- Create a vhost in your web server that points the DocumentRoot to the
+  `public/` directory of the project
+- Fire up the built-in web server in PHP(**note**: do not use this for
+  production!)
+
+In the latter case, do the following:
+
+```bash
+$ cd path/to/install
+$ php -S 0.0.0.0:8080 -ddisplay_errors=0 -t public public/index.php
 # OR use the composer alias:
-$ composer run --timeout 0 serve
+$ composer serve
 ```
 
-This will start the cli-server on port 8080, and bind it to all network
-interfaces. You can then visit the site at http://localhost:8080/
-- which will bring up Laminas MVC Skeleton welcome page.
+You can then visit the site at http://localhost:8080/ - which will bring up a
+welcome page and the ability to visit the dashboard in order to create and
+inspect your APIs.
 
-**Note:** The built-in CLI server is *for development only*.
+### NOTE ABOUT USING APACHE
 
-## Development mode
+Apache forbids the character sequences `%2F` and `%5C` in URI paths. However, the Laminas API Tools Admin
+API uses these characters for a number of service endpoints. As such, if you wish to use the
+Admin UI and/or Admin API with Apache, you will need to configure your Apache vhost/project to
+allow encoded slashes:
 
-The skeleton ships with [laminas-development-mode](https://github.com/laminas/laminas-development-mode)
-by default, and provides three aliases for consuming the script it ships with:
-
-```bash
-$ composer development-enable  # enable development mode
-$ composer development-disable # disable development mode
-$ composer development-status  # whether or not development mode is enabled
+```apacheconf
+AllowEncodedSlashes On
 ```
 
-You may provide development-only modules and bootstrap-level configuration in
-`config/development.config.php.dist`, and development-only application
-configuration in `config/autoload/development.local.php.dist`. Enabling
-development mode will copy these files to versions removing the `.dist` suffix,
-while disabling development mode will remove those copies.
+This change will need to be made in your server's vhost file (it cannot be added to `.htaccess`).
 
-Development mode is automatically enabled as part of the skeleton installation process. 
-After making changes to one of the above-mentioned `.dist` configuration files you will
-either need to disable then enable development mode for the changes to take effect,
-or manually make matching updates to the `.dist`-less copies of those files.
+### NOTE ABOUT OPCACHE
 
-## Running Unit Tests
+**Disable all opcode caches when running the admin!**
 
-To run the supplied skeleton unit tests, you need to do one of the following:
+The admin cannot and will not run correctly when an opcode cache, such as APC or
+OpCache, is enabled. Laminas API Tools does not use a database to store configuration;
+instead, it uses PHP configuration files. Opcode caches will cache these files
+on first load, leading to inconsistencies as you write to them, and will
+typically lead to a state where the admin API and code become unusable.
 
-- During initial project creation, select to install the MVC testing support.
-- After initial project creation, install [laminas-test](https://docs.laminas.dev/laminas-test/):
+The admin is a **development** tool, and intended for use a development
+environment. As such, you should likely disable opcode caching, regardless.
 
-  ```bash
-  $ composer require --dev laminas/laminas-test
-  ```
+When you are ready to deploy your API to **production**, however, you can
+disable development mode, thus disabling the admin interface, and safely run an
+opcode cache again. Doing so is recommended for production due to the tremendous
+performance benefits opcode caches provide.
 
-Once testing support is present, you can run the tests using:
+### NOTE ABOUT DISPLAY_ERRORS
 
-```bash
-$ ./vendor/bin/phpunit
-```
+The `display_errors` `php.ini` setting is useful in development to understand what warnings,
+notices, and error conditions are affecting your application. However, they cause problems for APIs:
+APIs are typically a specific serialization format, and error reporting is usually in either plain
+text, or, with extensions like XDebug, in HTML. This breaks the response payload, making it unusable
+by clients.
 
-If you need to make local modifications for the PHPUnit test setup, copy
-`phpunit.xml.dist` to `phpunit.xml` and edit the new file; the latter has
-precedence over the former when running tests, and is ignored by version
-control. (If you want to make the modifications permanent, edit the
-`phpunit.xml.dist` file.)
+For this reason, we recommend disabling `display_errors` when using the Laminas API Tools admin interface.
+This can be done using the `-ddisplay_errors=0` flag when using the built-in PHP web server, or you
+can set it in your virtual host or server definition. If you disable it, make sure you have
+reasonable error log settings in place. For the built-in PHP web server, errors will be reported in
+the console itself; otherwise, ensure you have an error log file specified in your configuration.
 
-## Using Vagrant
+`display_errors` should *never* be enabled in production, regardless.
 
-This skeleton includes a `Vagrantfile` based on ubuntu 18.04 (bento box)
-with configured Apache2 and PHP 7.3. Start it up using:
+### Vagrant
+
+If you prefer to develop with Vagrant, there is a basic vagrant recipe included with this project.
+
+This recipe assumes that you already have Vagrant installed. The virtual machine will try to use localhost:8080 by
+default, so if you already have a server on this port of your host machine, you need to shut down the conflicting
+server first, or if you know how, you can reconfigure the ports in Vagrantfile.
+
+Assuming you have Vagrant installed and assuming you have no port conflicts, you can bring up the Vagrant machine
+with the standard `up` command:
 
 ```bash
 $ vagrant up
 ```
 
-Once built, you can also run composer within the box. For example, the following
-will install dependencies:
+When the machine comes up, you can ssh to it with the standard ssh forward agent:
 
 ```bash
-$ vagrant ssh -c 'composer install'
+$ vagrant ssh
 ```
 
-While this will update them:
+The web root is inside the shared directory, which is at `/var/www`; this is
+also the home directory for the vagrant issue, which will be the initial
+directory you land in once you connect via SSH.
+
+The image installs composer during provisioning, meaning you can use it to
+install and update dependencies:
 
 ```bash
+# Install dependencies:
+$ vagrant ssh -c 'composer install'
+# Update dependencies:
 $ vagrant ssh -c 'composer update'
 ```
 
-While running, Vagrant maps your host port 8080 to port 80 on the virtual
-machine; you can visit the site at http://localhost:8080/
+You can also manipulate development mode:
 
-> ### Vagrant and VirtualBox
+```bash
+$ vagrant ssh -c 'composer development-enable'
+$ vagrant ssh -c 'composer development-disable'
+$ vagrant ssh -c 'composer development-status'
+```
+
+> #### Vagrant and VirtualBox
 >
-> The vagrant image is based on bento/ubuntu-18.04. If you are using VirtualBox as
+> The vagrant image is based on `bento/ubuntu-16.04`. If you are using VirtualBox as
 > a provider, you will need:
 >
-> - Vagrant 2.2.6 or later
-> - VirtualBox 6.0.14 or later
+> - Vagrant 1.8.5 or later
+> - VirtualBox 5.0.26 or later
 
 For vagrant documentation, please refer to [vagrantup.com](https://www.vagrantup.com/)
 
-## Using docker-compose
+### Docker
 
-This skeleton provides a `docker-compose.yml` for use with
-[docker-compose](https://docs.docker.com/compose/); it
-uses the provided `Dockerfile` to build a docker image 
-for the `laminas` container created with `docker-compose`.
+If you develop or deploy using Docker, we provide configuration for you.
 
-Build and start the image and container using:
+Prepare your development environment using [docker compose](https://docs.docker.com/compose/install/):
 
 ```bash
-$ docker-compose up -d --build
+$ git clone https://github.com/laminas-api-tools/api-tools-skeleton
+$ cd api-tools-skeleton
+$ docker-compose build
+# Install dependencies via composer, if you haven't already:
+$ docker-compose run api-tools composer install
+# Enable development mode:
+$ docker-compose run api-tools composer development-enable
 ```
 
-At this point, you can visit http://localhost:8080 to see the site running.
-
-You can also run commands such as `composer` in the container.  The container 
-environment is named "laminas" so you will pass that value to 
-`docker-compose run`:
+Start the container:
 
 ```bash
-$ docker-compose run laminas composer install
+$ docker-compose up
 ```
 
-Some composer packages optionally use additional PHP extensions.  
-The Dockerfile contains several commented-out commands 
-which enable some of the more popular php extensions. 
-For example, to install `pdo-pgsql` support for `laminas/laminas-db`
-uncomment the lines:
+Access Laminas API Tools from `http://localhost:8080/` or `http://<boot2docker ip>:8080/` if on Windows or Mac.
 
-```sh
-# RUN apt-get install --yes libpq-dev \
-#     && docker-php-ext-install pdo_pgsql
+You may also use the provided `Dockerfile` directly if desired.
+
+Once installed, you can use the container to update dependencies:
+
+```bash
+$ docker-compose run api-tools composer update
 ```
 
-then re-run the `docker-compose up -d --build` line as above.
+Or to manipulate development mode:
 
-> You may also want to combine the various `apt-get` and `docker-php-ext-*`
-> statements later to reduce the number of layers created by your image.
-
-## Web server setup
-
-### Apache setup
-
-To setup apache, setup a virtual host to point to the public/ directory of the
-project and you should be ready to go! It should look something like below:
-
-```apache
-<VirtualHost *:80>
-    ServerName laminasapp.localhost
-    DocumentRoot /path/to/laminasapp/public
-    <Directory /path/to/laminasapp/public>
-        DirectoryIndex index.php
-        AllowOverride All
-        Order allow,deny
-        Allow from all
-        <IfModule mod_authz_core.c>
-        Require all granted
-        </IfModule>
-    </Directory>
-</VirtualHost>
+```bash
+$ docker-compose run api-tools composer development-enable
+$ docker-compose run api-tools composer development-disable
+$ docker-compose run api-tools composer development-status
 ```
 
-### Nginx setup
+QA Tools
+--------
 
-To setup nginx, open your `/path/to/nginx/nginx.conf` and add an
-[include directive](http://nginx.org/en/docs/ngx_core_module.html#include) below
-into `http` block if it does not already exist:
-
-```nginx
-http {
-    # ...
-    include sites-enabled/*.conf;
-}
-```
-
-
-Create a virtual host configuration file for your project under `/path/to/nginx/sites-enabled/laminasapp.localhost.conf`
-it should look something like below:
-
-```nginx
-server {
-    listen       80;
-    server_name  laminasapp.localhost;
-    root         /path/to/laminasapp/public;
-
-    location / {
-        index index.php;
-        try_files $uri $uri/ @php;
-    }
-
-    location @php {
-        # Pass the PHP requests to FastCGI server (php-fpm) on 127.0.0.1:9000
-        fastcgi_pass   127.0.0.1:9000;
-        fastcgi_param  SCRIPT_FILENAME /path/to/laminasapp/public/index.php;
-        include fastcgi_params;
-    }
-}
-```
-
-Restart the nginx, now you should be ready to go!
-
-## QA Tools
-
-The skeleton does not come with any QA tooling by default, but does ship with
-configuration for each of:
-
-- [phpcs](https://github.com/squizlabs/php_codesniffer)
-- [phpunit](https://phpunit.de)
-
-Additionally, it comes with some basic tests for the shipped
+The skeleton ships with minimal QA tooling by default, including
+laminas/laminas-test. We supply basic tests for the shipped
 `Application\Controller\IndexController`.
 
-If you want to add these QA tools, execute the following:
+We also ship with configuration for [phpcs](https://github.com/squizlabs/php_codesniffer).
+If you wish to add this QA tool, execute the following:
 
 ```bash
-$ composer require --dev phpunit/phpunit squizlabs/php_codesniffer laminas/laminas-test
+$ composer require --dev squizlabs/php_codesniffer
 ```
 
 We provide aliases for each of these tools in the Composer configuration:

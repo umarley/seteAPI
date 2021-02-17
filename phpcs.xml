@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="Laminas Coding Standard">
-    <description>Laminas Coding Standard</description>
+<ruleset name="Laminas coding standard">
+    <description>Laminas coding standard</description>
 
     <!-- display progress -->
     <arg value="p"/>
@@ -8,7 +8,7 @@
     <arg name="extensions" value="php,dist,phtml"/>
 
     <!-- inherit rules from: -->
-    <rule ref="PSR12"/>
+    <rule ref="PSR2"/>
     <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.Formatting.SpaceAfterNot"/>
     <rule ref="Squiz.WhiteSpace.OperatorSpacing">
@@ -29,4 +29,5 @@
     <file>config</file>
     <file>module</file>
     <file>public/index.php</file>
+    <file>src</file>
 </ruleset>
