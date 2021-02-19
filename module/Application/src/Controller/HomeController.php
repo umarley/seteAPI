@@ -33,6 +33,9 @@ class HomeController extends AbstractActionController {
         ]);
         $client->authorize();
         $arAccessToken = $client->fetchAccessTokenWithAssertion();
+        
+        var_dump($arAccessToken);
+        
         $accessToken = $arAccessToken['access_token'];
         //https://firebase.google.com/docs/firestore/use-rest-api?hl=pt
         $url = "https://firestore.googleapis.com/v1/projects/softwareter/databases/(default)/documents/config";

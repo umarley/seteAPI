@@ -32,6 +32,9 @@ class API extends AbstractResourceListener {
     }
 
     public function populaResposta($codigoStatus, $arResposta) {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
         header('Content-Type: application/json', true, $codigoStatus);
         $arResult['data'] = $arResposta;
         $arResult['total'] = count($arResposta);
