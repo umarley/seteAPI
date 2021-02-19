@@ -4,6 +4,7 @@ return [
         'factories' => [
             \Sete\V1\Rest\User\UserResource::class => \Sete\V1\Rest\User\UserResourceFactory::class,
             \Sete\V1\Rest\Authenticator\AuthenticatorResource::class => \Sete\V1\Rest\Authenticator\AuthenticatorResourceFactory::class,
+            \Sete\V1\Rest\Municipios\MunicipiosResource::class => \Sete\V1\Rest\Municipios\MunicipiosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -26,12 +27,22 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.municipios' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/municipios[/:municipios_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Municipios\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
         'uri' => [
             0 => 'sete.rest.user',
             1 => 'sete.rest.authenticator',
+            2 => 'sete.rest.municipios',
         ],
     ],
     'api-tools-rest' => [
@@ -74,11 +85,30 @@ return [
             'collection_class' => \Sete\V1\Rest\Authenticator\AuthenticatorCollection::class,
             'service_name' => 'Authenticator',
         ],
+        'Sete\\V1\\Rest\\Municipios\\Controller' => [
+            'listener' => \Sete\V1\Rest\Municipios\MunicipiosResource::class,
+            'route_name' => 'sete.rest.municipios',
+            'route_identifier_name' => 'municipios_id',
+            'collection_name' => 'municipios',
+            'entity_http_methods' => [
+                0 => 'GET',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Municipios\MunicipiosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Municipios\MunicipiosCollection::class,
+            'service_name' => 'Municipios',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
             'Sete\\V1\\Rest\\User\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Authenticator\\Controller' => 'Json',
+            'Sete\\V1\\Rest\\Municipios\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -91,6 +121,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Municipios\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -98,6 +133,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Authenticator\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Municipios\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -127,6 +166,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.authenticator',
                 'route_identifier_name' => 'authenticator_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Municipios\MunicipiosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.municipios',
+                'route_identifier_name' => 'municipios_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\Municipios\MunicipiosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.municipios',
+                'route_identifier_name' => 'municipios_id',
                 'is_collection' => true,
             ],
         ],

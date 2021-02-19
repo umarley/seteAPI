@@ -1,27 +1,26 @@
 <?php
-
-namespace Sete\V1\Rest\Authenticator;
+namespace Sete\V1\Rest\Municipios;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
-class AuthenticatorResource extends AbstractResourceListener{
-
+class MunicipiosResource extends \Sete\V1\API
+{
+    
     public function __construct() {
-        $this->_model = new AuthenticatorModel();
+        parent::__construct();
+        $this->_model = new MunicipiosModel();
     }
-
+    
     /**
      * Create a resource
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function create($data) {
-        $conteudo = file_get_contents("php://input");
-        $arPost = json_decode($conteudo, true);
-        $arResult = $this->_model->autenticarUsuario($arPost);
-        return $arResult;
+    public function create($data)
+    {
+        return new ApiProblem(405, 'The POST method has not been defined');
     }
 
     /**
@@ -30,7 +29,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id) {
+    public function delete($id)
+    {
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -40,7 +40,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function deleteList($data) {
+    public function deleteList($data)
+    {
         return new ApiProblem(405, 'The DELETE method has not been defined for collections');
     }
 
@@ -50,9 +51,9 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id) {
-        
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+    public function fetch($id)
+    {
+        return $this->_model->getById($id);
     }
 
     /**
@@ -61,23 +62,9 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = []) {
-        $headers = apache_request_headers();
-        if(key_exists('Authorization', $headers)){
-            $accessToken = $headers['Authorization'];
-            if(!empty($accessToken)){
-                $valido = $this->_model->validarAccessToken($accessToken);
-                if($valido){
-                    return ['result' => true, 'messages' => 'Access Token válido!'];
-                }else{
-                    return ['result' => false, 'messages' => 'Access Token inválido!'];
-                }
-            }else{
-                return new ApiProblem(406, 'Cabeçalho Authorization vazio.');
-            }
-        }else{
-            return new ApiProblem(406, 'Cabeçalho Authorization ausente.');
-        }
+    public function fetchAll($params = [])
+    {
+        $this->populaResposta(200, $this->_model->getAll());
     }
 
     /**
@@ -87,7 +74,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patch($id, $data) {
+    public function patch($id, $data)
+    {
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
@@ -97,7 +85,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patchList($data) {
+    public function patchList($data)
+    {
         return new ApiProblem(405, 'The PATCH method has not been defined for collections');
     }
 
@@ -107,7 +96,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function replaceList($data) {
+    public function replaceList($data)
+    {
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -118,8 +108,8 @@ class AuthenticatorResource extends AbstractResourceListener{
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data) {
+    public function update($id, $data)
+    {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
-
 }
