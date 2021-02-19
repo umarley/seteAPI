@@ -23,17 +23,20 @@ CREATE TABLE IF NOT EXISTS `access_token` (
   CONSTRAINT `FK_ACCESS_TOKEN_USUARIO` FOREIGN KEY (`id_usuario`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Copiando dados para a tabela sete.access_token: ~8 rows (aproximadamente)
+-- Copiando dados para a tabela sete.access_token: ~10 rows (aproximadamente)
 /*!40000 ALTER TABLE `access_token` DISABLE KEYS */;
 INSERT INTO `access_token` (`access_token`, `id_usuario`, `expires`, `dt_criacao`) VALUES
 	('075d4a51de9153f8caaf2f209a97f777101537e1-web@sete.com.br', 1, 10800, '2021-02-17 21:28:29'),
 	('119d60c9cada5743faed6df2ff72512c6f579bd7-web@sete.com.br', 1, 10800, '2021-02-17 21:25:27'),
 	('1dae1540aa449fb3a7a0faa8935b09064fc8e313-web@sete.com.br', 1, 10800, '2021-02-17 21:31:51'),
 	('2d3a79917740293d32cbe40f94f1826940dcaf0b-web@sete.com.br', 1, 10800, '2021-02-17 21:18:44'),
+	('2fced0ebf7120d6c63844d422e3217cc1d221933-web@sete.com.br', 1, 10800, '2021-02-17 20:29:02'),
 	('352d8554d7e11cb3d86822ff2a21cb3d572933d3-web@sete.com.br', 1, 10800, '2021-02-17 21:28:22'),
 	('3fcfcfdf3f2256bd81eb470a3e134e5162f0d8c3-web@sete.com.br', 1, 10800, '2021-02-17 21:19:08'),
 	('5b6d79a58de0558ac79b4b6c09dd571e57cb2ea9-web@sete.com.br', 1, 10800, '2021-02-17 21:24:41'),
-	('768795aa779a125903487ac48a78bc3d7b094714-web@sete.com.br', 1, 10800, '2021-02-17 21:25:58');
+	('768795aa779a125903487ac48a78bc3d7b094714-web@sete.com.br', 1, 10800, '2021-02-17 21:25:58'),
+	('b1770be1d0187eae537de68697a4df4e9d07f63f-web@sete.com.br', 1, 10800, '2021-02-17 20:49:56'),
+	('bc26e09c8219f79ee0c5fe68635ebba63bff601e-web@sete.com.br', 1, 10800, '2021-02-19 20:10:20');
 /*!40000 ALTER TABLE `access_token` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela sete.cidades_usando_sistema
@@ -45,6 +48,27 @@ CREATE TABLE IF NOT EXISTS `cidades_usando_sistema` (
 
 -- Copiando dados para a tabela sete.cidades_usando_sistema: ~0 rows (aproximadamente)
 /*!40000 ALTER TABLE `cidades_usando_sistema` DISABLE KEYS */;
+INSERT INTO `cidades_usando_sistema` (`codigo_ibge`) VALUES
+	(1301209),
+	(1501303),
+	(2105302),
+	(2109007),
+	(2205201),
+	(2205508),
+	(2205706),
+	(2305654),
+	(2307601),
+	(2308500),
+	(2406007),
+	(2504009),
+	(2512077),
+	(2604403),
+	(2605806),
+	(2607208),
+	(2607752),
+	(2613701),
+	(2701001),
+	(2911808);
 /*!40000 ALTER TABLE `cidades_usando_sistema` ENABLE KEYS */;
 
 -- Copiando estrutura para tabela sete.escolas
