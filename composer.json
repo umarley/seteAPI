@@ -25,6 +25,7 @@
     "require": {
         "php": "^5.6 || ^7.0",
         "google/apiclient": "^2.7",
+        "google/cloud-firestore": "^1.19",
         "google/protobuf": "^v3.3.0",
         "kreait/firebase-php": "4.15.0",
         "ktamas77/firebase-php": "^3.0",

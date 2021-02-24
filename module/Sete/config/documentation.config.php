@@ -1,5 +1,4 @@
 <?php
-
 return [
     'Sete\\V1\\Rest\\Authenticator\\Controller' => [
         'description' => 'Serviço de autenticação',
@@ -40,5 +39,11 @@ curl -X GET --header \'access_token: 2d3a79917740293d32cbe40f94f1826940dcaf0b-we
 O Access Token deve ser enviado no Header da solicitação:
 curl -X GET --header \'access_token: 2d3a79917740293d32cbe40f94f1826940dcaf0b-web@sete.com.br\' \'http://<url_api>/authenticator\'":',
         ],
+    ],
+    'Sete\\V1\\Rest\\Municipios\\Controller' => [
+        'description' => 'Listagem dos municípios que usam o sistema',
+    ],
+    'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => [
+        'description' => 'Consulta e seta permissões na coleção config do Firestore',
     ],
 ];

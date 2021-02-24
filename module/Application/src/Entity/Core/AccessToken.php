@@ -11,7 +11,7 @@ class AccessToken extends AbstractDatabase {
     const EXPIRES_ACCESS_TOKEN = 10800; //3 horas
 
     public function __construct() {
-        $this->table = 'access_token';
+        $this->table = 'api_access_token';
         $this->primaryKey = 'access_token';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }

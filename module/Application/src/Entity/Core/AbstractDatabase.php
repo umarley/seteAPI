@@ -87,6 +87,22 @@ class AbstractDatabase extends TableGateway {
         return ['result' => $bool, 'messages' => $message];
     }
 
+    public function _truncate() {
+        $sql = "TRUNCATE TABLE {$this->table}";
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $boResultado = true;
+            $message = "Tabela truncada com sucesso!";
+        } catch (\PDOException $zAdapterEx) {
+            $boResultado = false;
+            $message = "Falha ao truncar tabela {$this->table}. <br />" . $zAdapterEx->getMessage();
+        } catch (\Laminas\Db\Adapter\Exception\InvalidQueryException $zendDbExc) {
+            $boResultado = false;
+            $message = "Falha ao trucar tabela {$this->table}. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
+        }
+        return ['result' => $boResultado, 'messages' => $message];
+    }
+
     public function _atualizar($id, $dados) {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);

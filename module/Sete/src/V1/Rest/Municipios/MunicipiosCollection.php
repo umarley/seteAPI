@@ -5,4 +5,6 @@ use Laminas\Paginator\Paginator;
 
 class MunicipiosCollection extends Paginator
 {
+    
+    
 }

@@ -16,7 +16,7 @@ class API extends AbstractResourceListener {
             if (!empty($accessToken)) {
                 $dbModelAuthenticator = new Rest\Authenticator\AuthenticatorModel();
                 $valido = $dbModelAuthenticator->validarAccessToken($accessToken);
-                if (!$valido){
+                if (!$valido) {
                     header('Content-Type: application/json', true, 401);
                     echo json_encode(['result' => false, 'messages' => 'Access Token inválido!']);
                     exit;
@@ -26,18 +26,24 @@ class API extends AbstractResourceListener {
                 echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization vazio!']);
             }
         } else {
-                header('Content-Type: application/json', true, 400);
+            header('Content-Type: application/json', true, 400);
             echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization ausente!']);
         }
     }
 
-    public function populaResposta($codigoStatus, $arResposta) {
+    public function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
         header('Content-Type: application/json', true, $codigoStatus);
-        $arResult['data'] = $arResposta;
-        $arResult['total'] = count($arResposta);
+
+        if ($retornaLista) {
+            $arResult['data'] = $arResposta;
+            $arResult['total'] = count($arResposta);
+        }else{
+            $arResult = $arResposta;
+        }
+
         echo json_encode($arResult);
         exit;
     }

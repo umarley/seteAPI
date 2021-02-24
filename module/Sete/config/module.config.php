@@ -5,6 +5,7 @@ return [
             \Sete\V1\Rest\User\UserResource::class => \Sete\V1\Rest\User\UserResourceFactory::class,
             \Sete\V1\Rest\Authenticator\AuthenticatorResource::class => \Sete\V1\Rest\Authenticator\AuthenticatorResourceFactory::class,
             \Sete\V1\Rest\Municipios\MunicipiosResource::class => \Sete\V1\Rest\Municipios\MunicipiosResourceFactory::class,
+            \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResource::class => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResourceFactory::class,
         ],
     ],
     'router' => [
@@ -12,7 +13,7 @@ return [
             'sete.rest.user' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/user[/:user_id]',
+                    'route' => '/user[/:user_type][/:user_id]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\User\\Controller',
                     ],
@@ -36,6 +37,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.permissao-firebase' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/permissao-firebase[/:permissao_firebase_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\PermissaoFirebase\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -43,6 +53,7 @@ return [
             0 => 'sete.rest.user',
             1 => 'sete.rest.authenticator',
             2 => 'sete.rest.municipios',
+            3 => 'sete.rest.permissao-firebase',
         ],
     ],
     'api-tools-rest' => [
@@ -53,13 +64,9 @@ return [
             'collection_name' => 'user',
             'entity_http_methods' => [
                 0 => 'GET',
-                1 => 'PATCH',
-                2 => 'PUT',
-                3 => 'DELETE',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
-                1 => 'POST',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -103,12 +110,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Municipios\MunicipiosCollection::class,
             'service_name' => 'Municipios',
         ],
+        'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => [
+            'listener' => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResource::class,
+            'route_name' => 'sete.rest.permissao-firebase',
+            'route_identifier_name' => 'permissao_firebase_id',
+            'collection_name' => 'permissao_firebase',
+            'entity_http_methods' => [],
+            'collection_http_methods' => [
+                0 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseEntity::class,
+            'collection_class' => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseCollection::class,
+            'service_name' => 'PermissaoFirebase',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
-            'Sete\\V1\\Rest\\User\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\User\\Controller' => 'Json',
             'Sete\\V1\\Rest\\Authenticator\\Controller' => 'Json',
             'Sete\\V1\\Rest\\Municipios\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -122,6 +146,11 @@ return [
                 2 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Municipios\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/hal+json',
                 2 => 'application/json',
@@ -140,18 +169,22 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
         ],
     ],
     'api-tools-hal' => [
         'metadata_map' => [
             \Sete\V1\Rest\User\UserEntity::class => [
-                'entity_identifier_name' => 'id',
+                'entity_identifier_name' => 'type, id',
                 'route_name' => 'sete.rest.user',
                 'route_identifier_name' => 'user_id',
                 'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
             ],
             \Sete\V1\Rest\User\UserCollection::class => [
-                'entity_identifier_name' => 'id',
+                'entity_identifier_name' => 'type, id',
                 'route_name' => 'sete.rest.user',
                 'route_identifier_name' => 'user_id',
                 'is_collection' => true,
@@ -178,6 +211,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.municipios',
                 'route_identifier_name' => 'municipios_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.permissao-firebase',
+                'route_identifier_name' => 'permissao_firebase_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.permissao-firebase',
+                'route_identifier_name' => 'permissao_firebase_id',
                 'is_collection' => true,
             ],
         ],

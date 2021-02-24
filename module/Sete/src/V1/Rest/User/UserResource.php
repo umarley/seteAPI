@@ -1,23 +1,29 @@
 <?php
+
 namespace Sete\V1\Rest\User;
 
+use Sete\V1\API;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
-class UserResource extends AbstractResourceListener
-{
+class UserResource extends API {
+
     /**
      * Create a resource
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function create($data)
-    {
-         echo 'Umarley';
-         
-         exit;
-       // return new ApiProblem(405, 'The POST method has not been defined');
+    public function create($data) {
+
+        $rota = $this->event->getRouteMatch();
+        $params = $rota->getParams();
+
+        var_dump($params);
+        echo 'Umarley';
+
+        exit;
+        // return new ApiProblem(405, 'The POST method has not been defined');
     }
 
     /**
@@ -26,8 +32,7 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id)
-    {
+    public function delete($id) {
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -37,8 +42,7 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function deleteList($data)
-    {
+    public function deleteList($data) {
         return new ApiProblem(405, 'The DELETE method has not been defined for collections');
     }
 
@@ -48,8 +52,18 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id)
-    {
+    public function fetch($id) {
+
+        $rota = $this->event->getRouteMatch();
+        $paramsUri = $rota->getParams();
+        $paramsQuery = $this->event->getQueryParams();
+
+        var_dump($id);
+        var_dump($paramsUri);
+        var_dump($paramsQuery);
+        
+        echo "Email: " . $paramsQuery['email'];
+        exit;
         return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
@@ -59,8 +73,8 @@ class UserResource extends AbstractResourceListener
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = [])
-    {
+    public function fetchAll($params = []) {
+
         return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
@@ -71,8 +85,7 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patch($id, $data)
-    {
+    public function patch($id, $data) {
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
@@ -82,8 +95,7 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patchList($data)
-    {
+    public function patchList($data) {
         return new ApiProblem(405, 'The PATCH method has not been defined for collections');
     }
 
@@ -93,8 +105,7 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function replaceList($data)
-    {
+    public function replaceList($data) {
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -105,8 +116,8 @@ class UserResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data)
-    {
+    public function update($id, $data) {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
+
 }

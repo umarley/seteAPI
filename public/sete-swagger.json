@@ -1,0 +1,317 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API SETE Web.\n",
+    "version": "1.0.0",
+    "title": "API SETE",
+    "contact": {
+      "email": "umarley.faria@ufg.br"
+    }
+  },
+  "host": "sete.api",
+  "tags": [
+    {
+      "name": "Authenticator",
+      "description": "Serviço de autenticação da API"
+    },
+    {
+      "name": "Municipios",
+      "description": "Municipios que usam o SETE"
+    },
+    {
+      "name": "Permissão Firebase",
+      "description": "Operações para permissão de usuários do firebase"
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/authenticator": {
+      "get": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Checar se o access token é válido",
+        "description": "Esse endpoinbt retorna se o access token é válido ou não.",
+        "operationId": "findPetsByStatus",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RetAuthGET"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Authenticator"
+        ],
+        "summary": "Efetuar login na API enviando usuário e senha",
+        "operationId": "Efetuar login",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto contendo usuário e senha",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/auth"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RetAuth"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          },
+          "405": {
+            "description": "Invalid input"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
+    },
+    "/municipios": {
+      "get": {
+        "tags": [
+          "Municipios"
+        ],
+        "summary": "Lista os municipios que utilizam o SETE DESKTOP",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/municipios/{codigo_ibge}": {
+      "get": {
+        "tags": [
+          "Municipios"
+        ],
+        "summary": "Obtém dados do municipio pelo código IBGE.",
+        "operationId": "getByCodigoIBGE",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "codigo_ibge",
+            "in": "path",
+            "description": "Código IBGE do municipio.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/MunicipioList"
+            }
+          },
+          "404": {
+            "description": "Municipio not found"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
+    },
+    "/permissao-firebase": {
+      "post": {
+        "tags": [
+          "Permissão Firebase"
+        ],
+        "summary": "Libera a permissão de um usuário para o municipio em que o mesmo se cadastrou.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto contendo os dados do modelo PermissaoFirebase",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/PermissaoFirebase"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "auth": {
+      "type": "object",
+      "properties": {
+        "usuario": {
+          "type": "string"
+        },
+        "senha": {
+          "type": "string",
+          "format": "md5"
+        }
+      }
+    },
+    "RetAuth": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "$ref": "#/definitions/RetAuth_access_token"
+        },
+        "messages": {
+          "type": "string"
+        }
+      }
+    },
+    "RetAuthGET": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "boolean"
+        },
+        "messages": {
+          "type": "string"
+        }
+      }
+    },
+    "MunicipioList": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MunicipioList_data"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "PermissaoFirebase": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "tipo_permissao": {
+          "type": "string",
+          "description": "admin - Usuário administrador  reader - Usuário somente leitura \n",
+          "enum": [
+            "admin",
+            "reader"
+          ]
+        }
+      }
+    },
+    "RetAuth_access_token": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "expires_in": {
+          "type": "integer"
+        }
+      }
+    },
+    "MunicipioList_data": {
+      "type": "object",
+      "properties": {
+        "codigo_municipio": {
+          "type": "string"
+        },
+        "nome_cidade": {
+          "type": "string"
+        },
+        "latitude": {
+          "type": "string"
+        },
+        "longitude": {
+          "type": "string"
+        },
+        "codigo_ibge": {
+          "type": "string"
+        },
+        "nome_estado": {
+          "type": "string"
+        },
+        "uf": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
