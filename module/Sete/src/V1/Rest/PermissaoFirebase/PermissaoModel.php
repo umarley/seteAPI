@@ -46,11 +46,10 @@ class PermissaoModel {
             $codigoCidade = $findEmail[$uidUsuario]['COD_CIDADE'];
             $documentoFirestore = $dbModelFirebase->getDocumentoByIdConfig($codigoCidade);
             if (!$documentoFirestore) {
-                $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados);
+                return $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados);
             } else {
-                $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore);
+                return $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore);
             }
-            return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Email não encontrado no firestore!"], 'codeHTTP' => 404];
         }
@@ -61,7 +60,8 @@ class PermissaoModel {
         if (!in_array($uidUsuario, $documentoFirestore['users'])) {
             ($arRequisicao->tipo_permissao === 'admin') ? array_push($documentoFirestore['admin'], $uidUsuario) : array_push($documentoFirestore['readers'], $uidUsuario);
             array_push($documentoFirestore['users'], $uidUsuario);
-            $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $documentoFirestore);
+            $dbModelFirebase->setDocumentoColecaoConfig($arUsuarioFirestore[$uidUsuario]['COD_CIDADE'], $documentoFirestore);
+            return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Usuário já com o acesso liberado!"], 'codeHTTP' => 200];
         }
@@ -78,6 +78,7 @@ class PermissaoModel {
         ($arRequisicao->tipo_permissao === 'admin') ? array_push($arNovoDocumento['admin'], $uidUsuario) : array_push($arNovoDocumento['readers'], $uidUsuario);
         array_push($arNovoDocumento['users'], $uidUsuario);
         $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $arNovoDocumento);
+        return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
     }
 
 }
