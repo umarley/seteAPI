@@ -13,11 +13,11 @@ class PermissaoModel {
     }
 
     public function getAll() {
-        return $this->_entity->getLista();
+        return [];
     }
 
     public function getById($codigo) {
-        return $this->_entity->getByCodigoIBGE($codigo);
+        return [];
     }
 
     public function validarPOST($arDados) {
@@ -48,13 +48,22 @@ class PermissaoModel {
             if (!$documentoFirestore) {
                 $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados);
             } else {
-                ($arDados->tipo_permissao === 'admin') ? array_push($documentoFirestore['admin'], $uidUsuario) : array_push($documentoFirestore['readers'], $uidUsuario);
-                array_push($documentoFirestore['users'], $uidUsuario);
-                $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $documentoFirestore);
+                $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore);
             }
             return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Email não encontrado no firestore!"], 'codeHTTP' => 404];
+        }
+    }
+
+    private function liberarUsuarioFirebaseColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao, $documentoFirestore) {
+        $uidUsuario = key($arUsuarioFirestore);
+        if (!in_array($uidUsuario, $documentoFirestore['users'])) {
+            ($arRequisicao->tipo_permissao === 'admin') ? array_push($documentoFirestore['admin'], $uidUsuario) : array_push($documentoFirestore['readers'], $uidUsuario);
+            array_push($documentoFirestore['users'], $uidUsuario);
+            $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $documentoFirestore);
+        } else {
+            return ['resposta' => ['result' => false, 'messages' => "Usuário já com o acesso liberado!"], 'codeHTTP' => 200];
         }
     }
 
@@ -66,7 +75,6 @@ class PermissaoModel {
             'readers' => [],
             'users' => []
         ];
-
         ($arRequisicao->tipo_permissao === 'admin') ? array_push($arNovoDocumento['admin'], $uidUsuario) : array_push($arNovoDocumento['readers'], $uidUsuario);
         array_push($arNovoDocumento['users'], $uidUsuario);
         $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $arNovoDocumento);
