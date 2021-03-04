@@ -17,15 +17,18 @@ class API extends AbstractResourceListener {
                 $dbModelAuthenticator = new Rest\Authenticator\AuthenticatorModel();
                 $valido = $dbModelAuthenticator->validarAccessToken($accessToken);
                 if (!$valido) {
+                    header('Access-Control-Allow-Origin: *');
                     header('Content-Type: application/json', true, 401);
                     echo json_encode(['result' => false, 'messages' => 'Access Token inválido!']);
                     exit;
                 }
             } else {
+                header('Access-Control-Allow-Origin: *');
                 header('Content-Type: application/json', true, 400);
                 echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization vazio!']);
             }
         } else {
+            header('Access-Control-Allow-Origin: *');
             header('Content-Type: application/json', true, 400);
             echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization ausente!']);
         }
