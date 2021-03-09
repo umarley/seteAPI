@@ -48,7 +48,7 @@ class API extends AbstractResourceListener {
         }
         
         if($codigoStatus !== 404){
-            $arResult['result'] = true;
+            $arResult['result'] = $arResposta['result'];
         }else{
             $arResult['result'] = false;
         }
