@@ -46,6 +46,12 @@ class API extends AbstractResourceListener {
         }else{
             $arResult = $arResposta;
         }
+        
+        if($codigoStatus !== 404){
+            $arResult['result'] = true;
+        }else{
+            $arResult['result'] = false;
+        }
 
         echo json_encode($arResult);
         exit;

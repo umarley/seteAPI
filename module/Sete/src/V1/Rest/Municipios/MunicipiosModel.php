@@ -10,7 +10,8 @@ class MunicipiosModel {
     }
     
     public function getAll(){
-        return $this->_entity->getLista();
+        $arDados = $this->_entity->getLista();
+        return $arDados;
     }
     
     public function getById($codigo){
