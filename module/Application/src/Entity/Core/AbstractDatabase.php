@@ -86,6 +86,22 @@ class AbstractDatabase extends TableGateway {
         }
         return ['result' => $bool, 'messages' => $message];
     }
+    
+    public function _deleteAll() {
+        $sql = "DELETE FROM {$this->table}";
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $boResultado = true;
+            $message = "Dados excluidos com sucesso!";
+        } catch (\PDOException $zAdapterEx) {
+            $boResultado = false;
+            $message = "Falha ao excluir registros tabela {$this->table}. <br />" . $zAdapterEx->getMessage();
+        } catch (\Laminas\Db\Adapter\Exception\InvalidQueryException $zendDbExc) {
+            $boResultado = false;
+            $message = "Falha ao excluir registros tabela {$this->table}. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
+        }
+        return ['result' => $boResultado, 'messages' => $message];
+    }
 
     public function _truncate() {
         $sql = "TRUNCATE TABLE {$this->table}";

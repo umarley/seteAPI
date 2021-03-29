@@ -68,6 +68,149 @@ class FirebaseModel {
         return $arLista;
     }
 
+    public function getAlunosMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('alunos')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getEscolasMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('escolas')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getEscolasTemAluno($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('escolatemalunos')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getGaragens($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('garagem')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getMotoristas($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('motoristas')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getRotasMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('rotas')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getVeiculosMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('veiculos')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getRotasAtendeAlunoMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('rotaatendealuno')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
+    public function getRotasDirigidaPorMotoristaMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('rotadirigidapormotorista')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+    
+    public function getRotasPassaPorEscolaMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('rotapassaporescolas')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+    
+        public function getRotasPossuiVeiculoMunicipio($codigoMunicipio) {
+        $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
+                        ->collection('rotapossuiveiculo')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
+        }
+        return $arLista;
+    }
+
     /**
      * Busca os documentos na coleção config e os insere na tabela firebase_config 
      * @return Array com a lista de documentos dentro da coleção config
