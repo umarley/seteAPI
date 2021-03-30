@@ -23,8 +23,11 @@ class MunicipiosModel {
         $arData['data'] = [
             'n_escolas' => $dbSeteEscolas->qtdEscolasAtendidas($codigo),
             'n_alunos' => $dbSeteAlunos->qtdAlunosAtendidos($codigo),
-            'n_veiculos' => $dbSeteVeiculos->qtdVeiculos($codigo),
-            'n_rotas' => $dbSeteRotas->qtdRotas($codigo)
+            'n_veiculos_funcionamento' => $dbSeteVeiculos->qtdVeiculosFuncionando($codigo),
+            'n_veiculos_manutencao' => $dbSeteVeiculos->qtdVeiculosManutencao($codigo),
+            'n_rotas' => $dbSeteRotas->qtdRotas($codigo),
+            'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($codigo),
+            'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($codigo)
         ];
         return $arData;
     }

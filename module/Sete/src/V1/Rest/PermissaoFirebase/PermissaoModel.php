@@ -80,5 +80,21 @@ class PermissaoModel {
         $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $arNovoDocumento);
         return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
     }
+    
+    public function getUsuariosLiberar($pagina){
+        $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
+        $qtdPerPage = 50;
+        $totalRegistros = $dbSeteUsuario->getTotalUsuariosPendentesLiberacao();
+        $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
+        $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
+        $arData = $dbSeteUsuario->getUsuariosPendentesLiberacao($offset, $qtdPerPage);
+        return [
+            'qtd_registros' => $totalRegistros, 
+            'pages' => $qtdPaginas, 
+            'reg_por_pagina' => $qtdPerPage,
+            'pg_atual' => $pagina, 
+            'registros' => $arData
+          ];
+    }
 
 }

@@ -11,12 +11,6 @@ class PermissaoFirebaseResource extends \Sete\V1\API
         $this->_model = new \Sete\V1\Rest\PermissaoFirebase\PermissaoModel();
     }
     
-    /**
-     * Create a resource
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function create($data)
     {
         $boValidate = $this->_model->validarPOST($data);
@@ -28,91 +22,48 @@ class PermissaoFirebaseResource extends \Sete\V1\API
         }
     }
 
-    /**
-     * Delete a resource
-     *
-     * @param  mixed $id
-     * @return ApiProblem|mixed
-     */
     public function delete($id)
     {
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
-    /**
-     * Delete a collection, or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function deleteList($data)
     {
         return new ApiProblem(405, 'The DELETE method has not been defined for collections');
     }
 
-    /**
-     * Fetch a resource
-     *
-     * @param  mixed $id
-     * @return ApiProblem|mixed
-     */
     public function fetch($id)
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+    {        
+        $rota = $this->getEvent()->getParams();
+        switch ($rota['id']){
+            case 'usuarios-liberar':
+                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
+                $arResult = $this->_model->getUsuariosLiberar($pagina);
+                break;
+        }
+        $this->populaResposta(200, $arResult, false);
     }
 
-    /**
-     * Fetch all or a subset of resources
-     *
-     * @param  array $params
-     * @return ApiProblem|mixed
-     */
     public function fetchAll($params = [])
     {                
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+       return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
-    /**
-     * Patch (partial in-place update) a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function patch($id, $data)
     {
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
-    /**
-     * Patch (partial in-place update) a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function patchList($data)
     {
         return new ApiProblem(405, 'The PATCH method has not been defined for collections');
     }
 
-    /**
-     * Replace a collection or members of a collection
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function replaceList($data)
     {
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
-    /**
-     * Update a resource
-     *
-     * @param  mixed $id
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function update($id, $data)
     {
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');

@@ -29,7 +29,7 @@ class FirebaseModel {
         return $arDocumentos;
     }
 
-    private function getDocumentosConfig() {
+    public function getDocumentosConfig() {
         $configRefs = $this->_db->collection('config')->documents();
         $arLista = [];
         foreach ($configRefs as $row) {
@@ -64,6 +64,18 @@ class FirebaseModel {
         $arLista = [];
         foreach ($configRefs as $row) {
             $arLista[] = $row->id();
+        }
+        return $arLista;
+    }
+    
+    public function getUsersFirebase() {
+        $configRefs = $this->_db->collection('users')->documents();
+        $arLista = [];
+        $auxiliar = 0;
+        foreach ($configRefs as $row) {
+            $arLista[$auxiliar] = $row->data();
+            $arLista[$auxiliar]['id_firebase'] = $row->id();
+            $auxiliar++;
         }
         return $arLista;
     }

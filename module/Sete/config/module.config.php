@@ -13,7 +13,7 @@ return [
             'sete.rest.user' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/user[/:user_type][/:user_id]',
+                    'route' => '/user[/:user_type[/:user_id]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\User\\Controller',
                     ],
@@ -115,7 +115,9 @@ return [
             'route_name' => 'sete.rest.permissao-firebase',
             'route_identifier_name' => 'permissao_firebase_id',
             'collection_name' => 'permissao_firebase',
-            'entity_http_methods' => [],
+            'entity_http_methods' => [
+                0 => 'GET',
+            ],
             'collection_http_methods' => [
                 0 => 'POST',
             ],

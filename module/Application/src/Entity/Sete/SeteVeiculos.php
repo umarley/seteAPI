@@ -27,11 +27,23 @@ class SeteVeiculos extends AbstractDatabase {
     }
     
     
-     public function qtdVeiculos($municipio){
+     public function qtdVeiculosFuncionando($municipio){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = {$municipio}");
+                ->where("codigo_cidade = {$municipio}")
+                ->where("manutencao = 'N'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }  
+    
+    public function qtdVeiculosManutencao($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("codigo_cidade = {$municipio}")
+                ->where("manutencao = 'S'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];

@@ -34,7 +34,27 @@ class SeteRotas extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    }  
+    }
+    
+    public function qtdRotasKilometragemTotal($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("sum(km)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
+    public function qtdRotasKilometragemMedia($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("avg(km)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
     
     
     

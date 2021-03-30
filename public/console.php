@@ -52,28 +52,64 @@ if (@$_SERVER['SERVER_ADDR'] !== '10.10.50.41') {
     define('AMBIENTE_EXEC', AMBIENTE_PRODUCAO);
 }
 
-//define('PATCH_SERVIDOR', 'C:/xampp/htdocs/enrico/gestao/');
-define('URL_PORTAL', 'http://www.odontobusca.com.br');
-define('URL_NOVO_PAGAMENTO', 'http://cadastro.odontobusca.com.br/cadastro-especialista/novo-pagamento');
-define('PATCH_SERVIDOR', '/var/www/odonto-busca/');
-define('PROCESSA_PAGAMENTOS', 'PROCESSAPGTOMP');
-
-/*
-  // Retrieve configuration
-  $appConfig = require __DIR__ . '/../config/application.config.php';
-  if (file_exists(__DIR__ . '/../config/development.config.php')) {
-  $appConfig = ArrayUtils::merge($appConfig, require __DIR__ . '/../config/development.config.php');
-  }
-
-  // Run the application!
-  //Application::init($appConfig); */
-
 //Início do serviço
 //sleep(60);
 mainLoadData();
 
 function mainLoadData() {
-    //populaListaMunicipios();
+    $dbCoreCargaDados = new \Db\Core\CargaDados();
+    if($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_MUNICIPIOS)){
+        cargaMunicipios();
+        $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_MUNICIPIOS, ['data_carga' => date('Y-m-d H:i:s')]);
+    }
+    if($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)){
+        cargaUsers();
+        $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_USERS, ['data_carga' => date('Y-m-d H:i:s')]);
+    }
+    
+    cargaUsuariosLiberados();
+    
+}
+
+function cargaUsuariosLiberados(){
+    $modelFirebase = new \Application\Model\FirebaseModel();
+    $arMunicipiosConfig = $modelFirebase->getDocumentosConfig();
+    $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
+    $dbSeteUsuariosLiberados->_truncate();
+    foreach ($arMunicipiosConfig as $row){
+        $arPermissao = $modelFirebase->getDocumentoByIdConfig($row);
+        foreach ($arPermissao['users'] as $rowUid){
+            $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'users']);
+        }
+        foreach ($arPermissao['readers'] as $rowUid){
+            $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'readers']);
+        }
+        foreach ($arPermissao['admin'] as $rowUid){
+            $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'admin']);
+        }
+    }
+}
+
+function cargaUsers(){
+    $modelFirebase = new \Application\Model\FirebaseModel();
+    $dbSeteUsuarios = new \Db\Sete\SeteUsuarios();
+    $arUsers = $modelFirebase->getUsersFirebase();
+    foreach ($arUsers as $rowUser){
+        $arUsersBD = deParaUsers($rowUser);
+        $usuarioExiste = $dbSeteUsuarios->usuarioExiste($rowUser['ID']);
+        if($usuarioExiste){
+            $arUsersBD['dt_alteracao'] = date("Y-m-d H:i:s");
+            $dbSeteUsuarios->_atualizar($rowUser['ID'], $arUsersBD);
+        }else{
+            $arUsersBD['dt_criacao'] = date("Y-m-d H:i:s");
+            $dbSeteUsuarios->_inserir($arUsersBD);
+        }
+    }
+}
+
+
+function cargaMunicipios(){
+    populaListaMunicipios();
     $arMunicipios = listarMunicipios();
     processarMunicipios($arMunicipios);
 }
@@ -420,6 +456,21 @@ function deParaEscolas($key, $arEscola) {
     $arData['ensino_pre_escola'] = isset($arEscola['ENSINO_PRE_ESCOLA']) && $arEscola['ENSINO_PRE_ESCOLA'] ? 'S' : 'N';
     $arData['mec_tp_localizacao_diferenciada'] = isset($arEscola['MEC_TP_LOCALIZACAO_DIFERENCIADA']) ? $arEscola['MEC_TP_LOCALIZACAO_DIFERENCIADA'] : null;
     $arData['codigo_escola_firebase'] = $arEscola['id_firebase'];
+    return $arData;
+}
+
+function deParaUsers($arUsuario){
+    $arData['codigo_cidade'] = $arUsuario['COD_CIDADE'];
+    $arData['uid']           = $arUsuario['ID'];
+    $arData['nome']          = $arUsuario['NOME'];
+    $arData['cpf']           = $arUsuario['CPF'];
+    $arData['telefone']      = $arUsuario['TELEFONE'];
+    $arData['email']         = $arUsuario['EMAIL'];
+    $arData['password']      = md5($arUsuario['PASSWORD']);
+    $arData['cidade']        = $arUsuario['CIDADE'];
+    $arData['cod_cidade']    = $arUsuario['COD_CIDADE'];
+    $arData['estado']        = $arUsuario['ESTADO'];
+    $arData['cod_estado']    = $arUsuario['COD_ESTADO'];
     return $arData;
 }
 
