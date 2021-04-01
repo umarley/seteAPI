@@ -56,11 +56,13 @@ class PermissaoModel {
     }
 
     private function liberarUsuarioFirebaseColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao, $documentoFirestore) {
+        $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
         $uidUsuario = key($arUsuarioFirestore);
         if (!in_array($uidUsuario, $documentoFirestore['users'])) {
             ($arRequisicao->tipo_permissao === 'admin') ? array_push($documentoFirestore['admin'], $uidUsuario) : array_push($documentoFirestore['readers'], $uidUsuario);
             array_push($documentoFirestore['users'], $uidUsuario);
             $dbModelFirebase->setDocumentoColecaoConfig($arUsuarioFirestore[$uidUsuario]['COD_CIDADE'], $documentoFirestore);
+            $dbSeteUsuariosLiberados->_inserir(['uid' => $uidUsuario, 'type' => 'users']);
             return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Usuário já com o acesso liberado!"], 'codeHTTP' => 200];
@@ -68,6 +70,7 @@ class PermissaoModel {
     }
 
     private function criarDocumentoComCamposColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao) {
+        $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
         $uidUsuario = key($arUsuarioFirestore);
         $codigoCidade = $arUsuarioFirestore[$uidUsuario]['COD_CIDADE'];
         $arNovoDocumento = [
@@ -78,6 +81,7 @@ class PermissaoModel {
         ($arRequisicao->tipo_permissao === 'admin') ? array_push($arNovoDocumento['admin'], $uidUsuario) : array_push($arNovoDocumento['readers'], $uidUsuario);
         array_push($arNovoDocumento['users'], $uidUsuario);
         $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $arNovoDocumento);
+        $dbSeteUsuariosLiberados->_inserir(['uid' => $uidUsuario, 'type' => 'users']);
         return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
     }
     

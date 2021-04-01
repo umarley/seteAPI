@@ -26,11 +26,13 @@ class API extends AbstractResourceListener {
                 header('Access-Control-Allow-Origin: *');
                 header('Content-Type: application/json', true, 400);
                 echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization vazio!']);
+                exit;
             }
         } else {
             header('Access-Control-Allow-Origin: *');
             header('Content-Type: application/json', true, 400);
             echo json_encode(['result' => false, 'messages' => 'Cabeçalho Authorization ausente!']);
+            exit;
         }
     }
 
