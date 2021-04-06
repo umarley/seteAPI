@@ -93,10 +93,10 @@ class PermissaoModel {
         $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
         $arData = $dbSeteUsuario->getUsuariosPendentesLiberacao($offset, $qtdPerPage);
         return [
-            'qtd_registros' => $totalRegistros, 
-            'pages' => $qtdPaginas, 
-            'reg_por_pagina' => $qtdPerPage,
-            'pg_atual' => $pagina, 
+            'qtd_registros' => (int) $totalRegistros, 
+            'pages' => (int) $qtdPaginas, 
+            'reg_por_pagina' => (int) $qtdPerPage,
+            'pg_atual' => (int) $pagina, 
             'registros' => $arData
           ];
     }

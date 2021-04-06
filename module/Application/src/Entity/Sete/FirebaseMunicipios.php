@@ -14,8 +14,8 @@ class FirebaseMunicipios extends AbstractDatabase {
         $this->primaryKey = 'codigo_municipio';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    public function getLista(){
+
+    public function getLista() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
@@ -23,13 +23,13 @@ class FirebaseMunicipios extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $arLista = [];
         $this->getResultSet($prepare->execute());
-        foreach ($this->resultSet as $row){
+        foreach ($this->resultSet as $row) {
             $arLista[] = $row;
         }
         return $arLista;
     }
-    
-    public function getByCodigoIBGE($codigo){
+
+    public function getByCodigoIBGE($codigo) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
@@ -38,6 +38,43 @@ class FirebaseMunicipios extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         return $prepare->execute()->current();
     }
-    
+
+    public function getTotalMunicipios() {
+        $sql = "SELECT COUNT(*) AS qtd FROM firebase_municipios us     
+                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
+                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['qtd'];
+    }
+
+    public function getMunicipiosLista($offset, $limit = 20) {
+        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
+        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
+        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
+        $dbSeteRotas = new \Db\Sete\SeteRotas();
+        $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
+                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
+                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf
+                    LIMIT {$offset}, {$limit}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $key => $row) {
+            $arLista[$key] = $row;
+            $arLista[$key]['data'] = [
+                'n_escolas' => $dbSeteEscolas->qtdEscolasAtendidas($row['codigo_municipio']),
+                'n_alunos' => $dbSeteAlunos->qtdAlunosAtendidos($row['codigo_municipio']),
+                'n_veiculos_funcionamento' => $dbSeteVeiculos->qtdVeiculosFuncionando($row['codigo_municipio']),
+                'n_veiculos_manutencao' => $dbSeteVeiculos->qtdVeiculosManutencao($row['codigo_municipio']),
+                'n_rotas' => $dbSeteRotas->qtdRotas($row['codigo_municipio']),
+                'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($row['codigo_municipio']),
+                'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio'])
+            ];
+        }
+        return $arLista;
+    }
 
 }

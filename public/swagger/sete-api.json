@@ -124,6 +124,24 @@
             "description": "Access Token",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "description": "Tipo de retorno dos dados mapa ou lista",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "mapa",
+              "lista"
+            ]
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "description": "Parâmetro que indica a pagina de registros a ser listado",
+            "required": false,
+            "type": "integer"
           }
         ],
         "responses": {

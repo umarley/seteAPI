@@ -64,7 +64,16 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetchAll($params = [])
     {
-        $this->populaResposta(200, $this->_model->getAll());
+        $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'mapa';
+        switch ($tipo){
+            case 'mapa':
+                $this->populaResposta(200, $this->_model->getAll());
+                break;
+            case 'lista':
+                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
+                $this->populaResposta(200, $this->_model->getListaPaginada($pagina), false);
+                break;
+        }
     }
 
     /**
