@@ -44,6 +44,11 @@ class MunicipiosModel {
             'pages' => (int) $qtdPaginas,
             'reg_por_pagina' => (int) $qtdPerPage,
             'pg_atual' => (int) $pagina,
+            'pageIndex' => (int) $pagina - 1,
+            'pageSize' => (int) $qtdPerPage,
+            'pageCount' => (int) $qtdPaginas,
+            'canNextPage' => $pagina - 1 <= $qtdPaginas - 1 ? true : false,
+            'canPreviousPage' => $pagina - 1 == 0 ? false : true,
             'registros' => $arData
         ];
     }
