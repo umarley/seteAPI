@@ -49,15 +49,18 @@ class FirebaseMunicipios extends AbstractDatabase {
         return $row['qtd'];
     }
 
-    public function getMunicipiosLista($offset, $limit = 20) {
+    public function getMunicipiosLista($offset, $limit = 20, $busca = "") {
         $dbSeteEscolas = new \Db\Sete\SeteEscolas();
         $dbSeteAlunos = new \Db\Sete\SeteAlunos();
         $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
         $dbSeteRotas = new \Db\Sete\SeteRotas();
         $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
-                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf
-                    LIMIT {$offset}, {$limit}";
+                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
+        if(!empty($busca)){
+            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+        }
+        $sql .= " LIMIT {$offset}, {$limit}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];

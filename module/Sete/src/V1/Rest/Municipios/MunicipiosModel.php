@@ -33,22 +33,17 @@ class MunicipiosModel {
         return $arData;
     }
 
-    public function getListaPaginada($pagina) {
+    public function getListaPaginada($pagina, $busca = "") {
         $qtdPerPage = 20;
         $totalRegistros = $this->_entity->getTotalMunicipios();
         $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
         $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
-        $arData = $this->_entity->getMunicipiosLista($offset, $qtdPerPage);
+        $arData = $this->_entity->getMunicipiosLista($offset, $qtdPerPage, $busca);
         return [
             'qtd_registros' => (int) $totalRegistros,
             'pages' => (int) $qtdPaginas,
             'reg_por_pagina' => (int) $qtdPerPage,
             'pg_atual' => (int) $pagina,
-            'pageIndex' => (int) $pagina - 1,
-            'pageSize' => (int) $qtdPerPage,
-            'pageCount' => (int) $qtdPaginas,
-            'canNextPage' => $pagina - 1 <= $qtdPaginas - 1 ? true : false,
-            'canPreviousPage' => $pagina - 1 == 0 ? false : true,
             'registros' => $arData
         ];
     }

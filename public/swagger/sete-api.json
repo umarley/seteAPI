@@ -142,6 +142,13 @@
             "description": "Parâmetro que indica a pagina de registros a ser listado",
             "required": false,
             "type": "integer"
+          },
+          {
+            "name": "busca",
+            "in": "query",
+            "description": "Parâmetro com nome do municipio para busca",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
