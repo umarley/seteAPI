@@ -22,8 +22,13 @@ class SeteAlunos extends AbstractDatabase {
                 ->where("a.codigo_aluno_firebase = '{$idFirebase}'")
                 ->where("a.codigo_cidade = {$codigoMunicipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id_aluno'];
+        $row = $prepare->execute();
+        if($row->count() > 0){
+            $row = $row->current();
+            return $row['id_aluno'];
+        }else{
+            return false;
+        }
     }
     
     public function qtdAlunosAtendidos($municipio){

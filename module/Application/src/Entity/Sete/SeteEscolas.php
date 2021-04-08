@@ -22,8 +22,13 @@ class SeteEscolas extends AbstractDatabase {
                 ->where("codigo_escola_firebase = '{$idFirebase}'")
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id_escola'];
+        $row = $prepare->execute();
+        if($row->count() > 0){
+            $row = $row->current();
+            return $row['id_escola'];
+        }else{
+            return false;
+        }
     }
 
     public function qtdEscolasAtendidas($municipio){
@@ -32,8 +37,13 @@ class SeteEscolas extends AbstractDatabase {
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['qtd'];
+        $row = $prepare->execute();
+        if($row->count() > 0){
+            $row = $row->current();
+            return $row['qtd'];
+        }else{
+            return 0;
+        }
     }    
     
     

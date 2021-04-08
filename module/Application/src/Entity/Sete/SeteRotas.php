@@ -22,8 +22,13 @@ class SeteRotas extends AbstractDatabase {
                 ->where("id_firebase = '{$codigoFirebase}'")
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id_rota'];
+        $row = $prepare->execute();
+        if($row->count() > 0){
+            $row = $row->current();
+            return $row['id_rota'];
+        }else{
+            return false;
+        }
     }
     
     public function qtdRotas($municipio){

@@ -30,10 +30,10 @@ include __DIR__ . '/../vendor/autoload.php';
 
 if (!class_exists(Application::class)) {
     throw new RuntimeException(
-    "Unable to load application.\n"
-    . "- Type `composer install` if you are developing locally.\n"
-    . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
-    . "- Type `docker-compose run laminas composer install` if you are using Docker.\n"
+                    "Unable to load application.\n"
+                    . "- Type `composer install` if you are developing locally.\n"
+                    . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
+                    . "- Type `docker-compose run laminas composer install` if you are using Docker.\n"
     );
 }
 
@@ -58,57 +58,56 @@ mainLoadData();
 
 function mainLoadData() {
     $dbCoreCargaDados = new \Db\Core\CargaDados();
-    if($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_MUNICIPIOS)){
+    if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_MUNICIPIOS)) {
         cargaMunicipios();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_MUNICIPIOS, ['data_carga' => date('Y-m-d H:i:s')]);
     }
-    if($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)){
+    if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)) {
         cargaUsers();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_USERS, ['data_carga' => date('Y-m-d H:i:s')]);
     }
-    
+
     cargaUsuariosLiberados();
-    
 }
 
-function cargaUsuariosLiberados(){
+function cargaUsuariosLiberados() {
     $modelFirebase = new \Application\Model\FirebaseModel();
     $arMunicipiosConfig = $modelFirebase->getDocumentosConfig();
     $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
     $dbSeteUsuariosLiberados->_truncate();
-    foreach ($arMunicipiosConfig as $row){
+    foreach ($arMunicipiosConfig as $row) {
         $arPermissao = $modelFirebase->getDocumentoByIdConfig($row);
-        foreach ($arPermissao['users'] as $rowUid){
+        foreach ($arPermissao['users'] as $rowUid) {
             $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'users']);
         }
-        foreach ($arPermissao['readers'] as $rowUid){
+        foreach ($arPermissao['readers'] as $rowUid) {
             $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'readers']);
         }
-        foreach ($arPermissao['admin'] as $rowUid){
+        foreach ($arPermissao['admin'] as $rowUid) {
             $dbSeteUsuariosLiberados->_inserir(['uid' => $rowUid, 'type' => 'admin']);
         }
     }
 }
 
-function cargaUsers(){
+function cargaUsers() {
     $modelFirebase = new \Application\Model\FirebaseModel();
     $dbSeteUsuarios = new \Db\Sete\SeteUsuarios();
     $arUsers = $modelFirebase->getUsersFirebase();
-    foreach ($arUsers as $rowUser){
+    foreach ($arUsers as $rowUser) {
         $arUsersBD = deParaUsers($rowUser);
         $usuarioExiste = $dbSeteUsuarios->usuarioExiste($rowUser['ID']);
-        if($usuarioExiste){
+        if ($usuarioExiste) {
             $arUsersBD['dt_alteracao'] = date("Y-m-d H:i:s");
             $dbSeteUsuarios->_atualizar($rowUser['ID'], $arUsersBD);
-        }else{
+        } else {
             $arUsersBD['dt_criacao'] = date("Y-m-d H:i:s");
             $dbSeteUsuarios->_inserir($arUsersBD);
         }
     }
 }
 
-
-function cargaMunicipios(){
+function cargaMunicipios() {
+    echo "Populando lista de municipios...\r\n";
     populaListaMunicipios();
     $arMunicipios = listarMunicipios();
     processarMunicipios($arMunicipios);
@@ -116,34 +115,48 @@ function cargaMunicipios(){
 
 function processarMunicipios($arMunicipios) {
     $modelFirebase = new \Application\Model\FirebaseModel();
+    echo "Limpando base de dados...\r\n";
     limparBD();
+    echo "Iniciando processo...\r\n";
     foreach ($arMunicipios as $row) {
+        echo "Processar municipio {$row['codigo_municipio']} - " . strtoupper($row['nome_cidade']). "...\r\n";
         $arAlunos = $modelFirebase->getAlunosMunicipio($row['codigo_municipio']);
+        echo "Processando dados alunos...\r\n";
         processarAlunos($row['codigo_municipio'], $arAlunos);
         $arEscolas = $modelFirebase->getEscolasMunicipio($row['codigo_municipio']);
+        echo "Processando dados escolas...\r\n";
         processarEscolas($row['codigo_municipio'], $arEscolas);
         $arEscolaTemAluno = $modelFirebase->getEscolasTemAluno($row['codigo_municipio']);
+        echo "Processando dados escola tem alunos...\r\n";
         processarEscolaTemAluno($row['codigo_municipio'], $arEscolaTemAluno);
         $arGaragens = $modelFirebase->getGaragens($row['codigo_municipio']);
+        echo "Processando dados garagens...\r\n";
         processarGaragens($row['codigo_municipio'], $arGaragens);
         $arMotoristas = $modelFirebase->getMotoristas($row['codigo_municipio']);
+        echo "Processando dados motoristas...\r\n";
         processarMotoristas($row['codigo_municipio'], $arMotoristas);
         $arRotas = $modelFirebase->getRotasMunicipio($row['codigo_municipio']);
+        echo "Processando dados rotas...\r\n";
         processarRotas($row['codigo_municipio'], $arRotas);
         $arVeiculos = $modelFirebase->getVeiculosMunicipio($row['codigo_municipio']);
+        echo "Processando dados veículos...\r\n";
         processarVeiculos($row['codigo_municipio'], $arVeiculos);
         $arRotasAtendeAluno = $modelFirebase->getRotasAtendeAlunoMunicipio($row['codigo_municipio']);
+        echo "Processando dados rota atende aluno...\r\n";
         processarRotasAtendeAluno($row['codigo_municipio'], $arRotasAtendeAluno);
         $arRotasDirigidaPorMotorista = $modelFirebase->getRotasDirigidaPorMotoristaMunicipio($row['codigo_municipio']);
+        echo "Processando dados rota dirigida por mororista...\r\n";
         processarRotasDirigidasPorMotorista($row['codigo_municipio'], $arRotasDirigidaPorMotorista);
         $arRotasPassaPorEscola = $modelFirebase->getRotasPassaPorEscolaMunicipio($row['codigo_municipio']);
+        echo "Processando dados rota passa por escola...\r\n";
         processarRotasPassaPorEscola($row['codigo_municipio'], $arRotasPassaPorEscola);
         $arRotasPossuiVeiculo = $modelFirebase->getRotasPossuiVeiculoMunicipio($row['codigo_municipio']);
+        echo "Processando dados rota possui veiculo...\r\n";
         processarRotasPossuiVeiculo($row['codigo_municipio'], $arRotasPossuiVeiculo);
     }
 }
 
-function limparBD(){
+function limparBD() {
     $dbSeteRotaPossuiVeiculo = new \Db\Sete\SeteRotaPossuiVeiculo();
     $dbSeteRotaPassaPorEscola = new \Db\Sete\SeteRotaPassaPorEscola();
     $dbSeteRotaDirigidaPorMotorista = new \Db\Sete\SeteRotaDirigidaPorMotorista();
@@ -168,7 +181,7 @@ function limparBD(){
     $dbSeteMotoristas->_deleteAll();
 }
 
-function processarRotasPossuiVeiculo($municipio, $arRotas){
+function processarRotasPossuiVeiculo($municipio, $arRotas) {
     $dbSeteRotaPossuiVeiculo = new \Db\Sete\SeteRotaPossuiVeiculo();
     $dbSeteVeiculo = new \Db\Sete\SeteVeiculos();
     $dbSeteRota = new \Db\Sete\SeteRotas();
@@ -181,14 +194,16 @@ function processarRotasPossuiVeiculo($municipio, $arRotas){
                 'id_veiculo' => $idVeiculo,
                 'codigo_cidade' => $municipio
             ]);
-            var_dump($arResult);
+            if (!$arResult['result']) {
+                echo $arResult['messages'] . "\r\n";
+            }
         } else {
             echo "Não encontrado ID Veiculo ou ID Rota\r\n";
         }
     }
 }
 
-function processarRotasPassaPorEscola($municipio, $arRotas){
+function processarRotasPassaPorEscola($municipio, $arRotas) {
     $dbSeteRotaPassaPorEscola = new \Db\Sete\SeteRotaPassaPorEscola();
     $dbSeteEscola = new \Db\Sete\SeteEscolas();
     $dbSeteRota = new \Db\Sete\SeteRotas();
@@ -201,7 +216,9 @@ function processarRotasPassaPorEscola($municipio, $arRotas){
                 'id_escola' => $idEscola,
                 'codigo_cidade' => $municipio
             ]);
-            var_dump($arResult);
+            if (!$arResult['result']) {
+                echo $arResult['messages'] . "\r\n";
+            }
         } else {
             echo "Não encontrado ID Escola ou ID Rota\r\n";
         }
@@ -221,7 +238,9 @@ function processarRotasDirigidasPorMotorista($municipio, $arRotasDirigidaMotoris
                 'cpf_motorista' => $cpfMotorista,
                 'codigo_cidade' => $municipio
             ]);
-            var_dump($arResult);
+            if (!$arResult['result']) {
+                echo $arResult['messages'] . "\r\n";
+            }
         } else {
             echo "Não encontrado ID Aluno ou ID Rota\r\n";
         }
@@ -241,7 +260,9 @@ function processarRotasAtendeAluno($municipio, $arRotasAtendeAluno) {
                 'id_aluno' => $idAluno,
                 'codigo_cidade' => $municipio
             ]);
-            var_dump($arResult);
+            if (!$arResult['result']) {
+                echo $arResult['messages'] . "\r\n";
+            }
         } else {
             echo "Não encontrado ID Aluno ou ID Rota\r\n";
         }
@@ -254,7 +275,9 @@ function processarVeiculos($municipio, $arVeiculos) {
         $arVeiculoDB = deParaVeiculos($key, $rowVeiculo);
         $arVeiculoDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteVeiculos->_inserir($arVeiculoDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -264,7 +287,9 @@ function processarRotas($municipio, $arRotas) {
         $arRotaDB = deParaRotas($key, $rowRotas);
         $arRotaDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteRotas->_inserir($arRotaDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -274,7 +299,9 @@ function processarMotoristas($municipio, $arMotoristas) {
         $arMotoristaDB = deParaMotoristas($key, $rowMotorista);
         $arMotoristaDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteMotorista->_inserir($arMotoristaDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -284,7 +311,9 @@ function processarGaragens($municipio, $arGaragens) {
         $arGaragemDB = deParaGaragem($key, $rowGaragem);
         $arGaragemDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteGaragem->_inserir($arGaragemDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -294,7 +323,9 @@ function processarEscolas($municipio, $arEscolas) {
         $arEscolaDB = deParaEscolas($key, $rowEscola);
         $arEscolaDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteEscolas->_inserir($arEscolaDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -320,7 +351,9 @@ function processarAlunos($municipio, $arAlunos) {
         $arAlunoDB = deParaAlunos($key, $rowAluno);
         $arAlunoDB['codigo_cidade'] = $municipio;
         $arResult = $dbSeteAlunos->_inserir($arAlunoDB);
-        var_dump($arResult);
+        if (!$arResult['result']) {
+            echo $arResult['messages'] . "\r\n";
+        }
     }
 }
 
@@ -411,7 +444,7 @@ function deParaAlunos($key, $arAluno) {
     $arData['nome'] = $arAluno['NOME'];
     $arData['data_nascimento'] = formatDateSQL($arAluno['DATA_NASCIMENTO']);
     $arData['sexo'] = $arAluno['SEXO'];
-    $arData['cor'] = isset($arAluno['COR']) && is_numeric($arAluno['COR']) ? $arAluno['COR'] : 0;
+    $arData['cor'] = isset($arAluno['COR']) && $arAluno['COR'] != 'NAN' ? $arAluno['COR'] : 0;
     $arData['nome_responsavel'] = $arAluno['NOME_RESPONSAVEL'];
     $arData['grau_responsavel'] = isset($arAluno['GRAU_RESPONSAVEL']) ? $arAluno['GRAU_RESPONSAVEL'] : null;
     $arData['telefone_responsavel'] = isset($arAluno['TELEFONE_RESPONSAVEL']) ? $arAluno['TELEFONE_RESPONSAVEL'] : null;
@@ -422,7 +455,7 @@ function deParaAlunos($key, $arAluno) {
     $arData['turno'] = $arAluno['TURNO'];
     $arData['nivel'] = $arAluno['NIVEL'];
     $arData['cpf'] = isset($arAluno['CPF']) ? $arAluno['CPF'] : null;
-    $arData['mec_tp_localizacao'] = $arAluno['MEC_TP_LOCALIZACAO'];
+    $arData['mec_tp_localizacao'] = isset($arAluno['MEC_TP_LOCALIZACAO']) ? $arAluno['MEC_TP_LOCALIZACAO'] : null;
     $arData['codigo_aluno_firebase'] = $arAluno['id_firebase'];
     return $arData;
 }
@@ -442,10 +475,10 @@ function deParaEscolas($key, $arEscola) {
     $arData['mec_in_especial_exclusiva'] = isset($arEscola['MEC_IN_ESPECIAL_EXCLUSIVA']) && $arEscola['MEC_IN_ESPECIAL_EXCLUSIVA'] ? 'S' : 'N';
     $arData['loc_latitude'] = isset($arEscola['LOC_LATITUDE']) ? $arEscola['LOC_LATITUDE'] : null;
     $arData['loc_longitude'] = isset($arEscola['LOC_LONGITUDE']) ? $arEscola['LOC_LONGITUDE'] : null;
-    $arData['loc_cep'] = $arEscola['LOC_CEP'];
-    $arData['loc_endereco'] = $arEscola['LOC_ENDERECO'];
-    $arData['contato_responsavel'] = $arEscola['CONTATO_RESPONSAVEL'];
-    $arData['contato_telefone'] = $arEscola['CONTATO_TELEFONE'];
+    $arData['loc_cep'] = isset($arEscola['LOC_CEP']) ? $arEscola['LOC_CEP'] : null;
+    $arData['loc_endereco'] = isset($arEscola['LOC_ENDERECO']) ? $arEscola['LOC_ENDERECO'] : null;
+    $arData['contato_responsavel'] = isset($arEscola['CONTATO_RESPONSAVEL']) ? $arEscola['CONTATO_RESPONSAVEL'] : null;
+    $arData['contato_telefone'] = isset($arEscola['CONTATO_TELEFONE']) ? $arEscola['CONTATO_TELEFONE'] : null;
     $arData['contato_email'] = isset($arEscola['CONTATO_EMAIL']) ? $arEscola['CONTATO_EMAIL'] : null;
     $arData['horario_matutino'] = isset($arEscola['HORARIO_MATUTINO']) && $arEscola['HORARIO_MATUTINO'] ? 'S' : 'N';
     $arData['horario_vespertino'] = isset($arEscola['HORARIO_VESPERTINO']) && $arEscola['HORARIO_VESPERTINO'] ? 'S' : 'N';
@@ -459,18 +492,18 @@ function deParaEscolas($key, $arEscola) {
     return $arData;
 }
 
-function deParaUsers($arUsuario){
+function deParaUsers($arUsuario) {
     $arData['codigo_cidade'] = $arUsuario['COD_CIDADE'];
-    $arData['uid']           = $arUsuario['ID'];
-    $arData['nome']          = $arUsuario['NOME'];
-    $arData['cpf']           = $arUsuario['CPF'];
-    $arData['telefone']      = $arUsuario['TELEFONE'];
-    $arData['email']         = $arUsuario['EMAIL'];
-    $arData['password']      = md5($arUsuario['PASSWORD']);
-    $arData['cidade']        = $arUsuario['CIDADE'];
-    $arData['cod_cidade']    = $arUsuario['COD_CIDADE'];
-    $arData['estado']        = $arUsuario['ESTADO'];
-    $arData['cod_estado']    = $arUsuario['COD_ESTADO'];
+    $arData['uid'] = $arUsuario['ID'];
+    $arData['nome'] = $arUsuario['NOME'];
+    $arData['cpf'] = $arUsuario['CPF'];
+    $arData['telefone'] = $arUsuario['TELEFONE'];
+    $arData['email'] = $arUsuario['EMAIL'];
+    $arData['password'] = md5($arUsuario['PASSWORD']);
+    $arData['cidade'] = $arUsuario['CIDADE'];
+    $arData['cod_cidade'] = $arUsuario['COD_CIDADE'];
+    $arData['estado'] = $arUsuario['ESTADO'];
+    $arData['cod_estado'] = $arUsuario['COD_ESTADO'];
     return $arData;
 }
 
