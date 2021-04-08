@@ -269,6 +269,13 @@
             "description": "Parâmetro para ser informada a página de resultados que deve ser exibida",
             "required": false,
             "type": "integer"
+          },
+          {
+            "name": "busca",
+            "in": "query",
+            "description": "Parâmetro que poderá conter o nome do usuário, email, nome do municipio ou nome do estado para busca",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {

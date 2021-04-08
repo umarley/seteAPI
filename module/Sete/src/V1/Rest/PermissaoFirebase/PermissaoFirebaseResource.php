@@ -38,7 +38,8 @@ class PermissaoFirebaseResource extends \Sete\V1\API
         switch ($rota['id']){
             case 'usuarios-liberar':
                 $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
-                $arResult = $this->_model->getUsuariosLiberar($pagina);
+                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
+                $arResult = $this->_model->getUsuariosLiberar($pagina, $busca);
                 break;
         }
         $this->populaResposta(200, $arResult, false);

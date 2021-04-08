@@ -85,13 +85,13 @@ class PermissaoModel {
         return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
     }
     
-    public function getUsuariosLiberar($pagina){
+    public function getUsuariosLiberar($pagina, $busca = ""){
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
         $qtdPerPage = 20;
-        $totalRegistros = $dbSeteUsuario->getTotalUsuariosPendentesLiberacao();
+        $totalRegistros = $dbSeteUsuario->getTotalUsuariosPendentesLiberacao($busca);
         $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
         $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
-        $arData = $dbSeteUsuario->getUsuariosPendentesLiberacao($offset, $qtdPerPage);
+        $arData = $dbSeteUsuario->getUsuariosPendentesLiberacao($offset, $qtdPerPage, $busca);
         return [
             'qtd_registros' => (int) $totalRegistros, 
             'pages' => (int) $qtdPaginas, 

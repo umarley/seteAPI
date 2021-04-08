@@ -39,10 +39,13 @@ class FirebaseMunicipios extends AbstractDatabase {
         return $prepare->execute()->current();
     }
 
-    public function getTotalMunicipios() {
+    public function getTotalMunicipios($busca = "") {
         $sql = "SELECT COUNT(*) AS qtd FROM firebase_municipios us     
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
                     INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
+        if(!empty($busca)){
+            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+        }
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();

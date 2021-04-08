@@ -35,7 +35,7 @@ class MunicipiosModel {
 
     public function getListaPaginada($pagina, $busca = "") {
         $qtdPerPage = 20;
-        $totalRegistros = $this->_entity->getTotalMunicipios();
+        $totalRegistros = $this->_entity->getTotalMunicipios($busca);
         $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
         $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
         $arData = $this->_entity->getMunicipiosLista($offset, $qtdPerPage, $busca);
