@@ -442,10 +442,10 @@ function deParaEscolas($key, $arEscola) {
     $arData['mec_in_especial_exclusiva'] = isset($arEscola['MEC_IN_ESPECIAL_EXCLUSIVA']) && $arEscola['MEC_IN_ESPECIAL_EXCLUSIVA'] ? 'S' : 'N';
     $arData['loc_latitude'] = isset($arEscola['LOC_LATITUDE']) ? $arEscola['LOC_LATITUDE'] : null;
     $arData['loc_longitude'] = isset($arEscola['LOC_LONGITUDE']) ? $arEscola['LOC_LONGITUDE'] : null;
-    $arData['loc_cep'] = $arEscola['LOC_CEP'];
-    $arData['loc_endereco'] = $arEscola['LOC_ENDERECO'];
-    $arData['contato_responsavel'] = $arEscola['CONTATO_RESPONSAVEL'];
-    $arData['contato_telefone'] = $arEscola['CONTATO_TELEFONE'];
+    $arData['loc_cep'] = isset($arEscola['LOC_CEP']) ? $arEscola['LOC_CEP'] : null;
+    $arData['loc_endereco'] = isset($arEscola['LOC_ENDERECO']) ? $arEscola['LOC_ENDERECO'] : null;
+    $arData['contato_responsavel'] = isset($arEscola['CONTATO_RESPONSAVEL']) ? $arEscola['CONTATO_RESPONSAVEL'] : null;
+    $arData['contato_telefone'] = isset($arEscola['CONTATO_TELEFONE']) ? $arEscola['CONTATO_TELEFONE'] : null;
     $arData['contato_email'] = isset($arEscola['CONTATO_EMAIL']) ? $arEscola['CONTATO_EMAIL'] : null;
     $arData['horario_matutino'] = isset($arEscola['HORARIO_MATUTINO']) && $arEscola['HORARIO_MATUTINO'] ? 'S' : 'N';
     $arData['horario_vespertino'] = isset($arEscola['HORARIO_VESPERTINO']) && $arEscola['HORARIO_VESPERTINO'] ? 'S' : 'N';
