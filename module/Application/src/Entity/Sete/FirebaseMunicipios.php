@@ -39,25 +39,32 @@ class FirebaseMunicipios extends AbstractDatabase {
         return $prepare->execute()->current();
     }
 
-    public function getTotalMunicipios() {
+    public function getTotalMunicipios($busca = "") {
         $sql = "SELECT COUNT(*) AS qtd FROM firebase_municipios us     
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
                     INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
+        if(!empty($busca)){
+            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+        }
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();
         return $row['qtd'];
     }
 
-    public function getMunicipiosLista($offset, $limit = 20) {
+    public function getMunicipiosLista($offset, $limit = 20, $busca = "") {
         $dbSeteEscolas = new \Db\Sete\SeteEscolas();
         $dbSeteAlunos = new \Db\Sete\SeteAlunos();
         $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
         $dbSeteRotas = new \Db\Sete\SeteRotas();
+        $dbSeteMotoristas = new \Db\Sete\SeteMotoristas();
         $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
-                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf
-                    LIMIT {$offset}, {$limit}";
+                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
+        if(!empty($busca)){
+            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+        }
+        $sql .= " LIMIT {$offset}, {$limit}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];
@@ -71,7 +78,8 @@ class FirebaseMunicipios extends AbstractDatabase {
                 'n_veiculos_manutencao' => $dbSeteVeiculos->qtdVeiculosManutencao($row['codigo_municipio']),
                 'n_rotas' => $dbSeteRotas->qtdRotas($row['codigo_municipio']),
                 'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($row['codigo_municipio']),
-                'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio'])
+                'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio']),
+                'n_motoristas' => $dbSeteMotoristas->qtdMotoristas($row['codigo_municipio'])
             ];
         }
         return $arLista;
