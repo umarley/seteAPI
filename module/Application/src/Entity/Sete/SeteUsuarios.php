@@ -28,7 +28,7 @@ class SeteUsuarios extends AbstractDatabase {
         }
     }
     
-    public function getUsuariosPendentesLiberacao($offset, $limit = 50){
+    public function getUsuariosPendentesLiberacao($offset, $limit = 20){
         $sql = "SELECT us.uid, us.nome, codigo_cidade, concat(cidade, ' - ', estado) AS localidade, email  FROM sete_usuarios us
                     WHERE us.uid NOT IN (SELECT uid FROM sete_usuarios_liberados ul)
                     LIMIT {$offset}, {$limit}";

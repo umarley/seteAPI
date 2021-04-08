@@ -87,7 +87,7 @@ class PermissaoModel {
     
     public function getUsuariosLiberar($pagina){
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
-        $qtdPerPage = 50;
+        $qtdPerPage = 20;
         $totalRegistros = $dbSeteUsuario->getTotalUsuariosPendentesLiberacao();
         $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
         $offset = ($qtdPerPage * $pagina) - $qtdPerPage;
