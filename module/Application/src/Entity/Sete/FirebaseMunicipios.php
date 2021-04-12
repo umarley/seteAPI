@@ -79,7 +79,8 @@ class FirebaseMunicipios extends AbstractDatabase {
                 'n_rotas' => $dbSeteRotas->qtdRotas($row['codigo_municipio']),
                 'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($row['codigo_municipio']),
                 'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio']),
-                'n_motoristas' => $dbSeteMotoristas->qtdMotoristas($row['codigo_municipio'])
+                'n_motoristas' => $dbSeteMotoristas->qtdMotoristas($row['codigo_municipio']),
+                'n_tempo_medio_rota' => $dbSeteRotas->qtdRotasTempoMedio($codigo)
             ];
         }
         return $arLista;

@@ -28,7 +28,8 @@ class MunicipiosModel {
             'n_veiculos_manutencao' => $dbSeteVeiculos->qtdVeiculosManutencao($codigo),
             'n_rotas' => $dbSeteRotas->qtdRotas($codigo),
             'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($codigo),
-            'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($codigo)
+            'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($codigo),
+            'n_tempo_medio_rota' => $dbSeteRotas->qtdRotasTempoMedio($codigo)
         ];
         return $arData;
     }

@@ -61,6 +61,16 @@ class SeteRotas extends AbstractDatabase {
         return $row['qtd'];
     } 
     
+    public function qtdRotasTempoMedio($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("avg(tempo)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
     
     
 
