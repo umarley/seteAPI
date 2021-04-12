@@ -21,24 +21,31 @@ class Usuario extends AbstractDatabase {
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
     
-    public function getLista() {
-        /*
-         * SELECT us.id_usuario, ps.nm_pessoa, us.is_ativo, sgc.nome as segmento FROM sys_usuarios us
-            LEFT JOIN glb_pessoa ps ON ps.id_pessoa = us.id_pessoa
-            LEFT JOIN glb_segmento_cadastro sgc ON ps.id_segmento_cadastro = sgc.id_tipo
-            LIMIT 500;
-         */
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select(['us' => $this->tableIdentifier])
-                ->columns(['*']);
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $this->getResultSet($prepare->execute());
-        $arUsuarios = [];
-        foreach ($this->resultSet as $row){
-            $arUsuarios[] = $row;
+    public function getTotalUsuarios($busca = "") {
+        $sql = "SELECT count(*) as qtd FROM usuarios us";
+        if(!empty($busca)){
+            $sql .= " WHERE (us.nome LIKE '%{$busca}%' OR us.email LIKE '%{$busca}%')";
         }
-        return $arUsuarios;
-        
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['qtd'];
+    }
+
+    public function getLista($offset, $limit = 20, $busca = "") {
+        $sql = "SELECT id, nome, email, is_ativo FROM usuarios us";
+        if(!empty($busca)){
+            $sql .= " WHERE (us.nome LIKE '%{$busca}%' OR us.email LIKE '%{$busca}%')";
+        }
+        $sql .= " LIMIT {$offset}, {$limit}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
     }
 
     public function getUsuariosActiveDirectory() {

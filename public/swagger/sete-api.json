@@ -21,6 +21,10 @@
     {
       "name": "Permissão Firebase",
       "description": "Operações para permissão de usuários do firebase"
+    },
+    {
+      "name": "Usuários",
+      "description": "Operações de cadastro e gerenciamento de usuários"
     }
   ],
   "schemes": [
@@ -296,6 +300,155 @@
           }
         }
       }
+    },
+    "/users/api": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Listar todos os usuários da API",
+        "operationId": "getUsuarios",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pagina",
+            "in": "query",
+            "description": "Parâmetro para ser informada a página de resultados que deve ser exibida",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "busca",
+            "in": "query",
+            "description": "Parâmetro que poderá conter o nome do usuário ou email para busca",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListUsuariosAPI"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Cria um novo usuário para acessar a API",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto contendo dados do usuário",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DadosUsuarioPOST"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RetUsuariosPOST"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
+    },
+    "/users/api/{id_usuario}": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Atualiza um usuário da API. Para trocar a senha do usuário envia apenas o objeto com a chave senha. Para ativar ou desativar o usuário envie apenas a chave is_ativo.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id_usuario",
+            "in": "path",
+            "description": "ID do usuário que será atualizado",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objeto contendo dados do usuário",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DadosUsuarioPUT"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/RetUsuariosPOST"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -405,6 +558,83 @@
         }
       }
     },
+    "DadosUsuarioPOST": {
+      "type": "object",
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "senha": {
+          "type": "string",
+          "format": "md5"
+        }
+      }
+    },
+    "DadosUsuarioPUT": {
+      "type": "object",
+      "properties": {
+        "nome": {
+          "type": "string"
+        },
+        "senha": {
+          "type": "string",
+          "format": "md5"
+        },
+        "is_ativo": {
+          "type": "string",
+          "description": "Para ativar o usuário envie a string S , para inativar envie N",
+          "enum": [
+            "S",
+            "N"
+          ]
+        }
+      }
+    },
+    "ListUsuariosAPI": {
+      "type": "object",
+      "properties": {
+        "registros": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ListUsuariosAPI_registros"
+          }
+        },
+        "qtd_registros": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "pages": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "reg_por_pagina": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "pg_atual": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "result": {
+          "type": "boolean"
+        }
+      }
+    },
+    "RetUsuariosPOST": {
+      "type": "object",
+      "properties": {
+        "result": {
+          "type": "boolean"
+        },
+        "messages": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
     "RetAuth_access_token": {
       "type": "object",
       "properties": {
@@ -455,6 +685,20 @@
           "type": "string"
         },
         "localidade": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "ListUsuariosAPI_registros": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
           "type": "string"
         },
         "email": {

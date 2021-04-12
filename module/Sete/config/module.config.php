@@ -13,7 +13,7 @@ return [
             'sete.rest.user' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/user[/:user_type[/:user_id]]',
+                    'route' => '/users[/:user_type[/:user_id]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\User\\Controller',
                     ],
@@ -64,9 +64,12 @@ return [
             'collection_name' => 'user',
             'entity_http_methods' => [
                 0 => 'GET',
+                1 => 'PUT',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
+                1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,

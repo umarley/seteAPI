@@ -8,11 +8,13 @@ use Laminas\ApiTools\Rest\AbstractResourceListener;
 class API extends AbstractResourceListener {
 
     protected $_model;
+    protected $accessToken;
 
     public function __construct() {
         $headers = apache_request_headers();
         if (key_exists('Authorization', $headers)) {
             $accessToken = $headers['Authorization'];
+            $this->accessToken = $accessToken;
             if (!empty($accessToken)) {
                 $dbModelAuthenticator = new Rest\Authenticator\AuthenticatorModel();
                 $valido = $dbModelAuthenticator->validarAccessToken($accessToken);
@@ -35,7 +37,11 @@ class API extends AbstractResourceListener {
             exit;
         }
     }
-
+    
+    public function getAcessToken(){
+        return $this->accessToken;        
+    }
+    
     public function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');

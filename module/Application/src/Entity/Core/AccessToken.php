@@ -35,6 +35,16 @@ class AccessToken extends AbstractDatabase {
             return false;
         }
     }
+    
+    public function getEmailUsuarioByAccessToken($accessToken){
+        $sql = "SELECT email FROM api_access_token ac
+                    INNER JOIN usuarios us ON us.id = ac.id_usuario
+                    WHERE ac.access_token = '{$accessToken}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['email'];            
+    }
 
     public function getAccessTokenByUsuario($idUsuario) {
         $sql = new Sql($this->AdapterBD);

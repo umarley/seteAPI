@@ -8,22 +8,27 @@ use Laminas\ApiTools\Rest\AbstractResourceListener;
 
 class UserResource extends API {
 
-    /**
-     * Create a resource
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
+    public function __construct() {
+        parent::__construct();
+        $this->_model = new UserModel();
+    }
+
     public function create($data) {
+        $userType = $this->event->getRouteMatch()->getParam('user_type');
+        switch ($userType) {
+            case 'api':
+                $validate = $this->_model->validarUsuario($data);
+                if (!$validate['result']) {
+                    $this->populaResposta(400, $validate, false);
+                } else {
+                    $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
+                    $this->populaResposta(200, $arResult, false);
+                }
+                break;
+            case 'sete':
 
-        $rota = $this->event->getRouteMatch();
-        $params = $rota->getParams();
-
-        var_dump($params);
-        echo 'Umarley';
-
-        exit;
-        // return new ApiProblem(405, 'The POST method has not been defined');
+                break;
+        }
     }
 
     /**
@@ -61,7 +66,7 @@ class UserResource extends API {
         var_dump($id);
         var_dump($paramsUri);
         var_dump($paramsQuery);
-        
+
         echo "Email: " . $paramsQuery['email'];
         exit;
         return new ApiProblem(405, 'The GET method has not been defined for individual resources');
@@ -74,8 +79,17 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = []) {
+        $userType = $this->event->getRouteMatch()->getParam('user_type');
+        switch ($userType) {
+            case 'api':
+                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
+                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
+                $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
+                break;
+            case 'sete':
 
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+                break;
+        }
     }
 
     /**
@@ -117,7 +131,22 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $params = $this->event->getParams();
+        $userType = $this->event->getRouteMatch()->getParam('user_type');
+        switch ($userType) {
+            case 'api':
+                $validate = $this->_model->validarUsuarioUpdate($data);
+                if (!$validate['result']) {
+                    $this->populaResposta(400, $validate, false);
+                } else {
+                    $arResult = $this->_model->processarUpdate($id, $data, $this->getAcessToken());
+                    $this->populaResposta(200, $arResult, false);
+                }
+                break;
+            case 'sete':
+
+                break;
+        }
     }
 
 }
