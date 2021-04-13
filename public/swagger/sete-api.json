@@ -8,7 +8,7 @@
       "email": "umarley.faria@ufg.br"
     }
   },
-  "host": "sete.api",
+  "host": "seteapi.umarleyricardo.eti.br",
   "tags": [
     {
       "name": "Authenticator",
