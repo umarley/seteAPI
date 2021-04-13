@@ -66,8 +66,8 @@ class SeteRotas extends AbstractDatabase {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("avg(tempo)")])
                 ->where("codigo_cidade = {$municipio}");
-                echo $sql->prepareStatementForSqlObject($select);
-                exit;
+                //echo $sql->prepareStatementForSqlObject($select);
+                //exit;
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
