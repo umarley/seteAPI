@@ -12,9 +12,32 @@ class MunicipiosModel {
 
     public function getAll() {
         $arDados = $this->_entity->getLista();
+        foreach ($arDados as $key => $value){
+            $arDados[$key]['usa_sistema'] = $this->checarSeMunicipioEstaUsandoSistema($value['codigo_ibge']);
+        }
         return $arDados;
     }
-
+    
+    private function checarSeMunicipioEstaUsandoSistema($codigoMunicipio){
+        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
+        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
+        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
+        $dbSeteRotas = new \Db\Sete\SeteRotas();
+        
+        $qtdEscolas = $dbSeteEscolas->qtdEscolasAtendidas($codigoMunicipio);
+        $qtdAlunos = $dbSeteAlunos->qtdAlunosAtendidos($codigoMunicipio);
+        $qtdVeiculos = $dbSeteVeiculos->qtdVeiculosFuncionando($codigoMunicipio);
+        $qtdVeiculosManutencao = $dbSeteVeiculos->qtdVeiculosManutencao($codigoMunicipio);
+        $qtdRotas = $dbSeteRotas->qtdRotas($codigoMunicipio);
+        
+        $somatoria = ($qtdAlunos + $qtdEscolas + $qtdRotas + $qtdVeiculos + $qtdVeiculosManutencao);
+        if($somatoria > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
     public function getById($codigo) {
         $dbSeteEscolas = new \Db\Sete\SeteEscolas();
         $dbSeteAlunos = new \Db\Sete\SeteAlunos();
