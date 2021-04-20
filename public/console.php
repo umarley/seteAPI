@@ -53,7 +53,7 @@ if (@$_SERVER['SERVER_ADDR'] !== '10.10.50.41') {
 }
 
 //Início do serviço
-//sleep(60);
+sleep(60);
 mainLoadData();
 
 function mainLoadData() {
