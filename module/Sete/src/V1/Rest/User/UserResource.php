@@ -26,7 +26,7 @@ class UserResource extends API {
                 }
                 break;
             case 'sete':
-
+                
                 break;
         }
     }
@@ -59,17 +59,17 @@ class UserResource extends API {
      */
     public function fetch($id) {
 
-        $rota = $this->event->getRouteMatch();
-        $paramsUri = $rota->getParams();
-        $paramsQuery = $this->event->getQueryParams();
-
-        var_dump($id);
-        var_dump($paramsUri);
-        var_dump($paramsQuery);
-
-        echo "Email: " . $paramsQuery['email'];
-        exit;
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        $userType = $this->event->getRouteMatch()->getParam('user_type');
+        switch ($userType) {
+            case 'api':
+                
+                break;
+            case 'sete':
+                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
+                $codigoCidade = $userType = $this->event->getRouteMatch()->getParam('user_id');
+                $this->populaResposta(200, $this->_model->getListaUsuariosSeteByCidade($codigoCidade, $busca));
+                break;
+        }
     }
 
     /**
@@ -87,7 +87,7 @@ class UserResource extends API {
                 $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
                 break;
             case 'sete':
-
+                
                 break;
         }
     }

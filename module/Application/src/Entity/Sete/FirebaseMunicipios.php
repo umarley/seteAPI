@@ -44,7 +44,7 @@ class FirebaseMunicipios extends AbstractDatabase {
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
                     INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
         if(!empty($busca)){
-            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+            $sql .= " WHERE mun.nome LIKE '{$busca}%'";
         }
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -62,7 +62,7 @@ class FirebaseMunicipios extends AbstractDatabase {
                     INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
                     INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
         if(!empty($busca)){
-            $sql .= " WHERE mun.nome LIKE '%{$busca}%'";
+            $sql .= " WHERE mun.nome LIKE '{$busca}%'";
         }
         $sql .= " LIMIT {$offset}, {$limit}";
         $statement = $this->AdapterBD->createStatement($sql);
@@ -82,6 +82,38 @@ class FirebaseMunicipios extends AbstractDatabase {
                 'n_motoristas' => $dbSeteMotoristas->qtdMotoristas($row['codigo_municipio']),
                 'n_tempo_medio_rota' => $dbSeteRotas->qtdRotasTempoMedio($row['codigo_municipio'])
             ];
+        }
+        return $arLista;
+    }
+    
+    public function getMunicipiosListaExcel() {
+        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
+        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
+        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
+        $dbSeteRotas = new \Db\Sete\SeteRotas();
+        $dbSeteMotoristas = new \Db\Sete\SeteMotoristas();
+        $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
+                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
+                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf
+                    ORDER BY est.nome, mun.nome ASC";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $key => $row) {
+            $rowArray = (array) $row;
+            
+            $arLista[] = array_merge($rowArray,  [
+                'n_escolas' => !empty($dbSeteEscolas->qtdEscolasAtendidas($row['codigo_municipio'])) ? $dbSeteEscolas->qtdEscolasAtendidas($row['codigo_municipio']) : '0',
+                'n_alunos' => !empty($dbSeteAlunos->qtdAlunosAtendidos($row['codigo_municipio'])) ? $dbSeteAlunos->qtdAlunosAtendidos($row['codigo_municipio']) : '0',
+                'n_veiculos_funcionamento' => !empty($dbSeteVeiculos->qtdVeiculosFuncionando($row['codigo_municipio'])) ? $dbSeteVeiculos->qtdVeiculosFuncionando($row['codigo_municipio']) : '0',
+                'n_veiculos_manutencao' => !empty($dbSeteVeiculos->qtdVeiculosManutencao($row['codigo_municipio'])) ? $dbSeteVeiculos->qtdVeiculosManutencao($row['codigo_municipio']) : '0',
+                'n_rotas' => !empty($dbSeteRotas->qtdRotas($row['codigo_municipio'])) ? $dbSeteRotas->qtdRotas($row['codigo_municipio']) : '0',
+                'n_rotas_kilometragem_total' => !empty($dbSeteRotas->qtdRotasKilometragemTotal($row['codigo_municipio'])) ? $dbSeteRotas->qtdRotasKilometragemTotal($row['codigo_municipio']) : '0',
+                'n_rotas_kilometragem_media' => !empty($dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio'])) ? $dbSeteRotas->qtdRotasKilometragemMedia($row['codigo_municipio']) : '0',
+                'n_motoristas' => !empty($dbSeteMotoristas->qtdMotoristas($row['codigo_municipio'])) ? $dbSeteMotoristas->qtdMotoristas($row['codigo_municipio']) : '0',
+                'n_tempo_medio_rota' => !empty($dbSeteRotas->qtdRotasTempoMedio($row['codigo_municipio'])) ? $dbSeteRotas->qtdRotasTempoMedio($row['codigo_municipio']) : '0'
+            ]);
         }
         return $arLista;
     }

@@ -17,7 +17,7 @@ class PermissaoFirebaseResource extends \Sete\V1\API
         if(!$boValidate['result']){
             $this->populaResposta(400, $boValidate, false);
         }else{
-            $arResult = $this->_model->processarPermissaoFirebase($data);
+            $arResult = $this->_model->processarPermissaoFirebase($data, $this->getAcessToken());
             $this->populaResposta($arResult['codeHTTP'], $arResult['resposta'], false);
         }
     }

@@ -137,7 +137,8 @@
             "type": "string",
             "enum": [
               "mapa",
-              "lista"
+              "lista",
+              "excel"
             ]
           },
           {
@@ -438,6 +439,58 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/RetUsuariosPOST"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
+    },
+    "/users/sete/{codigo_cidade}": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Listar todos os usuários do SETE de um municipio",
+        "operationId": "getUsuariosSeteByCidade",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "codigo_cidade",
+            "in": "path",
+            "description": "Parâmetro para ser informada a página de resultados que deve ser exibida",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "busca",
+            "in": "query",
+            "description": "Parâmetro que poderá conter o nome do usuário ou email para busca",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ListUsuariosAPI"
               }
             }
           },
