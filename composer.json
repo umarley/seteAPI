@@ -38,6 +38,7 @@
         "laminas/laminas-loader": "^2.7",
         "laminas/laminas-zendframework-bridge": "^1.0",
         "morrislaptop/firestore-php": "^2.2",
+        "phpoffice/phpspreadsheet": "^1.17",
         "phpseclib/phpseclib": "^3.0"
     },
     "require-dev": {

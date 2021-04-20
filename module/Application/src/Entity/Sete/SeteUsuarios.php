@@ -56,5 +56,22 @@ class SeteUsuarios extends AbstractDatabase {
         $row = $statement->execute()->current();
         return $row['QTD'];
     }
+    
+    public function getUsuariosLiberadosSistemaByCidade($codigoCidade, $busca = ""){
+        $sql = "select su.uid, su.nome, su.cpf, su.telefone, su.email from sete_usuarios su 
+                    where codigo_cidade  = {$codigoCidade}
+                    and uid in (select uid from sete_usuarios_liberados sul) ";
+                    if(!empty($busca)){
+                        $sql .= " AND (su.nome LIKE '{$busca}%' OR su.email LIKE '{$busca}%')";
+                    }
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
 
 }

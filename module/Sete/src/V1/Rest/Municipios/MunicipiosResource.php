@@ -74,6 +74,9 @@ class MunicipiosResource extends \Sete\V1\API
                 $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
                 $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
                 break;
+            case 'excel':
+                $this->populaResposta(200, $this->_model->processarExcel(), false);
+                break;
         }
     }
 

@@ -100,5 +100,10 @@ class UserModel {
     public function isValidMd5($md5 = '') {
         return strlen($md5) == 32 && ctype_xdigit($md5);
     }
+    
+    public function getListaUsuariosSeteByCidade($codigoCidade, $busca){
+        $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
+        return $dbSeteUsuario->getUsuariosLiberadosSistemaByCidade($codigoCidade, $busca);
+    }
 
 }

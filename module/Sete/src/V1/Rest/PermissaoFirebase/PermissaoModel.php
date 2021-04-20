@@ -38,7 +38,7 @@ class PermissaoModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function processarPermissaoFirebase($arDados) {
+    public function processarPermissaoFirebase($arDados, $accessToken) {
         $dbModelFirebase = new \Application\Model\FirebaseModel();
         $findEmail = $dbModelFirebase->procurarDocumentoUsuarioPorEmail($arDados->email);
         if (!empty($findEmail)) {
@@ -46,31 +46,36 @@ class PermissaoModel {
             $codigoCidade = $findEmail[$uidUsuario]['COD_CIDADE'];
             $documentoFirestore = $dbModelFirebase->getDocumentoByIdConfig($codigoCidade);
             if (!$documentoFirestore) {
-                return $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados);
+                return $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados, $accessToken);
             } else {
-                return $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore);
+                return $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore, $accessToken);
             }
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Email não encontrado no firestore!"], 'codeHTTP' => 404];
         }
     }
 
-    private function liberarUsuarioFirebaseColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao, $documentoFirestore) {
+    private function liberarUsuarioFirebaseColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao, $documentoFirestore, $accessToken) {
         $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
+        $dbAPILiberacaoUsuario = new \Db\API\ApiLiberacaoUsuario();
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
         $uidUsuario = key($arUsuarioFirestore);
         if (!in_array($uidUsuario, $documentoFirestore['users'])) {
             ($arRequisicao->tipo_permissao === 'admin') ? array_push($documentoFirestore['admin'], $uidUsuario) : array_push($documentoFirestore['readers'], $uidUsuario);
             array_push($documentoFirestore['users'], $uidUsuario);
             $dbModelFirebase->setDocumentoColecaoConfig($arUsuarioFirestore[$uidUsuario]['COD_CIDADE'], $documentoFirestore);
             $dbSeteUsuariosLiberados->_inserir(['uid' => $uidUsuario, 'type' => 'users']);
+            $dbAPILiberacaoUsuario->_inserir(['uid' => $uidUsuario, 'dt_liberacao' => date("Y-m-d H:i:s"), 'criado_por' => $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken)]);
             return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Usuário já com o acesso liberado!"], 'codeHTTP' => 200];
         }
     }
 
-    private function criarDocumentoComCamposColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao) {
+    private function criarDocumentoComCamposColecaoConfig(\Application\Model\FirebaseModel $dbModelFirebase, $arUsuarioFirestore, $arRequisicao, $accessToken) {
         $dbSeteUsuariosLiberados = new \Db\Sete\SeteUsuariosLiberados();
+        $dbAPILiberacaoUsuario = new \Db\API\ApiLiberacaoUsuario();
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
         $uidUsuario = key($arUsuarioFirestore);
         $codigoCidade = $arUsuarioFirestore[$uidUsuario]['COD_CIDADE'];
         $arNovoDocumento = [
@@ -82,6 +87,7 @@ class PermissaoModel {
         array_push($arNovoDocumento['users'], $uidUsuario);
         $dbModelFirebase->setDocumentoColecaoConfig($codigoCidade, $arNovoDocumento);
         $dbSeteUsuariosLiberados->_inserir(['uid' => $uidUsuario, 'type' => 'users']);
+        $dbAPILiberacaoUsuario->_inserir(['uid' => $uidUsuario, 'dt_liberacao' => date("Y-m-d H:i:s"), 'criado_por' => $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken)]);
         return ['resposta' => ['result' => true, 'messages' => "Email incluido na lista de acesso!"], 'codeHTTP' => 201];
     }
     
