@@ -4,6 +4,7 @@ namespace Application\Model;
 
 use Google\Cloud\Firestore\FirestoreClient;
 
+
 class FirebaseModel {
 
     private $_db;
@@ -249,6 +250,10 @@ class FirebaseModel {
             $dbSeteFirebaseMunicipios->_inserir(['codigo_municipio' => $row]);
         }
         return $arDocumentos;
+    }
+    
+    public function excluirDocumentoUsuarioPorUID($uid) {
+        $this->_db->collection('cities')->document($uid)->delete();
     }
 
 }

@@ -106,5 +106,14 @@ class PermissaoModel {
             'registros' => $arData
           ];
     }
+    
+    public function excluirUsuarioNaoLiberado($uid){
+        
+    }
+    
+    private function deleteUsuarioSete($uid){
+        $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
+        $arDadosUsuario = $dbSeteUsuario->get
+    }
 
 }

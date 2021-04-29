@@ -14,6 +14,11 @@ class SeteUsuarios extends AbstractDatabase {
         $this->primaryKey = 'uid';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
+    
+    public function getById($uid){
+        $arRow = $this->select("uid = {$uid}")->current();
+        return $arRow;
+    }
 
     public function usuarioExiste($uid) {
         $sql = "SELECT COUNT(*) AS qtd FROM sete_usuarios us

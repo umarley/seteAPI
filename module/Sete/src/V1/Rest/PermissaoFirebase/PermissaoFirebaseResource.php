@@ -24,7 +24,12 @@ class PermissaoFirebaseResource extends \Sete\V1\API
 
     public function delete($id)
     {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+       if(empty($id)){
+           $this->populaResposta(400, ['result' => false, 'messages' => 'O UID do usuário deve ser informado!'], false);         
+       }else{
+           $this->populaResposta(200, $this->_model->excluirUsuarioNaoLiberado($id), false);
+       } 
+       
     }
 
     public function deleteList($data)
