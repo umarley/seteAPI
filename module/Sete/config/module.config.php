@@ -120,6 +120,7 @@ return [
             'collection_name' => 'permissao_firebase',
             'entity_http_methods' => [
                 0 => 'GET',
+                1 => 'DELETE',
             ],
             'collection_http_methods' => [
                 0 => 'POST',
@@ -222,7 +223,7 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.permissao-firebase',
                 'route_identifier_name' => 'permissao_firebase_id',
-                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
             ],
             \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseCollection::class => [
                 'entity_identifier_name' => 'id',

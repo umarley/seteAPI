@@ -251,6 +251,50 @@
         }
       }
     },
+    "/permissao-firebase/{uid}": {
+      "delete": {
+        "tags": [
+          "Permissão Firebase"
+        ],
+        "summary": "Exclui um usuário da lista de liberação.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "uid",
+            "in": "path",
+            "description": "Access Token",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PermissaoFirebaseResposta"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "415": {
+            "description": "Unsupported Media Type"
+          }
+        }
+      }
+    },
     "/permissao-firebase/usuarios-liberar": {
       "get": {
         "tags": [
