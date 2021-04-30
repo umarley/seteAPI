@@ -10,11 +10,15 @@ class FirebaseModel {
     private $_db;
 
     public function __construct() {
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../../../../config/autoload/google.local.json');
+        $this->setarCredenciaisGoogle();
 
         $this->_db = new FirestoreClient([
             'projectId' => 'softwareter'
         ]);
+    }
+    
+    public function setarCredenciaisGoogle(){
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../../../../config/autoload/google.local.json');
     }
 
     public function procurarDocumentoUsuarioPorEmail($email) {
@@ -253,7 +257,7 @@ class FirebaseModel {
     }
     
     public function excluirDocumentoUsuarioPorUID($uid) {
-        $this->_db->collection('cities')->document($uid)->delete();
+        $this->_db->collection('users')->document($uid)->delete();
     }
 
 }

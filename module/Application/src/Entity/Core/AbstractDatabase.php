@@ -146,7 +146,7 @@ class AbstractDatabase extends TableGateway {
     public function _delete($id) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where($this->primaryKey . " = " . $id);
+        $delete->where($this->primaryKey . " =  '{$id}'");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

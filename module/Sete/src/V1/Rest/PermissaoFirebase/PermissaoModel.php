@@ -108,12 +108,30 @@ class PermissaoModel {
     }
     
     public function excluirUsuarioNaoLiberado($uid){
-        
+        $boOperacao = $this->excluirUsuarioFirebaseAuthentication($uid);
+        if(!$boOperacao['result']){
+            return ['result' => false, 'messages' => $boOperacao['messages']];
+        }else{
+            $dbFirebaseModel = new \Application\Model\FirebaseModel();
+            $dbSeteUsuarios = new \Db\Sete\SeteUsuarios();
+            $dbFirebaseModel->excluirDocumentoUsuarioPorUID($uid);
+            return $dbSeteUsuarios->_delete($uid);
+        }
     }
     
-    private function deleteUsuarioSete($uid){
-        $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
-        $arDadosUsuario = $dbSeteUsuario->get
+    private function excluirUsuarioFirebaseAuthentication($uid){
+       exec("export GOOGLE_APPLICATION_CREDENTIALS='/var/www/seteAPI/config/autoload/google.local.json' && node /var/www/seteAPI/daemon/firebase_del_user.js {$uid}", $retorno, $var);
+       $strRetorno = ""; 
+       foreach ($retorno as $line){
+           $strRetorno .= str_replace(["code", "message"], ["\"code\"", "\"message\""], $line);
+       }
+       $objeto = str_replace("'", "\"", $strRetorno);
+       $arRetorno = json_decode($objeto, true);
+       if(isset($arRetorno['code'])){
+           return ['result' => false, 'messages' => $arRetorno['code']. " / ". $arRetorno['message']];
+       }else{
+           return ['result' => true];
+       }
     }
 
 }
