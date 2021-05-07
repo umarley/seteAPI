@@ -4,7 +4,6 @@ namespace Application\Model;
 
 use Google\Cloud\Firestore\FirestoreClient;
 
-
 class FirebaseModel {
 
     private $_db;
@@ -16,12 +15,13 @@ class FirebaseModel {
             'projectId' => 'softwareter'
         ]);
     }
-    
-    public function setarCredenciaisGoogle(){
+
+    public function setarCredenciaisGoogle() {
         putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../../../../config/autoload/google.local.json');
     }
 
     public function procurarDocumentoUsuarioPorEmail($email) {
+        $this->gravaLogFirebase('users');
         $usersRef = $this->_db->collection('users');
         $query = $usersRef->where('EMAIL', '==', $email);
         $documents = $query->documents();
@@ -35,6 +35,7 @@ class FirebaseModel {
     }
 
     public function getDocumentosConfig() {
+        $this->gravaLogFirebase('config');
         $configRefs = $this->_db->collection('config')->documents();
         $arLista = [];
         foreach ($configRefs as $row) {
@@ -49,6 +50,7 @@ class FirebaseModel {
      * @param String $doc
      */
     public function getDocumentoByIdConfig($doc) {
+        $this->gravaLogFirebase('config', $doc);
         $configRefs = $this->_db->collection('config')->document($doc);
         $snapshot = $configRefs->snapshot();
         if ($snapshot->exists()) {
@@ -59,12 +61,26 @@ class FirebaseModel {
     }
 
     public function setDocumentoColecaoConfig($documento, $arCampos) {
+        $this->gravaLogFirebase('config', $documento);
         $citiesRef = $this->_db->collection('config');
         $citiesRef->document($documento)->set($arCampos);
         return true;
     }
 
+    private function gravaLogFirebase($colecao, $document = null, $municipio = null) {
+        $dbCoreLogFirebase = new \Db\Core\LogFirebase();
+        $arResult = $dbCoreLogFirebase->_inserir([
+            'colecao' => $colecao,
+            'dt_leitura' => date("Y-m-d H:i:s"),
+            'document' => $document,
+            'codigo_cidade' => $municipio
+        ]);
+        
+        var_dump($arResult);
+    }
+
     private function getDocumentosMunicipios() {
+        $this->gravaLogFirebase('municipios');
         $configRefs = $this->_db->collection('municipios')->documents();
         $arLista = [];
         foreach ($configRefs as $row) {
@@ -72,8 +88,9 @@ class FirebaseModel {
         }
         return $arLista;
     }
-    
+
     public function getUsersFirebase() {
+        $this->gravaLogFirebase('users');
         $configRefs = $this->_db->collection('users')->documents();
         $arLista = [];
         $auxiliar = 0;
@@ -86,6 +103,7 @@ class FirebaseModel {
     }
 
     public function getAlunosMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('alunos', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('alunos')->documents();
         $arLista = [];
@@ -99,6 +117,7 @@ class FirebaseModel {
     }
 
     public function getEscolasMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('escolas', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('escolas')->documents();
         $arLista = [];
@@ -112,6 +131,7 @@ class FirebaseModel {
     }
 
     public function getEscolasTemAluno($codigoMunicipio) {
+        $this->gravaLogFirebase('escolatemalunos', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('escolatemalunos')->documents();
         $arLista = [];
@@ -125,6 +145,7 @@ class FirebaseModel {
     }
 
     public function getGaragens($codigoMunicipio) {
+        $this->gravaLogFirebase('garagem', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('garagem')->documents();
         $arLista = [];
@@ -138,6 +159,7 @@ class FirebaseModel {
     }
 
     public function getMotoristas($codigoMunicipio) {
+        $this->gravaLogFirebase('motoristas', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('motoristas')->documents();
         $arLista = [];
@@ -151,6 +173,7 @@ class FirebaseModel {
     }
 
     public function getRotasMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('rotas', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('rotas')->documents();
         $arLista = [];
@@ -164,6 +187,7 @@ class FirebaseModel {
     }
 
     public function getVeiculosMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('veiculos', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('veiculos')->documents();
         $arLista = [];
@@ -177,6 +201,7 @@ class FirebaseModel {
     }
 
     public function getRotasAtendeAlunoMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('rotaatendealuno', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('rotaatendealuno')->documents();
         $arLista = [];
@@ -190,6 +215,7 @@ class FirebaseModel {
     }
 
     public function getRotasDirigidaPorMotoristaMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('rotadirigidapormotorista', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('rotadirigidapormotorista')->documents();
         $arLista = [];
@@ -201,8 +227,9 @@ class FirebaseModel {
         }
         return $arLista;
     }
-    
+
     public function getRotasPassaPorEscolaMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('rotapassaporescolas', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('rotapassaporescolas')->documents();
         $arLista = [];
@@ -214,8 +241,9 @@ class FirebaseModel {
         }
         return $arLista;
     }
-    
-        public function getRotasPossuiVeiculoMunicipio($codigoMunicipio) {
+
+    public function getRotasPossuiVeiculoMunicipio($codigoMunicipio) {
+        $this->gravaLogFirebase('rotapossuiveiculo', null, $codigoMunicipio);
         $configRefs = $this->_db->collection('municipios')->document($codigoMunicipio)
                         ->collection('rotapossuiveiculo')->documents();
         $arLista = [];
@@ -255,8 +283,9 @@ class FirebaseModel {
         }
         return $arDocumentos;
     }
-    
+
     public function excluirDocumentoUsuarioPorUID($uid) {
+        $this->gravaLogFirebase('users', $uid);
         $this->_db->collection('users')->document($uid)->delete();
     }
 

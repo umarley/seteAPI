@@ -6,6 +6,7 @@
  * The previous config file has been stored in ./config/modules.config.old
  */
 return [
+    'Laminas\Cache',
     'Laminas\\Db',
     'Laminas\\Filter',
     'Laminas\\Hydrator',
