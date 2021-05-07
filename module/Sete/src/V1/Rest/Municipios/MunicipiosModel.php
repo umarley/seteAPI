@@ -15,9 +15,17 @@ class MunicipiosModel {
     }
 
     public function getAll() {
-        $arDados = $this->_entity->getLista();
-        foreach ($arDados as $key => $value) {
-            $arDados[$key]['usa_sistema'] = $this->checarSeMunicipioEstaUsandoSistema($value['codigo_ibge']);
+        $cacheRedis = new \Db\Core\CacheRedis();
+        $cache = $cacheRedis->criaCacheAdapter(43200);
+        $existeCache = $cache->getItem('mapaMunicipios');
+        if (empty($existeCache)) {
+            $arDados = $this->_entity->getLista();
+            foreach ($arDados as $key => $value) {
+                $arDados[$key]['usa_sistema'] = $this->checarSeMunicipioEstaUsandoSistema($value['codigo_ibge']);
+            }
+            $cache->addItem('mapaMunicipios', json_encode($arDados));
+        }else{
+            $arDados = json_decode($existeCache, true);
         }
         return $arDados;
     }
@@ -77,12 +85,20 @@ class MunicipiosModel {
     }
 
     public function processarExcel() {
-        $arDados = $this->_entity->getMunicipiosListaExcel();
-        return $this->gerarArquivoExcel($arDados);        
+        $cacheRedis = new \Db\Core\CacheRedis();
+        $cache = $cacheRedis->criaCacheAdapter(21600);
+        $existeCache = $cache->getItem('excelMunicipios');
+        if(empty($existeCache)){
+            $arDados = $this->_entity->getMunicipiosListaExcel();
+            $cache->addItem('excelMunicipios', json_encode($arDados));
+        }else{
+            $arDados = json_decode($existeCache, true);
+        }
+        return $this->gerarArquivoExcel($arDados);
     }
-    
-    private function gerarArquivoExcel($arDados){
-        $nomeExcel = uniqid("cidades-sete").".xlsx";
+
+    private function gerarArquivoExcel($arDados) {
+        $nomeExcel = uniqid("cidades-sete") . ".xlsx";
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $spreadsheet->setActiveSheetIndex(0)
@@ -103,28 +119,28 @@ class MunicipiosModel {
 
         $writer = new Xlsx($spreadsheet);
         $pathArquivoGerado = "./data/{$nomeExcel}";
-        try{
+        try {
             $writer->save($pathArquivoGerado);
             $operacao = true;
         } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $ex) {
             $operacao = false;
             $messages = $ex->getMessage();
-        } 
+        }
         return $this->retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages);
     }
-    
-    private function retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages = ""){
-        if($operacao){
-            rename($pathArquivoGerado, $_SERVER['DOCUMENT_ROOT']."/exports/{$nomeExcel}");
+
+    private function retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages = "") {
+        if ($operacao) {
+            rename($pathArquivoGerado, $_SERVER['DOCUMENT_ROOT'] . "/exports/{$nomeExcel}");
             return [
-              'result' => true,
-              'messages' => "Arquivo gerado com sucesso!",
-              'file' => "exports/{$nomeExcel}"  
+                'result' => true,
+                'messages' => "Arquivo gerado com sucesso!",
+                'file' => "exports/{$nomeExcel}"
             ];
-        }else{
+        } else {
             return [
-              'result' => false,
-              'messages' => "Falha ao gerar o arquivo!" . $messages 
+                'result' => false,
+                'messages' => "Falha ao gerar o arquivo!" . $messages
             ];
         }
     }
