@@ -4,16 +4,21 @@ namespace Application\Model;
 
 use Google\Cloud\Firestore\FirestoreClient;
 
+
 class FirebaseModel {
 
     private $_db;
 
     public function __construct() {
-        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../../../../config/autoload/google.local.json');
+        $this->setarCredenciaisGoogle();
 
         $this->_db = new FirestoreClient([
             'projectId' => 'softwareter'
         ]);
+    }
+    
+    public function setarCredenciaisGoogle(){
+        putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../../../../config/autoload/google.local.json');
     }
 
     public function procurarDocumentoUsuarioPorEmail($email) {
@@ -249,6 +254,10 @@ class FirebaseModel {
             $dbSeteFirebaseMunicipios->_inserir(['codigo_municipio' => $row]);
         }
         return $arDocumentos;
+    }
+    
+    public function excluirDocumentoUsuarioPorUID($uid) {
+        $this->_db->collection('users')->document($uid)->delete();
     }
 
 }

@@ -1,0 +1,15 @@
+{
+  "name": "sete-api",
+  "version": "1.0.0",
+  "description": "Excluir contas de usuário no authentication pela API do Sete",
+  "main": "firebase_del_user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^8.4.2",
+    "firebase-admin": "^9.7.0"
+  }
+}
