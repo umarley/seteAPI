@@ -1,8 +1,10 @@
 CREATE TABLE sete.sys_log_firebase (
 	colecao varchar(100) NOT NULL,
 	dt_leitura DATETIME NOT NULL,
+        document varchar(255) NULL,
 	codigo_cidade varchar(100) NULL,
-	CONSTRAINT sys_log_firebase_pk PRIMARY KEY (colecao,dt_leitura)
+        id_log bigint(20) auto_increment NOT NULL,
+	CONSTRAINT sys_log_firebase_pk PRIMARY KEY (id_log)
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8

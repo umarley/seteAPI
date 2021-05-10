@@ -21,6 +21,7 @@ class SeteAlunos extends AbstractDatabase {
                 ->columns(['id_aluno'])
                 ->where("a.codigo_aluno_firebase = '{$idFirebase}'")
                 ->where("a.codigo_cidade = {$codigoMunicipio}");
+                echo $sql->buildSqlString($select);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
         if($row->count() > 0){
