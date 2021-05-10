@@ -19,8 +19,7 @@ class FirebaseMunicipios extends AbstractDatabase {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
-                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf'])
-                ->where('us.codigo_municipio = 3200102');
+                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf']);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $arLista = [];
         $this->getResultSet($prepare->execute());
