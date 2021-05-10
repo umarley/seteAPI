@@ -23,6 +23,7 @@ class SeteAlunos extends AbstractDatabase {
                 ->where("a.codigo_cidade = {$codigoMunicipio}");
                 echo $sql->buildSqlString($select);
                 echo "\r\n";
+                exit;
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
         if($row->count() > 0){
