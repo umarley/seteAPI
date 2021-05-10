@@ -19,9 +19,10 @@ class SeteAlunos extends AbstractDatabase {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['a' => $this->tableIdentifier])
                 ->columns(['id_aluno'])
-                ->where("a.codigo_aluno_firebase = '{$idFirebase}'")
+                ->where("a.codigo_aluno_firebase = '".addslashes($idFirebase)."'")
                 ->where("a.codigo_cidade = {$codigoMunicipio}");
                 echo $sql->buildSqlString($select);
+                echo "\r\n";
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
         if($row->count() > 0){
