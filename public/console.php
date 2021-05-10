@@ -65,9 +65,8 @@ function mainLoadData() {
     if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)) {
         cargaUsers();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_USERS, ['data_carga' => date('Y-m-d H:i:s')]);
+        cargaUsuariosLiberados();
     }
-
-    cargaUsuariosLiberados();
 }
 
 function cargaUsuariosLiberados() {
