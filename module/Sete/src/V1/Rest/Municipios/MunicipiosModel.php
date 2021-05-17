@@ -16,7 +16,7 @@ class MunicipiosModel {
 
     public function getAll() {
         $cacheRedis = new \Db\Core\CacheRedis();
-        $cache = $cacheRedis->criaCacheAdapter(43200);
+        $cache = $cacheRedis->criaCacheAdapter(10800);
         $existeCache = $cache->getItem('mapaMunicipios');
         if (empty($existeCache)) {
             $arDados = $this->_entity->getLista();
