@@ -75,8 +75,6 @@ class FirebaseModel {
             'document' => $document,
             'codigo_cidade' => $municipio
         ]);
-        
-        var_dump($arResult);
     }
 
     private function getDocumentosMunicipios() {
