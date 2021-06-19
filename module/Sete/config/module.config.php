@@ -6,6 +6,7 @@ return [
             \Sete\V1\Rest\Authenticator\AuthenticatorResource::class => \Sete\V1\Rest\Authenticator\AuthenticatorResourceFactory::class,
             \Sete\V1\Rest\Municipios\MunicipiosResource::class => \Sete\V1\Rest\Municipios\MunicipiosResourceFactory::class,
             \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResource::class => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResourceFactory::class,
+            \Sete\V1\Rest\Alunos\AlunosResource::class => \Sete\V1\Rest\Alunos\AlunosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -46,6 +47,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.alunos' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/alunos[/:alunos_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Alunos\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -54,6 +64,7 @@ return [
             1 => 'sete.rest.authenticator',
             2 => 'sete.rest.municipios',
             3 => 'sete.rest.permissao-firebase',
+            4 => 'sete.rest.alunos',
         ],
     ],
     'api-tools-rest' => [
@@ -132,6 +143,28 @@ return [
             'collection_class' => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseCollection::class,
             'service_name' => 'PermissaoFirebase',
         ],
+        'Sete\\V1\\Rest\\Alunos\\Controller' => [
+            'listener' => \Sete\V1\Rest\Alunos\AlunosResource::class,
+            'route_name' => 'sete.rest.alunos',
+            'route_identifier_name' => 'alunos_id',
+            'collection_name' => 'alunos',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Alunos\AlunosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Alunos\AlunosCollection::class,
+            'service_name' => 'Alunos',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -139,6 +172,7 @@ return [
             'Sete\\V1\\Rest\\Authenticator\\Controller' => 'Json',
             'Sete\\V1\\Rest\\Municipios\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Alunos\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -161,6 +195,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Alunos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -176,6 +215,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Alunos\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -229,6 +272,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.permissao-firebase',
                 'route_identifier_name' => 'permissao_firebase_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Alunos\AlunosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.alunos',
+                'route_identifier_name' => 'alunos_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\Alunos\AlunosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.alunos',
+                'route_identifier_name' => 'alunos_id',
                 'is_collection' => true,
             ],
         ],

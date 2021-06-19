@@ -15,6 +15,7 @@ class AbstractDatabasePostgres extends TableGateway {
 
     protected $AdapterBD;
     protected $primaryKey;
+    protected $schema;
     protected $sql;
     protected $tableIdentifier;
     protected $configName;
@@ -27,7 +28,7 @@ class AbstractDatabasePostgres extends TableGateway {
     public function __construct($configName) {
         $config = $this->montaConfiguracaoAdapter($configName);
         $this->AdapterBD = new Adapter($config);
-        $this->tableIdentifier = new TableIdentifier($this->table);
+        $this->tableIdentifier = new TableIdentifier($this->table, $this->schema);
         parent::__construct($this->table, $this->AdapterBD);
     }
 
