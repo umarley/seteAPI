@@ -10,6 +10,14 @@ return [
                 'password' => '834451',
                 'charset' => 'utf8'
             ],
+            'sete_postgres' => [
+                'database' => 'sete',
+                'driver' => 'PDO_pgsql',
+                'hostname' => 'localhost',
+                'username' => 'root',
+                'password' => '834451',
+                'charset' => 'utf8'
+            ],
         ],
     ],
 ];
