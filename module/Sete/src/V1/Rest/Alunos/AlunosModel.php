@@ -15,29 +15,59 @@ class AlunosModel {
     }
 
     public function getAll($codigoMunicipio) {
-
         $arDados = $this->_entity->qtdAlunosAtendidos($codigoMunicipio);
-
         return $arDados;
     }
 
     public function getById($codigo) {
-        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
-        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
-        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
-        $dbSeteRotas = new \Db\Sete\SeteRotas();
-        $arData = $this->_entity->getByCodigoIBGE($codigo);
-        $arData['data'] = [
-            'n_escolas' => $dbSeteEscolas->qtdEscolasAtendidas($codigo),
-            'n_alunos' => $dbSeteAlunos->qtdAlunosAtendidos($codigo),
-            'n_veiculos_funcionamento' => $dbSeteVeiculos->qtdVeiculosFuncionando($codigo),
-            'n_veiculos_manutencao' => $dbSeteVeiculos->qtdVeiculosManutencao($codigo),
-            'n_rotas' => $dbSeteRotas->qtdRotas($codigo),
-            'n_rotas_kilometragem_total' => $dbSeteRotas->qtdRotasKilometragemTotal($codigo),
-            'n_rotas_kilometragem_media' => $dbSeteRotas->qtdRotasKilometragemMedia($codigo),
-            'n_tempo_medio_rota' => $dbSeteRotas->qtdRotasTempoMedio($codigo)
-        ];
-        return $arData;
+        return [];
+    }
+
+    public function prepareInsert($arPost) {
+        
+    }
+
+    public function validarInsert($arPost) {
+        $arPost = (Array) $arPost;
+        $boValidate = true;
+        $arErros = [];
+        if (!isset($arPost['codigo_cidade']) || empty($arPost['codigo_cidade'])) {
+            $boValidate = false;
+            $arErros['codigo_cidade'] = "O código da cidade deve ser informado!";
+        } else {
+            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+            if (!$dbMunicipio->municipioExiste($arPost['codigo_cidade'])) {
+                $boValidate = false;
+                $arErros['codigo_cidade'] = "O código da cidade não existe. Verifique e tente novamente!";
+            }
+        }
+        if(!isset($arPost['nome']) || empty($arPost['nome'])){
+            $boValidate = false;
+            $arErros['nome'] = "O nome do aluno deve ser informado!";
+        }
+        if(!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])){
+            $boValidate = false;
+            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+        }
+        if(!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])){
+            $boValidate = false;
+            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
+        }
+        if(!isset($arPost['grau_responsavel']) || empty($arPost['grau_responsavel'])){
+            $boValidate = false;
+            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+        }
+        if($boValidate){
+            return $this->validarParametrosInsertAluno($arPost);
+        }else{
+            return ['result' => $boValidate, 'messages' => $arErros];
+        }        
+    }
+    
+    private function validarParametrosInsertAluno($arPost){
+        $arValoresBooleanos = ['S', 'N'];
+        $arValoresSexo = [1, 2, 3];
+        $arValoresCor = [1, 2, 3];
     }
 
     public function getListaPaginada($pagina, $busca = "") {
@@ -53,67 +83,6 @@ class AlunosModel {
             'pg_atual' => (int) $pagina,
             'registros' => $arData
         ];
-    }
-
-    public function processarExcel() {
-        $cacheRedis = new \Db\Core\CacheRedis();
-        $cache = $cacheRedis->criaCacheAdapter(21600);
-        $existeCache = $cache->getItem('excelMunicipios');
-        if (empty($existeCache)) {
-            $arDados = $this->_entity->getMunicipiosListaExcel();
-            $cache->addItem('excelMunicipios', json_encode($arDados));
-        } else {
-            $arDados = json_decode($existeCache, true);
-        }
-        return $this->gerarArquivoExcel($arDados);
-    }
-
-    private function gerarArquivoExcel($arDados) {
-        $nomeExcel = uniqid("cidades-sete") . ".xlsx";
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $spreadsheet->setActiveSheetIndex(0)
-                ->setCellValue('A1', 'Código IBGE')
-                ->setCellValue('B1', 'Cidade')
-                ->setCellValue('C1', 'Estado')
-                ->setCellValue('D1', 'UF')
-                ->setCellValue('E1', 'Quantidade Escolas')
-                ->setCellValue('F1', 'Quantidade Alunos')
-                ->setCellValue('G1', 'Qtd Veículos em funcionamento')
-                ->setCellValue('H1', 'Qtd Veículos em Manutenção!')
-                ->setCellValue('I1', 'Quantidade de Rotas')
-                ->setCellValue('J1', 'Distância total das rotas (km)')
-                ->setCellValue('K1', 'Distância média das rotas (km)')
-                ->setCellValue('L1', 'Quantidade de motoristas')
-                ->setCellValue('M1', 'Tempo médio das rotas (min)');
-        $sheet->fromArray($arDados, NULL, 'A2');
-
-        $writer = new Xlsx($spreadsheet);
-        $pathArquivoGerado = "./data/{$nomeExcel}";
-        try {
-            $writer->save($pathArquivoGerado);
-            $operacao = true;
-        } catch (\PhpOffice\PhpSpreadsheet\Writer\Exception $ex) {
-            $operacao = false;
-            $messages = $ex->getMessage();
-        }
-        return $this->retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages);
-    }
-
-    private function retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages = "") {
-        if ($operacao) {
-            rename($pathArquivoGerado, $_SERVER['DOCUMENT_ROOT'] . "/exports/{$nomeExcel}");
-            return [
-                'result' => true,
-                'messages' => "Arquivo gerado com sucesso!",
-                'file' => "exports/{$nomeExcel}"
-            ];
-        } else {
-            return [
-                'result' => false,
-                'messages' => "Falha ao gerar o arquivo!" . $messages
-            ];
-        }
     }
 
 }
