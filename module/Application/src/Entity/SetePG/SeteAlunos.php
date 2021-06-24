@@ -26,6 +26,19 @@ class SeteAlunos extends AbstractDatabasePostgres {
         return $row['qtd'];
     }    
     
+    public function alunoExiste($cpf){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("cpf = '{$cpf}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if($row['qtd'] > 0){
+            return true;
+        }else{
+            return false;
+        }
+    } 
     
 
 }

@@ -8,9 +8,9 @@ class MecTpLocalizacao {
     const URBANA = 1;
     const RURAL = 2;
     
-    const SEXOS = [
-        self::SEXO_MASCULINO,
-        self::SEXO_FEMININO
+    const LOCALIZACAO = [
+        self::URBANA,
+        self::RURAL
     ];
     
     public function getLabelSexo($valor){

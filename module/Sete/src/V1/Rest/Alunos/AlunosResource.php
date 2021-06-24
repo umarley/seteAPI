@@ -14,13 +14,13 @@ class AlunosResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        var_dump($data);
         $modelAlunos = new AlunosModel();
         $boValidate = $modelAlunos->validarInsert($data);
-        var_dump($boValidate);
-        
-        exit;
-        return new ApiProblem(405, 'The POST method has not been defined');
+        if($boValidate['result']){
+            return $modelAlunos->prepareInsert($data);
+        }else{
+            return $boValidate;
+        }
     }
 
     /**

@@ -23,7 +23,11 @@ class GlbMunicipios extends AbstractDatabasePostgres {
                 ->where("codigo_ibge = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
-        return $row['qtd'];
+        if($row['qtd'] > 0){
+            return true;
+        }else{
+            return false;
+        }
     }    
     
     

@@ -2022,9 +2022,9 @@ class Utils
 
 
     public static function validarCpf($cpf = null) {
-
+            
         // Verifica se um número foi informado
-        if(empty($cpf)) {
+        if(empty($cpf) || !is_numeric($cpf)) {
             return false;
         }
 
