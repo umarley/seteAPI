@@ -30,7 +30,12 @@ class AlunosModel {
         $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
         $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
         $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
-        return $this->_entity->_inserir($arPost);
+        $arResult = $this->_entity->_inserir($arPost);
+        if($arResult['result']){
+            $arResult['messages']['id'] = $this->_entity->getUltimoIdInserido();
+        }
+        
+        return $arResult;
     }
 
     public function validarInsert($arPost) {

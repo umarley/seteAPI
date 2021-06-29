@@ -40,5 +40,14 @@ class SeteAlunos extends AbstractDatabasePostgres {
         }
     } 
     
+    public function getUltimoIdInserido(){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_aluno)")]);
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['id'];
+    }
+    
 
 }
