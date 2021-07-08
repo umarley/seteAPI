@@ -6,11 +6,11 @@ use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
-class SeteAlunos extends AbstractDatabasePostgres {
+class SeteEscolas extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_alunos';
-        $this->primaryKey = 'id_aluno';
+        $this->table = 'sete_escolas';
+        $this->primaryKey = 'id_escola';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -19,7 +19,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_aluno = {$arIds['id_aluno']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_escola = {$arIds['id_escola']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -28,7 +28,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_aluno', 'nome', 'cpf'])
+                ->columns(['codigo_cidade', 'id_escola', 'nome'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -66,7 +66,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_aluno)")]);
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_escola)")]);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['id'];
@@ -76,7 +76,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_aluno' => $arId['id_aluno']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_escola' => $arId['id_escola']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -99,7 +99,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

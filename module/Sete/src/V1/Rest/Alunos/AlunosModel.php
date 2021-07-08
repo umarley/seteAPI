@@ -15,12 +15,18 @@ class AlunosModel {
     }
 
     public function getAll($codigoMunicipio) {
-        $arDados = $this->_entity->qtdAlunosAtendidos($codigoMunicipio);
+        $arDados = $this->_entity->getLista($codigoMunicipio);
         return $arDados;
     }
 
-    public function getById($codigo) {
-        return [];
+    public function getById($codigoCidade, $idAluno) {
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_aluno'] = $idAluno;
+        $arRow = $this->_entity->getById($arIds);
+        if (!empty($arRow)) {
+            $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
+        }
+        return $arRow;
     }
 
     public function prepareInsert($arPost) {
@@ -31,10 +37,10 @@ class AlunosModel {
         $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
         $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
         $arResult = $this->_entity->_inserir($arPost);
-        if($arResult['result']){
+        if ($arResult['result']) {
             $arResult['messages']['id'] = $this->_entity->getUltimoIdInserido();
         }
-        
+
         return $arResult;
     }
 
@@ -154,6 +160,67 @@ class AlunosModel {
         }
 
         return ['result' => $boValidate, 'messages' => $arErros];
+    }
+
+    public function validarUpdate($arPost) {
+        $arPost = (Array) $arPost;
+        $boValidate = true;
+        $arErros = [];
+        if (!isset($arPost['nome']) || empty($arPost['nome'])) {
+            $boValidate = false;
+            $arErros['nome'] = "O nome do aluno deve ser informado!";
+        }
+        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
+            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
+            $dbAluno = new \Db\SetePG\SeteAlunos();
+            if (!$cpfValido) {
+                $boValidate = false;
+                $arErros['cpf'] = "O cpf informado é inválido!";
+            }
+            if ($dbAluno->alunoExiste($arPost['cpf'])) {
+                $boValidate = false;
+                $arErros['cpf'] = "O cpf informado já existe!";
+            }
+        }
+        if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
+            $boValidate = false;
+            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+        }
+        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+            $boValidate = false;
+            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
+        }
+        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
+            $boValidate = false;
+            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+        }
+        if ($boValidate) {
+            return $this->validarParametrosInsertAluno($arPost);
+        } else {
+            return ['result' => $boValidate, 'messages' => $arErros];
+        }
+    }
+
+    public function prepareUpdate($codigoCidade, $idAluno, $arPost) {
+        $arPost = (Array) $arPost;
+        unset($arPost['codigo_cidade']);
+        unset($arPost['id_aluno']);
+        $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
+        $arPost['da_mataburro'] = isset($arPost['da_mataburro']) ? $arPost['da_mataburro'] : 'N';
+        $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
+        $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
+        $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
+        $arId['codigo_cidade'] = $codigoCidade;
+        $arId['id_aluno'] = $idAluno;
+        $arResult = $this->_entity->_atualizar($arId, $arPost);
+        return $arResult;
+    }
+    
+    public function removerRegistroById($codigoCidade, $idAluno){
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_aluno'] = $idAluno;
+        $arResult = $this->_entity->_delete($arIds);
+        return $arResult;
     }
 
     public function getListaPaginada($pagina, $busca = "") {

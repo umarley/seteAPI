@@ -7,6 +7,7 @@ return [
             \Sete\V1\Rest\Municipios\MunicipiosResource::class => \Sete\V1\Rest\Municipios\MunicipiosResourceFactory::class,
             \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResource::class => \Sete\V1\Rest\PermissaoFirebase\PermissaoFirebaseResourceFactory::class,
             \Sete\V1\Rest\Alunos\AlunosResource::class => \Sete\V1\Rest\Alunos\AlunosResourceFactory::class,
+            \Sete\V1\Rest\Escolas\EscolasResource::class => \Sete\V1\Rest\Escolas\EscolasResourceFactory::class,
         ],
     ],
     'router' => [
@@ -50,9 +51,18 @@ return [
             'sete.rest.alunos' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/alunos[/:alunos_id]',
+                    'route' => '/alunos[/:codigo_cidade[/:alunos_id]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Alunos\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.escolas' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/escolas[/:codigo_cidade[/:escolas_id]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Escolas\\Controller',
                     ],
                 ],
             ],
@@ -65,6 +75,7 @@ return [
             2 => 'sete.rest.municipios',
             3 => 'sete.rest.permissao-firebase',
             4 => 'sete.rest.alunos',
+            5 => 'sete.rest.escolas',
         ],
     ],
     'api-tools-rest' => [
@@ -157,6 +168,8 @@ return [
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
+                3 => 'DELETE',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -164,6 +177,29 @@ return [
             'entity_class' => \Sete\V1\Rest\Alunos\AlunosEntity::class,
             'collection_class' => \Sete\V1\Rest\Alunos\AlunosCollection::class,
             'service_name' => 'Alunos',
+        ],
+        'Sete\\V1\\Rest\\Escolas\\Controller' => [
+            'listener' => \Sete\V1\Rest\Escolas\EscolasResource::class,
+            'route_name' => 'sete.rest.escolas',
+            'route_identifier_name' => 'escolas_id',
+            'collection_name' => 'escolas',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'DELETE',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Escolas\EscolasEntity::class,
+            'collection_class' => \Sete\V1\Rest\Escolas\EscolasCollection::class,
+            'service_name' => 'Escolas',
         ],
     ],
     'api-tools-content-negotiation' => [
@@ -173,6 +209,7 @@ return [
             'Sete\\V1\\Rest\\Municipios\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\PermissaoFirebase\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Alunos\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Escolas\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -200,6 +237,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Escolas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -219,6 +261,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Alunos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Escolas\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -284,6 +330,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.alunos',
                 'route_identifier_name' => 'alunos_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Escolas\EscolasEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.escolas',
+                'route_identifier_name' => 'escolas_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\Escolas\EscolasCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.escolas',
+                'route_identifier_name' => 'escolas_id',
                 'is_collection' => true,
             ],
         ],
