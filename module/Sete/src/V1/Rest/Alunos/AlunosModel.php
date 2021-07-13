@@ -103,11 +103,11 @@ class AlunosModel {
         }
         if (isset($arPost['da_mataburro']) && !in_array($arPost['da_mataburro'], $arValoresBooleanos)) {
             $boValidate = false;
-            $arErros['da_mataburro'] = "O o valor do objeto da_mataburro deve ser S ou N";
+            $arErros['da_mataburro'] = "O valor do objeto da_mataburro deve ser S ou N";
         }
         if (isset($arPost['da_colchete']) && !in_array($arPost['da_colchete'], $arValoresBooleanos)) {
             $boValidate = false;
-            $arErros['da_colchete'] = "O o valor do objeto da_colchete deve ser S ou N";
+            $arErros['da_colchete'] = "O valor do objeto da_colchete deve ser S ou N";
         }
         if (isset($arPost['da_atoleiro']) && !in_array($arPost['da_atoleiro'], $arValoresBooleanos)) {
             $boValidate = false;

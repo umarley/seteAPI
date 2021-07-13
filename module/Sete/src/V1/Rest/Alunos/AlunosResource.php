@@ -59,6 +59,8 @@ class AlunosResource extends AbstractResourceListener {
     public function fetch($id) {
         $modelAlunos = new AlunosModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        var_dump($arParams);
+        exit;
         $codigoCidade = $arParams['codigo_cidade'];
         $idAluno = $arParams['alunos_id'];
         return $modelAlunos->getById($codigoCidade, $idAluno);
@@ -71,7 +73,10 @@ class AlunosResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = []) {
-        $codigoCidade = $_GET['codigo_cidade'];
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        var_dump($arParams);
+        exit;
+        $codigoCidade = $arParams['codigo_cidade'];
         if (!isset($codigoCidade) || empty($codigoCidade)) {
             return ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"];
         } else {

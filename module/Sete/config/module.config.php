@@ -51,7 +51,7 @@ return [
             'sete.rest.alunos' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/alunos[/:codigo_cidade[/:alunos_id]]',
+                    'route' => '/alunos[/:codigo_cidade[/:alunos_id[/:rota]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Alunos\\Controller',
                     ],
