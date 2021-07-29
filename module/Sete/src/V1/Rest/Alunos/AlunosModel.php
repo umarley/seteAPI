@@ -15,7 +15,11 @@ class AlunosModel {
     }
 
     public function getAll($codigoMunicipio) {
+        $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
+        foreach ($arDados as $key => $row){
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoMunicipio}/{$row['id_aluno']}");
+        }
         return $arDados;
     }
 
@@ -26,6 +30,8 @@ class AlunosModel {
         if (!empty($arRow)) {
             $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
         }
+        $urlHelper = new \Application\Utils\UrlHelper();
+        $arRow['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoCidade}/{$idAluno}/escola");
         return $arRow;
     }
 
@@ -77,6 +83,11 @@ class AlunosModel {
         if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
             $boValidate = false;
             $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+        } else {
+            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
+                $boValidate = false;
+                $arErros['data_nascimento'] = "A data informada é inválida!";
+            }
         }
         if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
             $boValidate = false;
@@ -162,7 +173,7 @@ class AlunosModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUpdate($arPost) {
+    public function validarUpdate($arPost, $idAluno) {
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
@@ -177,7 +188,7 @@ class AlunosModel {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado é inválido!";
             }
-            if ($dbAluno->alunoExiste($arPost['cpf'])) {
+            if ($dbAluno->alunoExiste($arPost['cpf'], $idAluno)) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado já existe!";
             }
@@ -185,6 +196,11 @@ class AlunosModel {
         if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
             $boValidate = false;
             $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+        } else {
+            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
+                $boValidate = false;
+                $arErros['data_nascimento'] = "A data informada é inválida!";
+            }
         }
         if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
             $boValidate = false;
@@ -215,8 +231,8 @@ class AlunosModel {
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
-    
-    public function removerRegistroById($codigoCidade, $idAluno){
+
+    public function removerRegistroById($codigoCidade, $idAluno) {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_aluno'] = $idAluno;
         $arResult = $this->_entity->_delete($arIds);

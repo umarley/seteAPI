@@ -10,7 +10,7 @@ class API extends AbstractResourceListener {
     protected $_model;
     protected $accessToken;
 
-    public function __construct() {
+    public function __construct($AuthAPI = true) {
         $headers = apache_request_headers();
         if (key_exists('Authorization', $headers)) {
             $accessToken = $headers['Authorization'];
@@ -40,6 +40,16 @@ class API extends AbstractResourceListener {
     
     public function getAcessToken(){
         return $this->accessToken;        
+    }
+    
+    protected function usuarioPodeAcessarCidade($codigoCidade){
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);
+        if($cidadeUsuario == $codigoCidade){
+            return true;
+        }else{
+            return false;
+        }
     }
     
     public function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {

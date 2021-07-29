@@ -28,7 +28,18 @@ class GlbMunicipios extends AbstractDatabasePostgres {
         }else{
             return false;
         }
-    }    
+    }
+
+    public function getByCodigo($codigoCidade){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['cid' => $this->tableIdentifier])
+                ->columns(['nm_cidade' => 'nome', 'codigo_uf'])
+                ->join(['est' => new TableIdentifier('glb_estado', $this->schema)], "cid.codigo_uf = est.codigo", ['estado' => 'nome'])
+                ->where("cid.codigo_ibge = {$codigoCidade}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row;
+    }
     
     
 

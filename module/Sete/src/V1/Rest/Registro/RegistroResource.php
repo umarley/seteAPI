@@ -1,16 +1,14 @@
 <?php
 
-namespace Sete\V1\Rest\Authenticator;
+namespace Sete\V1\Rest\Registro;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
-class AuthenticatorResource extends AbstractResourceListener {
+class RegistroResource extends AbstractResourceListener {
 
-    public function __construct() {
-        $this->_model = new AuthenticatorModel();
-    }
-
+    private $_model;
+    
     /**
      * Create a resource
      *
@@ -18,16 +16,47 @@ class AuthenticatorResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function create($data) {
-        $arParams = $this->getEvent()->getRouteMatch()->getParams();
-        $conteudo = file_get_contents("php://input");
-        $arPost = json_decode($conteudo, true);
-        if (isset($arParams['tipo'])) {
-            $arResult = $this->_model->autenticarUsuarioSETE($arPost);
+        $this->_model = new \Sete\V1\Rest\User\UserModel();
+        $codigoCidade = $this->event->getRouteMatch()->getParam('registro_id');
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
         } else {
-            $arResult = $this->_model->autenticarUsuario($arPost);
+            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+            if (!$dbMunicipio->municipioExiste($codigoCidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
+            }
+        }
+        $boValidate = $this->_model->validarUsuarioSETE($data);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, $boValidate, false);
+        } else {
+            $data->codigo_cidade = $codigoCidade;
+            $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+            $this->populaResposta(201, $arResult, false);
+        }
+    }
+    
+    private function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
+        header('Content-Type: application/json', true, $codigoStatus);
+
+        if ($retornaLista) {
+            $arResult['data'] = $arResposta;
+            $arResult['total'] = count($arResposta);
+        }else{
+            $arResult = $arResposta;
+        }
+        
+        if($codigoStatus !== 404){
+            $arResult['result'] = isset($arResposta['result']) ? $arResposta['result'] : true;
+        }else{
+            $arResult['result'] = false;
         }
 
-        return $arResult;
+        echo json_encode($arResult);
+        exit;
     }
 
     /**
@@ -57,7 +86,6 @@ class AuthenticatorResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function fetch($id) {
-
         return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
@@ -68,22 +96,7 @@ class AuthenticatorResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function fetchAll($params = []) {
-        $headers = apache_request_headers();
-        if (key_exists('Authorization', $headers)) {
-            $accessToken = $headers['Authorization'];
-            if (!empty($accessToken)) {
-                $valido = $this->_model->validarAccessToken($accessToken);
-                if ($valido) {
-                    return ['result' => true, 'messages' => 'Access Token válido!'];
-                } else {
-                    return ['result' => false, 'messages' => 'Access Token inválido!'];
-                }
-            } else {
-                return new ApiProblem(406, 'Cabeçalho Authorization vazio.');
-            }
-        } else {
-            return new ApiProblem(406, 'Cabeçalho Authorization ausente.');
-        }
+        return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
     /**

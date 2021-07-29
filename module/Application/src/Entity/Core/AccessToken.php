@@ -2,31 +2,34 @@
 
 namespace Db\Core;
 
-use Db\Core\AbstractDatabase;
+use Db\Core\AbstractDatabasePostgres;
 use Zend\Db\Sql\Sql;
 use Zend\Db\Sql\Predicate\Expression;
 
-class AccessToken extends AbstractDatabase {
+class AccessToken extends AbstractDatabasePostgres {
 
     const EXPIRES_ACCESS_TOKEN = 10800; //3 horas
 
     public function __construct() {
-        $this->table = 'api_access_token';
+        $this->table = 'api_access_token'; 
         $this->primaryKey = 'access_token';
-        parent::__construct(AbstractDatabase::DATABASE_CORE);
+        $this->schema = 'api';
+        parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
 
     public function accessTokenValido($accessToken) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['tempo_percorrido' => new Expression("unix_timestamp(NOW()) - unix_timestamp(dt_criacao)"), 'expires'])
+                ->columns(['dt_criacao', 'expires'])
                 ->where("access_token = '{$accessToken}'");
-        //echo $sql->buildSqlString($select);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $arCount = $prepare->execute()->count();
         if ($arCount > 0) {
             $arRow = $prepare->execute()->current();
-            if ($arRow['tempo_percorrido'] > $arRow['expires']) {
+            $secondsCriacaoToken = strtotime($arRow['dt_criacao']);
+            $secondsAtual = strtotime('now');
+            $tempoPercorrido = $secondsAtual - $secondsCriacaoToken;
+            if ($tempoPercorrido > $arRow['expires']) {
                 return false;
             } else {
                 return true;
@@ -39,6 +42,16 @@ class AccessToken extends AbstractDatabase {
     public function getEmailUsuarioByAccessToken($accessToken){
         $sql = "SELECT email FROM api_access_token ac
                     INNER JOIN usuarios us ON us.id = ac.id_usuario
+                    WHERE ac.access_token = '{$accessToken}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['email'];            
+    }
+    
+    public function getEmailUsuarioSETEByAccessToken($accessToken){
+        $sql = "SELECT email FROM api.api_access_token ac
+                    INNER JOIN sete.sete_usuarios us ON us.id_usuario = ac.id_usuario
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -58,7 +71,7 @@ class AccessToken extends AbstractDatabase {
         return $arRow['access_token'];
     }
 
-    public function gerarAccessToken($usuario) {
+    public function gerarAccessTokenAPI($usuario) {
         $dbSIRUsuario = new \Db\Core\Usuario();
         $idUsuario = $dbSIRUsuario->getIdUsuarioByUsername($usuario);
         $accessToken = sha1(time()) . "-{$usuario}";
@@ -75,6 +88,35 @@ class AccessToken extends AbstractDatabase {
             'access_token' => $accessToken,
             'expires_in' => self::EXPIRES_ACCESS_TOKEN
         ];
+    }
+    
+    public function gerarAccessTokenUsuarioSETE($usuario) {
+        $dbSIRUsuario = new \Db\SetePG\SeteUsuarios();
+        $idUsuario = $dbSIRUsuario->getIdUsuarioByUsername($usuario);
+        $accessToken = sha1(time()) . "-{$usuario}";
+        $dataCriacao = date("Y-m-d H:i:s");
+
+        $row = $this->_inserir([
+            'access_token' => $accessToken,
+            'id_usuario' => $idUsuario,
+            'expires' => self::EXPIRES_ACCESS_TOKEN,
+            'dt_criacao' => $dataCriacao
+        ]);
+
+        return [
+            'access_token' => $accessToken,
+            'expires_in' => self::EXPIRES_ACCESS_TOKEN
+        ];
+    }
+    
+    public function getCodigoCidadeUsuarioAutenticado($accessToken){
+        $sql = "select us.codigo_cidade from api.api_access_token aat 
+                    inner join sete.sete_usuarios us on aat.id_usuario = us.id_usuario 
+                    where aat.access_token = '{$accessToken}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['codigo_cidade']; 
     }
 
 }

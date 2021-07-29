@@ -73,6 +73,7 @@ class AbstractDatabasePostgres extends TableGateway {
         $insert->columns($arColunas);
         $insert->values($arValues);
         $sql = $this->sql->buildSqlString($insert);
+        //$sql = str_replace("`", "", $sql);
         $statement = $this->AdapterBD->createStatement($sql);
         try {
             $result = $statement->execute();

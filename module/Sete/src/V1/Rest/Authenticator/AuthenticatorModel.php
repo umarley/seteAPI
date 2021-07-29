@@ -36,6 +36,24 @@ class AuthenticatorModel {
         }
     }
     
+    public function autenticarUsuarioSETE($arPost){
+        $dbCoreUsuarioPG = new \Db\SetePG\SeteUsuarios();
+        if($dbCoreUsuarioPG->checkUsuarioAndPassword($arPost['usuario'], $arPost['senha'])){
+            $dbCoreAccessToken = new \Db\Core\AccessToken();
+            $arDadosUsuario = $dbCoreUsuarioPG->getUsuarioByUsername($arPost['usuario']);
+            $arAccessToken = $dbCoreAccessToken->gerarAccessTokenUsuarioSETE($arDadosUsuario['email']);
+            $arAccessToken['tipo_permissao'] = $arDadosUsuario['nivel_permissao'];
+            $arResult['result'] = true;
+            $arResult['access_token'] = $arAccessToken;
+            $arResult['messages'] = "Login efetuado com sucesso!";
+        }else{
+            $arResult['result'] = false;
+            $arResult['status'] =  403;
+            $arResult['messages'] = "Usuário / Senha não conferem!";
+        }
+        return $arResult;
+    }
+    
     
     
 }

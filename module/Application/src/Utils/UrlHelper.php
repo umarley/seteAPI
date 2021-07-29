@@ -17,7 +17,7 @@ class UrlHelper {
         $this->url = $this->protocolo . $this->host . $this->uri;
         $this->basePath = getcwd() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;  
         
-        $this->forcarUsoHTTPS();
+        //$this->forcarUsoHTTPS();
         
     }
     

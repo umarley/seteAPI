@@ -15,6 +15,7 @@ class UserResource extends API {
 
     public function create($data) {
         $userType = $this->event->getRouteMatch()->getParam('user_type');
+        $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
         switch ($userType) {
             case 'api':
                 $validate = $this->_model->validarUsuario($data);
@@ -22,11 +23,26 @@ class UserResource extends API {
                     $this->populaResposta(400, $validate, false);
                 } else {
                     $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
-                    $this->populaResposta(200, $arResult, false);
+                    $this->populaResposta(201, $arResult, false);
                 }
                 break;
             case 'sete':
-                
+                if (!isset($codigoCidade) || empty($codigoCidade)) {
+                    $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
+                } else {
+                    $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+                    if (!$dbMunicipio->municipioExiste($codigoCidade)) {
+                        $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
+                    }
+                }
+                $boValidate = $this->_model->validarUsuarioSETE($data);
+                if (!$boValidate['result']) {
+                    $this->populaResposta(400, $boValidate, false);
+                } else {
+                    $data->codigo_cidade = $codigoCidade;
+                    $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+                    $this->populaResposta(201, $arResult, false);
+                }
                 break;
         }
     }
@@ -58,16 +74,14 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function fetch($id) {
-
         $userType = $this->event->getRouteMatch()->getParam('user_type');
+        $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
         switch ($userType) {
             case 'api':
-                
+
                 break;
             case 'sete':
-                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
-                $codigoCidade = $userType = $this->event->getRouteMatch()->getParam('user_id');
-                $this->populaResposta(200, $this->_model->getListaUsuariosSeteByCidade($codigoCidade, $busca));
+                $this->populaResposta(200, $this->_model->getById($id, $codigoCidade), false);
                 break;
         }
     }
@@ -80,6 +94,8 @@ class UserResource extends API {
      */
     public function fetchAll($params = []) {
         $userType = $this->event->getRouteMatch()->getParam('user_type');
+        $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
+        $userId = $this->event->getRouteMatch()->getParam('user_id');
         switch ($userType) {
             case 'api':
                 $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
@@ -87,9 +103,24 @@ class UserResource extends API {
                 $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
                 break;
             case 'sete':
-                
+                if (isset($userId)) {
+                    $this->fetch($userId);
+                } else {
+                    $this->populaResposta(200, $this->_model->getListaTodosUsuariosSETE($codigoCidade), true);
+                }
+
+                break;
+            case 'logout':
+                $this->logout();
                 break;
         }
+    }
+    
+    private function logout(){
+        $accessToken = $this->getAcessToken();
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $dbCoreAccessToken->_delete($accessToken);
+        $this->populaResposta(200, ['result' => true, 'messages' => 'Logout efetuado com sucesso!'] , false); 
     }
 
     /**

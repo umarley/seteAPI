@@ -15,7 +15,11 @@ class EscolasModel {
     }
 
     public function getAll($codigoMunicipio) {
+        $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
+        foreach ($arDados as $key => $row){
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoMunicipio}/{$row['id_escola']}");
+        }
         return $arDados;
     }
 
@@ -23,6 +27,8 @@ class EscolasModel {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_escola'] = $idEscola;
         $arRow = $this->_entity->getById($arIds);
+        $urlHelper = new \Application\Utils\UrlHelper();
+        $arRow['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoCidade}/{$idEscola}/alunos");
         return $arRow;
     }
 

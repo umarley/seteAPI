@@ -6,10 +6,10 @@ use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
-class SeteEscolas extends AbstractDatabasePostgres {
+class SeteEscolaTemAluno extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_escolas';
+        $this->table = 'sete_escola_tem_alunos';
         $this->primaryKey = 'id_escola';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
@@ -17,12 +17,26 @@ class SeteEscolas extends AbstractDatabasePostgres {
 
     public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_escola = {$arIds['id_escola']}");
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['esc' => new \Laminas\Db\Sql\TableIdentifier('sete_escolas', 'sete')], "eta.id_escola = esc.id_escola AND eta.codigo_cidade = esc.codigo_cidade", ['*'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_aluno = {$arIds['id_aluno']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
+    }
+    
+    public function getAlunosByEscola($codigoCidade, $idEscola){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf'])
+                ->where("eta.codigo_cidade = {$codigoCidade} AND eta.id_escola = {$idEscola}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $this->getResultSet($prepare->execute());
+        $arLista = [];
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
+        }
+        return $arLista;
     }
 
     public function getLista($municipio) {
@@ -38,22 +52,12 @@ class SeteEscolas extends AbstractDatabasePostgres {
         }
         return $arLista;
     }
-
-    public function qtdAlunosAtendidos($municipio) {
+    
+    public function alunoAssociadoEscola($idAluno, $codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = {$municipio}");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['qtd'];
-    }
-
-    public function escolaExiste($idEscola, $codigoCidade) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("id_escola = '{$idEscola}' AND codigo_cidade = '{$codigoCidade}'");
+                ->where("codigo_cidade = '{$codigoCidade}' AND id_aluno = {$idAluno}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -63,43 +67,10 @@ class SeteEscolas extends AbstractDatabasePostgres {
         }
     }
 
-    public function getUltimoIdInserido() {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_escola)")]);
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id'];
-    }
-
-    public function _atualizar($arId, $dados) {
-        $this->sql = new Sql($this->AdapterBD);
-        $update = $this->sql->update($this->tableIdentifier);
-        $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_escola' => $arId['id_escola']]);
-        $sql = $this->sql->buildSqlString($update);
-        try {
-            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
-            $bool = true;
-            $message = 'Registro atualizado com sucesso!';
-        } catch (\PDOException $ex) {
-            $bool = false;
-            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
-            echo $ex->getMessage();
-            die();
-            //$this->rollback();
-        } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
-            $bool = false;
-            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
-            //$this->rollback();
-        }
-        return ['result' => $bool, 'messages' => $message];
-    }
-
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

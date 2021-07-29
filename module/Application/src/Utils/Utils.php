@@ -2,8 +2,7 @@
 
 namespace Application\Utils;
 
-class Utils
-{
+class Utils {
 
     const MINLATIN = 'á,à,â,ã,ä,é,è,ê,ë,í,ì,î,ï,ó,ò,õ,ô,ö,ú,ù,û,ü,ç,ñ,",\'';
     const MAXLATIN = 'Á,À,Â,Ã,Ä,É,È,Ê,Ë,Í,Ì,Î,Ï,Ó,Ò,Õ,Ô,Ö,Ú,Ù,Û,Ü,Ç,Ñ,",\'';
@@ -12,8 +11,7 @@ class Utils
     /**
      * Complementa um número com zeros à esquerda retornando uma string.<br>
      */
-    public static function adicionarDigitosEsquerda($totalDigitos, $numero)
-    {
+    public static function adicionarDigitosEsquerda($totalDigitos, $numero) {
         $tmNumero = count($numero);
         $novoNumero = '';
         for ($i = 0; $i < ($totalDigitos - $tmNumero); $i++) {
@@ -29,8 +27,7 @@ class Utils
      * Retorno menor que 0 = Data inicial maior.<br>
      * Retorno maior que 0 = Data final maior.
      */
-    public static function difDatas($dt_inicial, $dt_final)
-    {
+    public static function difDatas($dt_inicial, $dt_final) {
         //Data inicial
         list($dia_i, $mes_i, $ano_i) = explode("/", $dt_inicial);
         //Data final
@@ -41,7 +38,7 @@ class Utils
         $mk_f = mktime(0, 0, 0, $mes_f, $dia_f, $ano_f);
         //Acha a diferença entre as datas
         $diferenca = $mk_f - $mk_i;
-        $dias = (int)ceil($diferenca / (60 * 60 * 24));
+        $dias = (int) ceil($diferenca / (60 * 60 * 24));
         if ($dias == 0) {
             //É a mesma data
             return $dias;
@@ -54,8 +51,7 @@ class Utils
         }
     }
 
-    public static function difDatasHoras($dt_inicial, $dt_final)
-    {
+    public static function difDatasHoras($dt_inicial, $dt_final) {
         //Data inicial
         list($dia_i, $mes_i, $ano_i) = explode("/", substr($dt_inicial, 0, 10));
         list($hora_i, $minuto_i) = explode(":", substr($dt_inicial, 11, 15));
@@ -68,7 +64,7 @@ class Utils
         $mk_f = mktime($hora_f, $minuto_f, 0, $mes_f, $dia_f, $ano_f);
         //Acha a diferença entre as datas
         $diferenca = $mk_f - $mk_i;
-        $dias = (int)ceil($diferenca / (60 * 60 * 24));
+        $dias = (int) ceil($diferenca / (60 * 60 * 24));
         if ($dias > 0) {
             //Data final é maior que data inicial
             return true;
@@ -78,8 +74,7 @@ class Utils
         }
     }
 
-    public static function ObjectOrArray2Ul($lista, $id, $class)
-    {
+    public static function ObjectOrArray2Ul($lista, $id, $class) {
         if (is_array($lista) || is_object($lista)) {
             $ar[] = '<div id="tree_' . $id . '" class="' . $class . '">';
             $ar[] = '<ul>';
@@ -91,8 +86,7 @@ class Utils
         }
     }
 
-    public static function validaChaveDeAcessoNotaFiscal($chave, $documentoEmissor)
-    {
+    public static function validaChaveDeAcessoNotaFiscal($chave, $documentoEmissor) {
         $cnpjChave = substr($chave, 6, 14);
         if ($cnpjChave == $documentoEmissor) {
             return true;
@@ -101,8 +95,7 @@ class Utils
         }
     }
 
-    public static function Array2Ul($lista)
-    {
+    public static function Array2Ul($lista) {
         $ul = "";
         if (is_object($lista)) {
             $lista = self::objectToArray($lista);
@@ -126,8 +119,7 @@ class Utils
         return $ul;
     }
 
-    public static function objectToArray($object)
-    {
+    public static function objectToArray($object) {
         if (!is_object($object) && !is_array($object)) {
             return $object;
         }
@@ -141,31 +133,27 @@ class Utils
      * @param Array $array Vetor de dados
      * @return stdClass Objeto stdClass
      */
-    public static function arrayToObject($array)
-    {
+    public static function arrayToObject($array) {
         if (is_array($array)) {
-            return (object)array_map(__METHOD__, $array);
+            return (object) array_map(__METHOD__, $array);
         } else {
             return $array;
         }
     }
 
-    public static function serializar($string)
-    {
+    public static function serializar($string) {
         $string = str_replace("&", CARACTERE_ECOMERCIAL, $string);
         $string = str_replace("=", CARACTERE_IGUAL, $string);
         return $string;
     }
 
-    public static function desserializar($string)
-    {
+    public static function desserializar($string) {
         $string = str_replace(CARACTERE_ECOMERCIAL, "&", $string);
         $string = str_replace(CARACTERE_IGUAL, "=", $string);
         return $string;
     }
 
-    public static function db2tree($ar_registros)
-    {
+    public static function db2tree($ar_registros) {
         //@todo ainda falta completar
         if (is_object($ar_registros)) {
             $ar_registros = self::objectToArray($ar_registros);
@@ -178,7 +166,7 @@ class Utils
                     $ar_registros = self::objectToArray($ar_dado);
                 }
                 if ($valor) {
-
+                    
                 }
             }
         }
@@ -191,8 +179,7 @@ class Utils
      * Esta função transforma um objeto DBTable, que é um array de objetos em
      * um array chave/valor. Necessário haver os campos id e nome
      */
-    public static function DbTable2Array($db_table)
-    {
+    public static function DbTable2Array($db_table) {
         $ar = array();
         foreach ($db_table as $chave => $valor) {
             $ar[$valor->id] = $valor->nome;
@@ -205,8 +192,7 @@ class Utils
      * @param string $valor
      * @return bool
      */
-    public static function checkBool($valor)
-    {
+    public static function checkBool($valor) {
         return strtolower($valor) == 'true' || strtolower($valor) == 'false' || strtolower($valor) == '0' || strtolower($valor) == '1';
     }
 
@@ -215,8 +201,7 @@ class Utils
      * @param mixed $valor
      * @return bool
      */
-    public static function checkInteger($valor)
-    {
+    public static function checkInteger($valor) {
         return is_numeric($valor);
     }
 
@@ -225,8 +210,7 @@ class Utils
      * @param mixed $valor
      * @return bool
      */
-    public static function checkCodigo($valor)
-    {
+    public static function checkCodigo($valor) {
         if (isset($valor)) {
             return $valor && self::checkInteger($valor) && $valor > 0;
         }
@@ -237,8 +221,7 @@ class Utils
      * @param mixed $valor
      * @return bool
      */
-    public static function checkNumeric($valor)
-    {
+    public static function checkNumeric($valor) {
         /**
          * @todo verificar o separador decimal
          */
@@ -250,8 +233,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-    public static function checkText($valor)
-    {
+    public static function checkText($valor) {
         return true;
     }
 
@@ -260,10 +242,9 @@ class Utils
      * @param string $valor
      * @return bool
      */
-    public static function checkDate($valor)
-    {
+    public static function checkDate($valor) {
         $tmp = sscanf($valor, '%d/%d/%d');
-        return checkdate((int)$tmp[1], (int)$tmp[0], (int)$tmp[2]);
+        return checkdate((int) $tmp[1], (int) $tmp[0], (int) $tmp[2]);
     }
 
     /**
@@ -271,8 +252,7 @@ class Utils
      * @param string $hora
      * @return bool
      */
-    public static function checkTime($hora)
-    {
+    public static function checkTime($hora) {
         $tmp = sscanf($hora, '%d:%d');
         if (count($tmp) != 2) {
             return false;
@@ -286,8 +266,7 @@ class Utils
      * @param array $arDados Array de dados para teste
      * @return boolean
      */
-    public static function checkArrayNaoVazio($arDados)
-    {
+    public static function checkArrayNaoVazio($arDados) {
         $boVinculo = false;
         if (!is_array($arDados)) {
             return false;
@@ -305,8 +284,7 @@ class Utils
      * @param string $timestamp
      * @return bool
      */
-    public static function checkTimestamp($timestamp)
-    {
+    public static function checkTimestamp($timestamp) {
         $tmp = explode(" ", $timestamp);
         if (count($tmp) != 2) {
             return false;
@@ -324,41 +302,37 @@ class Utils
      * @param  bool $reset Whether or not to reset the route defaults with those provided
      * @return string Url for the link href attribute.
      */
-    public static function url(array $urlOptions = array(), $name = null, $reset = true, $encode = true)
-    {
+    public static function url(array $urlOptions = array(), $name = null, $reset = true, $encode = true) {
         $urlOptions = array_map('strtolower', $urlOptions);
         $module = isset($urlOptions['module']) ? $urlOptions['module'] : 'application';
         $controller = isset($urlOptions['controller']) ? $urlOptions['controller'] : 'index';
         $action = isset($urlOptions['action']) ? $urlOptions['action'] : 'index';
         $arUrl = parse_url(self::getUrlCurrent());
         return $arUrl['scheme'] . '://' . $arUrl['host'] . $arUrl['path'] .
-            implode('/', [$module, $controller, $action]);
+                implode('/', [$module, $controller, $action]);
     }
 
-    public static function getUrl(array $arrayRota)
-    {
+    public static function getUrl(array $arrayRota) {
         $module = isset($arrayRota['module']) ? $arrayRota['module'] : 'application';
         $controller = isset($arrayRota['controller']) ? $arrayRota['controller'] : 'index';
         $action = isset($arrayRota['action']) ? $arrayRota['action'] : 'index';
         $serverUrl = new \Zend\View\Helper\ServerUrl();
         return $serverUrl->getScheme()
-            . '://' . $serverUrl->getHost()
-            . '/' . self::hifenizar($module)
-            . '/' . self::hifenizar($controller)
-            . '/' . self::hifenizar($action);
+                . '://' . $serverUrl->getHost()
+                . '/' . self::hifenizar($module)
+                . '/' . self::hifenizar($controller)
+                . '/' . self::hifenizar($action);
     }
 
-    public static function getUrlCurrent()
-    {
+    public static function getUrlCurrent() {
         $url = @($_SERVER["HTTPS"] != 'on') ?
-            'http://' . $_SERVER["SERVER_NAME"] :
-            'https://' . $_SERVER["SERVER_NAME"];
+                'http://' . $_SERVER["SERVER_NAME"] :
+                'https://' . $_SERVER["SERVER_NAME"];
         $url .= $_SERVER["REQUEST_URI"];
         return $url;
     }
 
-    public static function gzipAction()
-    {
+    public static function gzipAction() {
         // captura todo conteudo impresso na tela
         ob_start();
         /*
@@ -530,8 +504,7 @@ class Utils
      * Hosting. This function simulates it.
      */
 
-    public static function _mkdir_r($dir_name, $rights = 0777)
-    {
+    public static function _mkdir_r($dir_name, $rights = 0777) {
         $dirs = explode("/", $dir_name);
         $dir = "";
         foreach ($dirs as $part) {
@@ -546,8 +519,7 @@ class Utils
      * @param string $filename Arquivo a ser lido
      * @return string Retorna o conteúdo do arquivo
      */
-    public static function getIncludeContents($filename, $once = false)
-    {
+    public static function getIncludeContents($filename, $once = false) {
         if (self::fileExists($filename)) {
             ob_start();
             if ($once) {
@@ -569,8 +541,7 @@ class Utils
      * @param string $formato
      * @return string
      */
-    public static function dataBr($valor, $formato = 'YYYY-MM-dd')
-    {
+    public static function dataBr($valor, $formato = 'YYYY-MM-dd') {
         if (strlen($valor) == 10) {
             list($dia, $mes, $ano) = explode("/", substr($valor, 0, 10));
 
@@ -587,8 +558,7 @@ class Utils
      * @param string $data
      * @return string
      */
-    public static function ultimoDiaMes($mes, $ano)
-    {
+    public static function ultimoDiaMes($mes, $ano) {
         return date("t", mktime(0, 0, 0, $mes, '01', $ano));
     }
 
@@ -597,8 +567,7 @@ class Utils
      * @param string $data
      * @return string
      */
-    public static function converteDataDB2BR($data)
-    {
+    public static function converteDataDB2BR($data) {
         if (empty($data)) {
             return '';
         }
@@ -611,20 +580,20 @@ class Utils
         }
         return sprintf($format_str, $ar[2], $ar[1], $ar[0], $ar[3], $ar[4]);
     }
-    
-    public static function gerarSlug($str){
+
+    public static function gerarSlug($str) {
         $str = mb_strtolower($str); //Vai converter todas as letras maiúsculas pra minúsculas
         $str = preg_replace('/(â|á|ã)/', 'a', $str);
         $str = preg_replace('/(ê|é)/', 'e', $str);
         $str = preg_replace('/(í|Í)/', 'i', $str);
         $str = preg_replace('/(ú)/', 'u', $str);
-        $str = preg_replace('/(ó|ô|õ|Ô)/', 'o',$str);
-        $str = preg_replace('/(_|\/|!|\?|#)/', '',$str);
-        $str = preg_replace('/( )/', '-',$str);
-        $str = preg_replace('/ç/','c',$str);
-        $str = preg_replace('/(-[-]{1,})/','-',$str);
-        $str = preg_replace('/(,)/','-',$str);
-        $str=strtolower($str);
+        $str = preg_replace('/(ó|ô|õ|Ô)/', 'o', $str);
+        $str = preg_replace('/(_|\/|!|\?|#)/', '', $str);
+        $str = preg_replace('/( )/', '-', $str);
+        $str = preg_replace('/ç/', 'c', $str);
+        $str = preg_replace('/(-[-]{1,})/', '-', $str);
+        $str = preg_replace('/(,)/', '-', $str);
+        $str = strtolower($str);
         return $str;
     }
 
@@ -633,8 +602,7 @@ class Utils
      * @param string $data
      * @return string
      */
-    public static function converteDataDB2BR_DMYHMS($data)
-    {
+    public static function converteDataDB2BR_DMYHMS($data) {
         if (empty($data)) {
             return '';
         }
@@ -652,8 +620,7 @@ class Utils
      * @param string $data
      * @return string
      */
-    public static function converteDataBR2DB($data)
-    {
+    public static function converteDataBR2DB($data) {
         if (empty($data)) {
             return '';
         }
@@ -673,8 +640,7 @@ class Utils
      * @param string $data
      * @return string
      */
-    public static function converteDataYMD($data)
-    {
+    public static function converteDataYMD($data) {
         if (empty($data)) {
             return '';
         }
@@ -690,8 +656,7 @@ class Utils
      * @param date $data
      * @return string
      */
-    public static function formataDataDMY_HMS($data)
-    {
+    public static function formataDataDMY_HMS($data) {
         $ar = sscanf($data, '%d-%d-%d %d:%d');
 
         $novadata = sprintf('%d/%d/%d %d:%d', $ar[2], $ar[1], $ar[0], $ar[3]);
@@ -704,10 +669,10 @@ class Utils
      * @param string $str
      * @return string
      */
-    public static function urlDecodeUTF8($str)
-    {
+    public static function urlDecodeUTF8($str) {
         $str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
-        return html_entity_decode($str, null, 'UTF-8');;
+        return html_entity_decode($str, null, 'UTF-8');
+        ;
     }
 
     /**
@@ -716,8 +681,7 @@ class Utils
      * @param integer $minutos número de minutos que será acrescentado
      * @return string com o novo timestamp
      */
-    public static function addMinutos($timestamp, $minutos)
-    {
+    public static function addMinutos($timestamp, $minutos) {
         $timestamp = System::db()->converteDataBr2DB($timestamp);
         $data = strtotime($timestamp);
         return $data = date('d/m/Y H:i', mktime(date('H', $data), date('i', $data) + $minutos, 0, date('m', $data), date('d', $data), date('Y', $data)));
@@ -729,8 +693,7 @@ class Utils
      * @param integer $dias número de dias que serão adicionados
      * @return string com a nova data
      */
-    public static function addDias($data, $dias)
-    {
+    public static function addDias($data, $dias) {
         $data = self::dataBr($data);
         $data = strtotime($data);
         $date = date('Y-m-d', mktime(0, 0, 0, date('m', $data), date('d', $data) + $dias, date('Y', $data)));
@@ -743,8 +706,7 @@ class Utils
      * @param integer $dias número de dias que serão removidos
      * @return string com a nova data
      */
-    public static function removeDias($data, $dias)
-    {
+    public static function removeDias($data, $dias) {
         $ar = sscanf($data, '%d/%d/%d');
         return date('d/m/Y', mktime(0, 0, 0, $ar[1], $ar[0] - $dias, $ar[2]));
     }
@@ -754,8 +716,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-    public static function decimalBR2decimalPHP($valor)
-    {
+    public static function decimalBR2decimalPHP($valor) {
         $valor = str_replace('.', '', $valor);
         return floatval(str_replace(',', '.', $valor));
     }
@@ -766,8 +727,7 @@ class Utils
      * @param date $date uma data
      * @return timestamp $timestamp
      */
-    public static function str2Timestamp($data)
-    {
+    public static function str2Timestamp($data) {
         $data = str_replace("-", '/', $data);
         $ar = sscanf($data, '%d/%d/%d');
         return mktime(0, 0, 0, $ar[1], $ar[0], $ar[2]);
@@ -779,8 +739,7 @@ class Utils
      * @param date $data_final data no formato string
      * @return integer diferença de datas
      */
-    public static function subtractDatas($data_inicial, $data_final)
-    {
+    public static function subtractDatas($data_inicial, $data_final) {
         // Usa a função criada e pega o timestamp das duas datas:
         $time_inicial = self::str2Timestamp($data_inicial);
         $time_final = self::str2Timestamp($data_final);
@@ -792,7 +751,7 @@ class Utils
         /**
          * @todo Usar floor ao invés de ceil?
          */
-        $dias = (int)ceil($diferenca / (60 * 60 * 24));
+        $dias = (int) ceil($diferenca / (60 * 60 * 24));
         return $dias;
     }
 
@@ -801,8 +760,7 @@ class Utils
      * @param string $date data no formato dd/mm/yyyy
      * @return string Data por extenso
      */
-    public static function data2Extenso($data)
-    {
+    public static function data2Extenso($data) {
         $ar_data = sscanf($data, '%2d/%2d/%4d');
         return $ar_data[0] . ' de ' . Util::mesToString($ar_data[1]) . ' de ' . $ar_data[2];
     }
@@ -812,8 +770,7 @@ class Utils
      * @param int $mes
      * @return string
      */
-    public static function mesToString($mes)
-    {
+    public static function mesToString($mes) {
         $ar_mes = array(1 => "Janeiro", 2 => "Fevereiro", 3 => "Março", 4 => "Abril",
             5 => "Maio", 6 => "Junho", 7 => "Julho", 8 => "Agosto",
             9 => "Setembro", 10 => "Outubro", 11 => "Novembro", 12 => "Dezembro");
@@ -821,8 +778,7 @@ class Utils
         return $mes;
     }
 
-    public static function limparVetor(array $ar = array())
-    {
+    public static function limparVetor(array $ar = array()) {
         foreach ($ar as $chave => $valor) {
             if (empty($valor)) {
                 unset($ar[$chave]);
@@ -836,8 +792,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-    public static function translate($valor, $upper = true)
-    {
+    public static function translate($valor, $upper = true) {
         $str = str_replace(explode(',', self::MINLATIN), explode(',', self::TRANSLATIN), self::strToLower($valor));
         $str = str_replace(explode(',', self::MAXLATIN), explode(',', self::TRANSLATIN), self::strToLower($str));
 //        if ($upper) {
@@ -851,8 +806,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-    public static function trans($valor, $upper = true)
-    {
+    public static function trans($valor, $upper = true) {
         $str = str_replace(explode(',', self::MINLATIN), explode(',', self::TRANSLATIN), $valor);
         $str = str_replace(explode(',', self::MAXLATIN), explode(',', self::TRANSLATIN), $str);
 //        if ($upper) {
@@ -866,8 +820,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-    public static function strToUpper($valor)
-    {
+    public static function strToUpper($valor) {
         return mb_strtoupper($valor, 'UTF-8');
         return str_replace(explode(',', self::MINLATIN), explode(',', self::MAXLATIN), strtoupper($valor));
     }
@@ -877,8 +830,7 @@ class Utils
      * @param <type> $valor
      * @return <type>
      */
-    public static function strToLower($valor)
-    {
+    public static function strToLower($valor) {
         setlocale(LC_ALL, "portuguese", "pt_BR", "pt_BR.iso88591", "pt_BR.utf8");
         setlocale(LC_CTYPE, "pt_BR");
 //        return strtolower($valor);
@@ -891,23 +843,20 @@ class Utils
      * @param string $string frase a ser analisada
      * @return string frase com primeiras letras maiúsculas
      */
-    public static function ucwords($string)
-    {
+    public static function ucwords($string) {
         return $string;
         $string = mb_convert_case($string, MB_CASE_TITLE, "UTF-8");
         return $string;
     }
 
-    public static function bool($string_bool)
-    {
+    public static function bool($string_bool) {
         $bo = false;
         if ($string_bool == 't' || $string_bool == 'true' || $string_bool == '1' || $string_bool == 'on')
             $bo = true;
         return $bo;
     }
 
-    public static function bool2String($bool)
-    {
+    public static function bool2String($bool) {
         $string = 'false';
         if ($bool)
             $string = 'true';
@@ -922,8 +871,7 @@ class Utils
 //       return unserialize(gzuncompress(base64_decode($txt)));
 //    }
 
-    public static function in_array_r($needle, $haystack)
-    {
+    public static function in_array_r($needle, $haystack) {
         foreach ($haystack as $item) {
             if ($item == $needle || (is_array($item) && self::in_array_r($needle, $item))) {
                 return true;
@@ -932,8 +880,7 @@ class Utils
         return false;
     }
 
-    public static function in_array($needle, $haystack)
-    {
+    public static function in_array($needle, $haystack) {
         foreach ($haystack as $chave => $valor) {
             if ($valor == $needle) {
                 return true;
@@ -942,8 +889,7 @@ class Utils
         return false;
     }
 
-    public static function hifenizar($str)
-    {
+    public static function hifenizar($str) {
         if (empty($str)) {
             return;
         }
@@ -952,8 +898,7 @@ class Utils
         return preg_replace_callback('/([A-Z])/', $func, $str);
     }
 
-    public static function camelCase($palavra)
-    {
+    public static function camelCase($palavra) {
         $palavra = str_replace('_', '-', $palavra);
         $ar = explode('-', $palavra);
         foreach ($ar as $chave => $valor) {
@@ -963,26 +908,24 @@ class Utils
         }
         return implode('', $ar);
     }
-    
-    public static function tratar_nome ($nome) {
+
+    public static function tratar_nome($nome) {
         $nome = strtolower($nome); // Converter o nome todo para minúsculo
         $nome = explode(" ", $nome); // Separa o nome por espaços
         $saida = "";
-        for ($i=0; $i < count($nome); $i++) {
+        for ($i = 0; $i < count($nome); $i++) {
 
             // Tratar cada palavra do nome
             if ($nome[$i] == "de" or $nome[$i] == "da" or $nome[$i] == "e" or $nome[$i] == "dos" or $nome[$i] == "do") {
-                $saida .= $nome[$i].' '; // Se a palavra estiver dentro das complementares mostrar toda em minúsculo
-            }else {
-                $saida .= ucfirst($nome[$i]).' '; // Se for um nome, mostrar a primeira letra maiúscula
+                $saida .= $nome[$i] . ' '; // Se a palavra estiver dentro das complementares mostrar toda em minúsculo
+            } else {
+                $saida .= ucfirst($nome[$i]) . ' '; // Se for um nome, mostrar a primeira letra maiúscula
             }
-
         }
         return $saida;
     }
 
-    public static function camelCaseInvert($input, $separador = '-')
-    {
+    public static function camelCaseInvert($input, $separador = '-') {
         preg_match_all('!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!', $input, $matches);
         $ret = $matches[0];
         foreach ($ret as &$match) {
@@ -995,8 +938,7 @@ class Utils
      * @deprecated Função com erros quando se trata dos últimos dias do ano.
      * Utilizar a função formatDate dessa mesma classe.
      */
-    public static function dataIso($valor, $formato = 'YYYY-MM-dd')
-    {
+    public static function dataIso($valor, $formato = 'YYYY-MM-dd') {
         if (strlen($valor) == 10) {
             list($ano, $mes, $dia) = explode("-", substr($valor, 0, 10));
             return $dia . "/" . $mes . "/" . $ano;
@@ -1005,8 +947,7 @@ class Utils
         }
     }
 
-    public static function moeda($valor, $simbolo = false, $precision = 2)
-    {
+    public static function moeda($valor, $simbolo = false, $precision = 2) {
         $zCurrrency = new Zend_Currency(array('precision' => $precision));
 
         if (!$simbolo)
@@ -1014,7 +955,7 @@ class Utils
         else
             $zCurrrency->setFormat(array('display' => Zend_Currency::USE_SYMBOL));
 
-        return $zCurrrency->toCurrency((double)$valor);
+        return $zCurrrency->toCurrency((double) $valor);
     }
 
     /**
@@ -1024,17 +965,16 @@ class Utils
      * @param string $numero
      * @return string
      */
-    public static function cpfCnpj($numero)
-    {
+    public static function cpfCnpj($numero) {
         $numero = trim(self::removerPontuacao($numero));
         switch (strlen($numero)) {
             case 11:
                 return substr($numero, 0, 3) . '.' . substr($numero, 3, 3) . '.' . substr($numero, 6, 3) . '-'
-                    . substr($numero, 9, 2);
+                        . substr($numero, 9, 2);
                 break;
             case 14:
                 return substr($numero, 0, 2) . '.' . substr($numero, 2, 3) . '.' . substr($numero, 5, 3) . '/'
-                    . substr($numero, 8, 4) . '-' . substr($numero, 12, 2);
+                        . substr($numero, 8, 4) . '-' . substr($numero, 12, 2);
                 break;
         }
     }
@@ -1046,8 +986,7 @@ class Utils
      * @param string $conteudo
      * @return string
      */
-    public static function removerPontuacao($conteudo)
-    {
+    public static function removerPontuacao($conteudo) {
         return str_replace(array('-', ',', '.', '/', '\\', ';', ':', '?', '!'), '', $conteudo);
     }
 
@@ -1058,8 +997,7 @@ class Utils
      * @param string $conteudo
      * @return string
      */
-    public static function removerCaracteresEspeciaisEspacos($conteudo)
-    {
+    public static function removerCaracteresEspeciaisEspacos($conteudo) {
         return str_replace(array('(', ')', '[', ']', '{', '}', '-', ',', '.', '/', '\\', ';', ':', '?', '!', ' '), '', $conteudo);
     }
 
@@ -1070,13 +1008,11 @@ class Utils
      * @param string $conteudo
      * @return string
      */
-    public static function removerCaracteresEspeciais($conteudo)
-    {
+    public static function removerCaracteresEspeciais($conteudo) {
         return str_replace(array('(', ')', '[', ']', '{', '}', '-', ',', '.', '/', '\\', ';', ':', '?', '!', '&', '\'', '"'), '', $conteudo);
     }
 
-    public static function tratarCaracteresNaoReconhecidos($conteudo)
-    {
+    public static function tratarCaracteresNaoReconhecidos($conteudo) {
         return str_replace('�', '', $conteudo);
     }
 
@@ -1087,8 +1023,7 @@ class Utils
      * @param float $valor
      * @return float
      */
-    public static function numeroDecimal($valor, $casasDecimais = 2)
-    {
+    public static function numeroDecimal($valor, $casasDecimais = 2) {
         return number_format($valor, $casasDecimais, '.', '');
     }
 
@@ -1100,9 +1035,7 @@ class Utils
      * @param string $valor
      * @return string
      */
-
-    public static function diasEntreDatas($dataInicio, $dataFim)
-    {
+    public static function diasEntreDatas($dataInicio, $dataFim) {
         $dataInicio = self::formatDate($dataInicio);
         $dataFim = self::formatDate($dataFim);
 
@@ -1116,8 +1049,7 @@ class Utils
         return $days;
     }
 
-    public static function inverterData($data)
-    {
+    public static function inverterData($data) {
         if (count(explode("/", $data)) > 1) {
             return implode("-", array_reverse(explode("/", $data)));
         }
@@ -1128,39 +1060,33 @@ class Utils
      * @param string $palavra Palavara
      * @return string
      */
-    public static function acento2Html($palavra)
-    {
+    public static function acento2Html($palavra) {
         $comacento = array('Á', 'á', 'Â', 'â', 'À', 'à', 'Ã', 'ã', 'É', 'é', 'Ê', 'ê', 'È', 'è', 'Ó', 'ó', 'Ô', 'ô', 'Ò', 'ò', 'Õ', 'õ', 'Í', 'í', 'Î', 'î', 'Ì', 'ì', 'Ú', 'ú', 'Û', 'û', 'Ù', 'ù', 'Ç', 'ç',);
         $acentohtml = array('&Aacute;', '&aacute;', '&Acirc;', '&acirc;', '&Agrave;', '&agrave;', '&Atilde;', '&atilde;', '&Eacute;', '&eacute;', '&Ecirc;', '&ecirc;', '&Egrave;', '&egrave;', '&Oacute;', '&oacute;', '&Ocirc;', '&ocirc;', '&Ograve;', '&ograve;', '&Otilde;', '&otilde;', '&Iacute;', '&iacute;', '&Icirc;', '&icirc;', '&Igrave;', '&igrave;', '&Uacute;', '&uacute;', '&Ucirc;', '&ucirc;', '&Ugrave;', '&ugrave;', '&Ccedil;', '&ccedil;');
         $palavra = str_replace($comacento, $acentohtml, $palavra);
         return $palavra;
     }
 
-    public static function html2Acento($palavra)
-    {
+    public static function html2Acento($palavra) {
         $comacento = array('Á', 'á', 'Â', 'â', 'À', 'à', 'Ã', 'ã', 'É', 'é', 'Ê', 'ê', 'È', 'è', 'Ó', 'ó', 'Ô', 'ô', 'Ò', 'ò', 'Õ', 'õ', 'Í', 'í', 'Î', 'î', 'Ì', 'ì', 'Ú', 'ú', 'Û', 'û', 'Ù', 'ù', 'Ç', 'ç', ' ');
         $acentohtml = array('&Aacute;', '&aacute;', '&Acirc;', '&acirc;', '&Agrave;', '&agrave;', '&Atilde;', '&atilde;', '&Eacute;', '&eacute;', '&Ecirc;', '&ecirc;', '&Egrave;', '&egrave;', '&Oacute;', '&oacute;', '&Ocirc;', '&ocirc;', '&Ograve;', '&ograve;', '&Otilde;', '&otilde;', '&Iacute;', '&iacute;', '&Icirc;', '&icirc;', '&Igrave;', '&igrave;', '&Uacute;', '&uacute;', '&Ucirc;', '&ucirc;', '&Ugrave;', '&ugrave;', '&Ccedil;', '&ccedil;', '&nbsp;');
         $palavra = str_replace($acentohtml, $comacento, $palavra);
         return $palavra;
     }
 
-    public static function mascararPropriedade($cod_propriedade)
-    {
+    public static function mascararPropriedade($cod_propriedade) {
         return Util::mask($cod_propriedade, '##.#####.####');
     }
 
-    public static function mascararUP($cod_up)
-    {
+    public static function mascararUP($cod_up) {
         return Util::mask($cod_up, '##.#####.####.##.###');
     }
 
-    public static function mascararIe($ie)
-    {
+    public static function mascararIe($ie) {
         return Util::mask($ie, '##.###.###-#');
     }
 
-    public static function mascararCpfCnpj($cpf_cnpj)
-    {
+    public static function mascararCpfCnpj($cpf_cnpj) {
         $cpf_cnpj = util::removerCaracteresEspeciaisEspacos($cpf_cnpj);
         if (strlen($cpf_cnpj)) {
             if (strlen($cpf_cnpj) == 11) {
@@ -1172,29 +1098,25 @@ class Utils
         }
     }
 
-    public static function mascararCpf($cpf)
-    {
+    public static function mascararCpf($cpf) {
         $cpf = str_replace('.', '', $cpf);
         $cpf = str_replace('/', '', $cpf);
         $cpf = str_replace('-', '', $cpf);
         return Util::mask($cpf, '###.###.###-##');
     }
 
-    public static function mascararCnpj($cnpj)
-    {
+    public static function mascararCnpj($cnpj) {
         $cnpj = str_replace('.', '', $cnpj);
         $cnpj = str_replace('/', '', $cnpj);
         $cnpj = str_replace('-', '', $cnpj);
         return Util::mask($cnpj, '##.###.###/####-##');
     }
 
-    public static function mascararLatitudeLongitude($coordenada)
-    {
+    public static function mascararLatitudeLongitude($coordenada) {
         return Util::mask($coordenada, '##°##\'##.#\'\'');
     }
 
-    private static function mask($val, $mask)
-    {
+    private static function mask($val, $mask) {
         $maskared = '';
         $k = 0;
         $val = str_split($val);
@@ -1215,8 +1137,7 @@ class Utils
      * @param array $ar_post Array contendo valores na chave
      * @return string Uma string post no formato pametro1=valor1&parametro2=valor2
      */
-    public static function arrayToPost($ar_post)
-    {
+    public static function arrayToPost($ar_post) {
         $ar_string = array();
         if (!is_array($ar_post) || empty($ar_post)) {
             return $ar_string;
@@ -1227,8 +1148,7 @@ class Utils
         return implode('&', $ar_string);
     }
 
-    public static function ArrayToTagTable($ar_valores, $label, $descricao)
-    {
+    public static function ArrayToTagTable($ar_valores, $label, $descricao) {
         if (count($ar_valores)) {
             $ar[] = "<table id='tableDetalhe'>";
             foreach ($ar_valores as $chave => $valor) {
@@ -1241,13 +1161,11 @@ class Utils
         }
     }
 
-    public static function formatarMoeda($numero)
-    {
+    public static function formatarMoeda($numero) {
         return number_format($numero, 2, ',', '.');
     }
 
-    public static function formatarCpfCnpj($cpf_cnpj)
-    {
+    public static function formatarCpfCnpj($cpf_cnpj) {
         $cpf_cnpj = self::removerCaracteresEspeciaisEspacos($cpf_cnpj);
         if (strlen($cpf_cnpj)) {
             if (strlen($cpf_cnpj) == 11) {
@@ -1265,8 +1183,7 @@ class Utils
      * @param string $telefone Sequência de números de telefone
      * @return string Telefone formatado
      */
-    public static function formatarTelefone($telefone)
-    {
+    public static function formatarTelefone($telefone) {
         // Buscar apenas os numeros
         $len = strlen($telefone);
         $total_numeros = 0;
@@ -1345,9 +1262,8 @@ class Utils
         return false;
     }
 
-    /** O valor de $moeda, necessariamente precisa estar no formato R$ XXX.XXX,XX para funcionar **/
-    public static function removerFormatacaoValor($moeda)
-    {
+    /** O valor de $moeda, necessariamente precisa estar no formato R$ XXX.XXX,XX para funcionar * */
+    public static function removerFormatacaoValor($moeda) {
         //$valor = self::removerFormatacao($moeda, array(' ', 'R$', '.'));
         //return str_replace(",", ".", $valor);
         $charac = array(' ', 'R$', '.');
@@ -1357,28 +1273,23 @@ class Utils
         return str_replace(",", ".", $moeda);
     }
 
-    public static function formataMoedaSQL($valor)
-    {
+    public static function formataMoedaSQL($valor) {
         $valor = str_replace(".", "", $valor);
         $valor = str_replace(",", ".", $valor);
         return $valor;
-
     }
 
-    public static function removerFormatacao($valor, array $charac = array())
-    {
+    public static function removerFormatacao($valor, array $charac = array()) {
         $texto = preg_replace('/[^A-Za-z0-9\s.\s-]/', '', $valor);
         $sem_espaco = str_replace(" ", "", $texto);
         return str_replace("-", "", $sem_espaco);
     }
 
-    public static function removerFormatacaoCPFCNPJ($valor)
-    {
+    public static function removerFormatacaoCPFCNPJ($valor) {
         return str_replace(['.', '-', '/'], "", $valor);
     }
 
-    public static function hexToStr($hex)
-    {
+    public static function hexToStr($hex) {
         $string = '';
         $length = (strlen($hex));
         $length -= 1;
@@ -1388,8 +1299,7 @@ class Utils
         return $string;
     }
 
-    public static function strToHex($string)
-    {
+    public static function strToHex($string) {
         $hex = '';
         for ($i = 0; $i < strlen($string); $i++) {
             $hex .= dechex(ord($string[$i]));
@@ -1403,8 +1313,7 @@ class Utils
      * @param type $key
      * @return int
      */
-    public static function array_key_index(&$arr, $key)
-    {
+    public static function array_key_index(&$arr, $key) {
         $i = 0;
         foreach (array_keys($arr) as $k) {
             if ($k == $key)
@@ -1413,8 +1322,7 @@ class Utils
         }
     }
 
-    public static function mascara_telefone($telefone)
-    {
+    public static function mascara_telefone($telefone) {
         $telefone = self::removerCaracteresEspeciaisEspacos($telefone);
         if (strlen($telefone) == 11) {
             return self::mascara_string('(##)#####-####', $telefone);
@@ -1425,18 +1333,15 @@ class Utils
         }
     }
 
-    public static function mascara_data($data)
-    {
+    public static function mascara_data($data) {
         return self::mascara_string('##/##/####', $data);
     }
 
-    public static function mascara_horario($horario)
-    {
+    public static function mascara_horario($horario) {
         return self::mascara_string('##:##', $horario);
     }
 
-    public static function mascara_string($mascara, $string)
-    {
+    public static function mascara_string($mascara, $string) {
         $string = str_replace(" ", "", $string);
         for ($i = 0; $i < strlen($string); $i++) {
             $mascara[strpos($mascara, "#")] = $string[$i];
@@ -1445,36 +1350,32 @@ class Utils
     }
 
     /** @todo função quebra-galho até conseguir dominar translate */
-    public static function desacentuar($texto)
-    {
+    public static function desacentuar($texto) {
         $array1 = array("á", "à", "â", "ã", "ä", "é", "è", "ê", "ë", "í", "ì", "î", "ï", "ó", "ò", "ô", "õ", "ö", "ú", "ù", "û", "ü", "ç"
-        , "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç");
+            , "Á", "À", "Â", "Ã", "Ä", "É", "È", "Ê", "Ë", "Í", "Ì", "Î", "Ï", "Ó", "Ò", "Ô", "Õ", "Ö", "Ú", "Ù", "Û", "Ü", "Ç");
         $array2 = array("a", "a", "a", "a", "a", "e", "e", "e", "e", "i", "i", "i", "i", "o", "o", "o", "o", "o", "u", "u", "u", "u", "c"
-        , "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C");
+            , "A", "A", "A", "A", "A", "E", "E", "E", "E", "I", "I", "I", "I", "O", "O", "O", "O", "O", "U", "U", "U", "U", "C");
         return str_replace($array1, $array2, $texto);
     }
 
-    public static function utf8_urldecode($str)
-    {
+    public static function utf8_urldecode($str) {
         $str = preg_replace("/%u([0-9a-f]{3,4})/i", "&#x\\1;", urldecode($str));
-        return html_entity_decode($str, null, 'UTF-8');;
+        return html_entity_decode($str, null, 'UTF-8');
+        ;
     }
 
-    public static function m2ToHa($m2)
-    {
+    public static function m2ToHa($m2) {
         $m2 = $m2 / 1000;
         return $m2;
     }
 
-    public static function criptografar_gta($documento)
-    {
+    public static function criptografar_gta($documento) {
         $array1 = array("0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
         $array2 = array("$", "t", "*", ")", "@", "!", "p", "(", "^", ";");
         return str_replace($array1, $array2, $documento);
     }
 
-    public static function getHora($data)
-    {
+    public static function getHora($data) {
         $ar = explode(' ', $data);
         $ar_hora = explode(':', $ar[1]);
         if (isset($ar_hora[0])) {
@@ -1482,8 +1383,7 @@ class Utils
         }
     }
 
-    public static function getMinuto($data)
-    {
+    public static function getMinuto($data) {
         $ar = explode(' ', $data);
         $ar_hora = explode(':', $ar[1]);
         if (isset($ar_hora[1])) {
@@ -1491,22 +1391,19 @@ class Utils
         }
     }
 
-    public static function getSenha123abc()
-    {
+    public static function getSenha123abc() {
         $senha = md5('123abc');
         return $senha;
     }
 
-    public static function milhar($number)
-    {
+    public static function milhar($number) {
         return number_format(round($number, 0), 0, '', '.');
     }
 
     /**
      * Identificar a extensão do arquivo
      */
-    public static function findexts($filename)
-    {
+    public static function findexts($filename) {
         $filename = strtolower($filename);
         $exts = split("[/\\.]", $filename);
         $n = count($exts) - 1;
@@ -1515,16 +1412,14 @@ class Utils
         return $exts;
     }
 
-    public static function removerFormatacaoValorWithDot($moeda)
-    {
+    public static function removerFormatacaoValorWithDot($moeda) {
         $valor = self::removerFormatacao($moeda, array(' ', 'R$'));
         $valor = str_replace(".", "", $valor);
         $valor = str_replace(",", ".", $valor);
         return $valor;
     }
 
-    public static function removerUnidadeValor($moeda)
-    {
+    public static function removerUnidadeValor($moeda) {
         $valor = self::removerFormatacao($moeda, array(' ', 'R$'));
         $valor = str_replace(".", "", $valor);
         $valor = str_replace(",", ".", $valor);
@@ -1532,26 +1427,22 @@ class Utils
     }
 
     //Compara dois números com ponto flutuante
-    public static function floatcmp($f1, $f2, $precision = 10)
-    {
+    public static function floatcmp($f1, $f2, $precision = 10) {
         $e = pow(10, $precision);
         return (intval($f1 * $e) < intval($f2 * $e));
     }
 
-    public static function fileExists($file)
-    {
+    public static function fileExists($file) {
         return file_exists($file) && !is_dir($file);
     }
 
-    public static function HaTom2($ha)
-    {
+    public static function HaTom2($ha) {
         $m2 = $ha * 1000;
         return $m2;
     }
 
     // Função para calcular os dias úteis entre datas, excluindo sábados e domingos
-    public static function calcula_dias_uteis($dataInicial, $dataFinal)
-    {
+    public static function calcula_dias_uteis($dataInicial, $dataFinal) {
         $data_inicial = explode("/", $dataInicial);
         $data_final = explode("/", $dataFinal);
 
@@ -1570,7 +1461,7 @@ class Utils
 //diminuo a uma data a outra
         $segundos_diferenca = $timestamp1 - $timestamp2;
 
-        $dias_diferenca = (int)ceil($segundos_diferenca / (60 * 60 * 24));
+        $dias_diferenca = (int) ceil($segundos_diferenca / (60 * 60 * 24));
 
         $totalFinalSemana = 0;
         for ($x = 0; $x < $dias_diferenca; $x++) {
@@ -1583,14 +1474,12 @@ class Utils
             if ($diaSemana == 6 || $diaSemana == 0) {
                 $totalFinalSemana++;
             }
-
         }
         $diferenca = $dias_diferenca - $totalFinalSemana;
         return $diferenca;
     }
 
-    public static function tokenGta($string)
-    {
+    public static function tokenGta($string) {
         $alphabet = array('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z');
         $ar = str_split(strrev($string));
         $new_ar = array();
@@ -1600,8 +1489,7 @@ class Utils
         return 'ktone' . implode('', $new_ar) . 'tga';
     }
 
-    public static function generateRandomString($length = 8)
-    {
+    public static function generateRandomString($length = 8) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
         $randomString = '';
         for ($i = 0; $i < $length; $i++) {
@@ -1610,8 +1498,7 @@ class Utils
         return $randomString;
     }
 
-    public static function formatDate($data)
-    {
+    public static function formatDate($data) {
         if (empty($data)) {
             return "-";
         }
@@ -1622,8 +1509,7 @@ class Utils
         }
     }
 
-    public static function formatDateHour($data)
-    {
+    public static function formatDateHour($data) {
         if (empty($data)) {
             return "-";
         }
@@ -1634,8 +1520,7 @@ class Utils
         }
     }
 
-    public static function formatDateHourSeconds($data)
-    {
+    public static function formatDateHourSeconds($data) {
         if (empty($data)) {
             return "-";
         }
@@ -1646,8 +1531,7 @@ class Utils
         }
     }
 
-    public static function traduzirBooleano($ativo)
-    {
+    public static function traduzirBooleano($ativo) {
         $valor = '<label class="label label-important" >Não</label>';
         if ($ativo == 't' || $ativo == 'true' || $ativo == '1') {
             $valor = '<label class="label label-success" >Sim</label>';
@@ -1655,8 +1539,7 @@ class Utils
         return $valor;
     }
 
-    public static function is_utf8($str)
-    {
+    public static function is_utf8($str) {
         $c = 0;
         $b = 0;
         $bits = 0;
@@ -1664,18 +1547,27 @@ class Utils
         for ($i = 0; $i < $len; $i++) {
             $c = ord($str[$i]);
             if ($c > 128) {
-                if (($c >= 254)) return false;
-                elseif ($c >= 252) $bits = 6;
-                elseif ($c >= 248) $bits = 5;
-                elseif ($c >= 240) $bits = 4;
-                elseif ($c >= 224) $bits = 3;
-                elseif ($c >= 192) $bits = 2;
-                else return false;
-                if (($i + $bits) > $len) return false;
+                if (($c >= 254))
+                    return false;
+                elseif ($c >= 252)
+                    $bits = 6;
+                elseif ($c >= 248)
+                    $bits = 5;
+                elseif ($c >= 240)
+                    $bits = 4;
+                elseif ($c >= 224)
+                    $bits = 3;
+                elseif ($c >= 192)
+                    $bits = 2;
+                else
+                    return false;
+                if (($i + $bits) > $len)
+                    return false;
                 while ($bits > 1) {
                     $i++;
                     $b = ord($str[$i]);
-                    if ($b < 128 || $b > 191) return false;
+                    if ($b < 128 || $b > 191)
+                        return false;
                     $bits--;
                 }
             }
@@ -1689,15 +1581,13 @@ class Utils
      *
      * @return boolean Indica se o acesso foi via shell.
      */
-    public static function isCli()
-    {
+    public static function isCli() {
         $bo = false;
         $sapi_type = php_sapi_name();
         if (substr($sapi_type, 0, 3) == 'cli') {
             $bo = true;
         }
         return $bo;
-
     }
 
     /**
@@ -1706,8 +1596,7 @@ class Utils
      *
      * @return bool Verdadeiro para acesso mobile.
      */
-    public static function isMobile()
-    {
+    public static function isMobile() {
         $detector = new \Agrodefesa\Validation\Mobile();
         return $detector->isMobile();
     }
@@ -1721,8 +1610,7 @@ class Utils
      * @param float $b
      * @return 0 (igual), -1($num1 menor), 1($num2 menor)
      */
-    public static function compara_float($num1, $num2, $precisao = 5)
-    {
+    public static function compara_float($num1, $num2, $precisao = 5) {
         $desprezar = pow(1, -1 * $precisao);
         $diff = abs($num1 - $num2);
         if ($diff < $desprezar) {
@@ -1737,8 +1625,7 @@ class Utils
      * @param string $money_texto Valor em moeda formatado
      * @return float Valor float correspondente
      */
-    public static function moneyToFloat($money_texto)
-    {
+    public static function moneyToFloat($money_texto) {
         $semString = preg_replace('/([^0-9\.,])/i', '', $money_texto);
         $onlyNumbersString = preg_replace('/([^0-9])/i', '', $money_texto);
 
@@ -1747,11 +1634,10 @@ class Utils
         $stringWithCommaOrDot = preg_replace('/([,\.])/', '', $semString, $separatorsCountToBeErased);
         $removedThousendSeparator = preg_replace('/(\.|,)(?=[0-9]{3,}$)/', '', $stringWithCommaOrDot);
 
-        return (float)str_replace(',', '.', $removedThousendSeparator);
+        return (float) str_replace(',', '.', $removedThousendSeparator);
     }
 
-    public static function tratarValorNumerico($valor)
-    {
+    public static function tratarValorNumerico($valor) {
         if (strpos($valor, ',') !== false) {
             $valor = str_replace(".", "", $valor);
             $valor = str_replace(",", ".", $valor);
@@ -1759,8 +1645,7 @@ class Utils
         return $valor;
     }
 
-    public static function formatarArea($numero, $casasDecimais = 4)
-    {
+    public static function formatarArea($numero, $casasDecimais = 4) {
         return number_format($numero, $casasDecimais, ',', '.');
     }
 
@@ -1769,8 +1654,7 @@ class Utils
      * @param array $array Array a ser verificado
      * @return boolean Booleano true ou false
      */
-    public static function arrayTemValoresDuplicados($array)
-    {
+    public static function arrayTemValoresDuplicados($array) {
         $dupe_array = array();
         foreach ($array as $val) {
             if (!isset($dupe_array[$val])) {
@@ -1785,8 +1669,7 @@ class Utils
         return false;
     }
 
-    public static function traduzirSituacaoAtivoInativo($ativo)
-    {
+    public static function traduzirSituacaoAtivoInativo($ativo) {
         $valor = '<label class="label label-important" >Inativo</label>';
         if ($ativo == 't' || $ativo == 'true' || $ativo == '1') {
             $valor = '<label class="label label-success" >Ativo</label>';
@@ -1794,8 +1677,7 @@ class Utils
         return $valor;
     }
 
-    public static function array_column($array, $column)
-    {
+    public static function array_column($array, $column) {
         $ret = array();
         foreach ($array as $row) {
             $ret[] = $row[$column];
@@ -1803,9 +1685,7 @@ class Utils
         return $ret;
     }
 
-
-    public static function arrayToXml($array, $level = 1)
-    {
+    public static function arrayToXml($array, $level = 1) {
         $xml = '';
         // if ($level==1) {
         //     $xml .= "<array>\n";
@@ -1831,11 +1711,11 @@ class Utils
                         if (trim($value2) != '') {
                             if (htmlspecialchars($value2) != $value2) {
                                 $xml .= str_repeat("\t", $level) .
-                                    "<$key2><![CDATA[$value2]]>" . // changed $key to $key2... didn't work otherwise.
-                                    "</$key2>\n";
+                                        "<$key2><![CDATA[$value2]]>" . // changed $key to $key2... didn't work otherwise.
+                                        "</$key2>\n";
                             } else {
                                 $xml .= str_repeat("\t", $level) .
-                                    "<$key2>$value2</$key2>\n"; // changed $key to $key2
+                                        "<$key2>$value2</$key2>\n"; // changed $key to $key2
                             }
                         }
                         $multi_tags = true;
@@ -1846,16 +1726,15 @@ class Utils
                     $xml .= array_to_xml($value, $level + 1);
                     $xml .= str_repeat("\t", $level) . "</$key>\n";
                 }
-
             } else {
                 if (trim($value) != '') {
                     echo "value=$value<br>";
                     if (htmlspecialchars($value) != $value) {
                         $xml .= str_repeat("\t", $level) . "<$key>" .
-                            "<![CDATA[$value]]></$key>\n";
+                                "<![CDATA[$value]]></$key>\n";
                     } else {
                         $xml .= str_repeat("\t", $level) .
-                            "<$key>$value</$key>\n";
+                                "<$key>$value</$key>\n";
                     }
                 }
             }
@@ -1866,8 +1745,7 @@ class Utils
         return $xml;
     }
 
-    public static function arrayColuna($vetor, $coluna)
-    {
+    public static function arrayColuna($vetor, $coluna) {
         $arr = [];
 
         foreach ($vetor as $valor) {
@@ -1878,8 +1756,7 @@ class Utils
         return $arr;
     }
 
-    public static function validarEmail($email)
-    {
+    public static function validarEmail($email) {
         if (!preg_match('/\S+@\S+\.\S+/', $email)) {
             return false;
         } else {
@@ -1887,13 +1764,28 @@ class Utils
         }
     }
 
-    public static function class_namespaced()
-    {
+    public static function ValidaDataDDMMYYYY($dat) {
+        $data = explode("/", "$dat"); // fatia a string $dat em pedados, usando / como referência
+        $d = $data[0];
+        $m = $data[1];
+        $y = $data[2];
+
+        // verifica se a data é válida!
+        // 1 = true (válida)
+        // 0 = false (inválida)
+        $res = checkdate($m, $d, $y);
+        if ($res == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static function class_namespaced() {
         return __CLASS__;
     }
 
-    public static function processarFK($valor_fk)
-    {
+    public static function processarFK($valor_fk) {
         $ar = array();
         $ar_pedido = explode(DELIMITADOR, str_replace(DELIMITADOR_CAMPO, '&', $valor_fk));
 
@@ -1920,8 +1812,7 @@ class Utils
         return $ar;
     }
 
-    public static function timeAgo($time)
-    {
+    public static function timeAgo($time) {
         $diff = time() - $time;
         $seconds = $diff;
         $minutes = round($diff / 60);
@@ -1931,18 +1822,24 @@ class Utils
         $months = round($diff / 2419200);
         $years = round($diff / 29030400);
 
-        if ($seconds <= 60) $retorno = "$seconds segundos atrás";
-        else if ($minutes <= 60) $retorno = $minutes == 1 ? '1 minuto atrás' : $minutes . ' minutos atrás';
-        else if ($hours <= 24) $retorno = $hours == 1 ? '1 hora atrás' : $hours . ' horas atrás';
-        else if ($days <= 7) $retorno = $days == 1 ? '1 dia atrás' : $days . ' dias atrás';
-        else if ($weeks <= 4) $retorno = $weeks == 1 ? '1 semana atrás' : $weeks . ' semanas atrás';
-        else if ($months <= 12) $retorno = $months == 1 ? '1 mês atrás' : $months . ' meses atrás';
-        else $retorno = $years == 1 ? '1 ano atrás' : $years . ' anos atrás';
+        if ($seconds <= 60)
+            $retorno = "$seconds segundos atrás";
+        else if ($minutes <= 60)
+            $retorno = $minutes == 1 ? '1 minuto atrás' : $minutes . ' minutos atrás';
+        else if ($hours <= 24)
+            $retorno = $hours == 1 ? '1 hora atrás' : $hours . ' horas atrás';
+        else if ($days <= 7)
+            $retorno = $days == 1 ? '1 dia atrás' : $days . ' dias atrás';
+        else if ($weeks <= 4)
+            $retorno = $weeks == 1 ? '1 semana atrás' : $weeks . ' semanas atrás';
+        else if ($months <= 12)
+            $retorno = $months == 1 ? '1 mês atrás' : $months . ' meses atrás';
+        else
+            $retorno = $years == 1 ? '1 ano atrás' : $years . ' anos atrás';
         return $retorno;
     }
 
-    public static function findWhere($array, $matching)
-    {
+    public static function findWhere($array, $matching) {
         foreach ($array as $item) {
             $isMatch = true;
             foreach ($matching as $key => $value) {
@@ -1976,8 +1873,7 @@ class Utils
         return false;
     }
 
-    public static function orderWhere()
-    {
+    public static function orderWhere() {
         $args = func_get_args();
         $data = array_shift($args);
         foreach ($args as $n => $field) {
@@ -1994,8 +1890,7 @@ class Utils
         return array_pop($args);
     }
 
-    public static function porcentagem($parcial, $total)
-    {
+    public static function porcentagem($parcial, $total) {
         $resultado = 0;
         if ($parcial > 0) {
             $resultado = ($total * 100) / $parcial;
@@ -2006,25 +1901,22 @@ class Utils
         return number_format($resultado, 2);
     }
 
-
     /**
      * Transforma um valor do banco do tipo ARRAY para um array a ser usado no
      * componente jQuery CHOSEN
      * @param String $valor
      * @return Array $valor
      */
-    public static function pgArrayToChosen($valor)
-    {
+    public static function pgArrayToChosen($valor) {
         $valor = str_replace("{", "", $valor);
         $valor = str_replace("}", "", $valor);
         return explode(",", $valor);
     }
 
-
     public static function validarCpf($cpf = null) {
-            
+
         // Verifica se um número foi informado
-        if(empty($cpf) || !is_numeric($cpf)) {
+        if (empty($cpf) || !is_numeric($cpf)) {
             return false;
         }
 
@@ -2039,15 +1931,15 @@ class Utils
         // Verifica se nenhuma das sequências invalidas abaixo
         // foi digitada. Caso afirmativo, retorna falso
         else if ($cpf == '00000000000' ||
-            $cpf == '11111111111' ||
-            $cpf == '22222222222' ||
-            $cpf == '33333333333' ||
-            $cpf == '44444444444' ||
-            $cpf == '55555555555' ||
-            $cpf == '66666666666' ||
-            $cpf == '77777777777' ||
-            $cpf == '88888888888' ||
-            $cpf == '99999999999') {
+                $cpf == '11111111111' ||
+                $cpf == '22222222222' ||
+                $cpf == '33333333333' ||
+                $cpf == '44444444444' ||
+                $cpf == '55555555555' ||
+                $cpf == '66666666666' ||
+                $cpf == '77777777777' ||
+                $cpf == '88888888888' ||
+                $cpf == '99999999999') {
             return false;
             // Calcula os digitos verificadores para verificar se o
             // CPF é válido
@@ -2068,9 +1960,8 @@ class Utils
         }
     }
 
-    public static function validarCnpj($cnpj)
-    {
-        $cnpj = preg_replace('/[^0-9]/', '', (string)$cnpj);
+    public static function validarCnpj($cnpj) {
+        $cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
         // Valida tamanho
         if (strlen($cnpj) != 14)
             return false;
@@ -2091,60 +1982,58 @@ class Utils
         return $cnpj{13} == ($resto < 2 ? 0 : 11 - $resto);
     }
 
-    /*public static function validarCnpj($cnpj)
-    {
-        $cnpj = Util::removerCaracteresEspeciaisEspacos($cnpj);
-        $cnpj = trim($cnpj);
-        if (empty($cnpj) || strlen($cnpj) != 14) {
-            return false;
-        } else {
+    /* public static function validarCnpj($cnpj)
+      {
+      $cnpj = Util::removerCaracteresEspeciaisEspacos($cnpj);
+      $cnpj = trim($cnpj);
+      if (empty($cnpj) || strlen($cnpj) != 14) {
+      return false;
+      } else {
 
-                $sum = 0;
-                $rev_cnpj = strrev(substr($cnpj, 0, 12));
-                for ($i = 0; $i <= 11; $i++) {
-                    $i == 0 ? $multiplier = 2 : $multiplier;
-                    $i == 8 ? $multiplier = 2 : $multiplier;
-                    $multiply = ($rev_cnpj[$i] * $multiplier);
-                    $sum = $sum + $multiply;
-                    $multiplier++;
-                }
-                $rest = $sum % 11;
-                if ($rest == 0 || $rest == 1) {
-                    $dv1 = 0;
-                } else {
-                    $dv1 = 11 - $rest;
-                    $sub_cnpj = substr($cnpj, 0, 12);
-                    $rev_cnpj = strrev($sub_cnpj . $dv1);
-                    unset($sum);
-                    $sum = 0;
-                    for ($i = 0; $i <= 12; $i++) {
+      $sum = 0;
+      $rev_cnpj = strrev(substr($cnpj, 0, 12));
+      for ($i = 0; $i <= 11; $i++) {
+      $i == 0 ? $multiplier = 2 : $multiplier;
+      $i == 8 ? $multiplier = 2 : $multiplier;
+      $multiply = ($rev_cnpj[$i] * $multiplier);
+      $sum = $sum + $multiply;
+      $multiplier++;
+      }
+      $rest = $sum % 11;
+      if ($rest == 0 || $rest == 1) {
+      $dv1 = 0;
+      } else {
+      $dv1 = 11 - $rest;
+      $sub_cnpj = substr($cnpj, 0, 12);
+      $rev_cnpj = strrev($sub_cnpj . $dv1);
+      unset($sum);
+      $sum = 0;
+      for ($i = 0; $i <= 12; $i++) {
 
-                        $i == 0 ? $multiplier = 2 : $multiplier;
-                        $i == 8 ? $multiplier = 2 : $multiplier;
-                        $multiply = ($rev_cnpj[$i] * $multiplier);
-                        $sum = $sum + $multiply;
-                        $multiplier++;
-                    }
-                    $rest = $sum % 11;
-                    if ($rest == 0 || $rest == 1) {
-                        $dv2 = 0;
-                    } else {
-                        $dv2 = 11 - $rest;
-                    }
+      $i == 0 ? $multiplier = 2 : $multiplier;
+      $i == 8 ? $multiplier = 2 : $multiplier;
+      $multiply = ($rev_cnpj[$i] * $multiplier);
+      $sum = $sum + $multiply;
+      $multiplier++;
+      }
+      $rest = $sum % 11;
+      if ($rest == 0 || $rest == 1) {
+      $dv2 = 0;
+      } else {
+      $dv2 = 11 - $rest;
+      }
 
-                    if ($dv1 == $cnpj[12] && $dv2 == $cnpj[13]) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
+      if ($dv1 == $cnpj[12] && $dv2 == $cnpj[13]) {
+      return true;
+      } else {
+      return false;
+      }
+      }
 
-        }
-    }*/
+      }
+      } */
 
-
-    public static function traduzirDataBanco($data)
-    {
+    public static function traduzirDataBanco($data) {
         $retorno = str_replace('day', 'dia', $data);
         $retorno = str_replace('days', 'dias', $retorno);
         $retorno = str_replace('week', 'semana', $retorno);
@@ -2156,8 +2045,8 @@ class Utils
         return $retorno;
     }
 
-    public static function formatarMoedaSefaz($numero)
-    {
+    public static function formatarMoedaSefaz($numero) {
         return sprintf('%.4f', $numero / 10000);
     }
+
 }
