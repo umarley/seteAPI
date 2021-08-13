@@ -69,12 +69,18 @@ class AuthenticatorResource extends AbstractResourceListener {
      */
     public function fetchAll($params = []) {
         $headers = apache_request_headers();
+        $arParams = $this->event->getRouteMatch()->getParams();
         if (key_exists('Authorization', $headers)) {
             $accessToken = $headers['Authorization'];
             if (!empty($accessToken)) {
                 $valido = $this->_model->validarAccessToken($accessToken);
                 if ($valido) {
-                    return ['result' => true, 'messages' => 'Access Token válido!'];
+                    if($arParams['tipo'] === 'sete'){
+                        $dbSeteUsuario = new \Db\SetePG\SeteUsuarios();
+                        return ['result' => true, 'data' => $dbSeteUsuario->getUsuarioByAccessToken($accessToken)];
+                    }else{
+                        return ['result' => true, 'messages' => 'Access Token válido!'];
+                    }
                 } else {
                     return ['result' => false, 'messages' => 'Access Token inválido!'];
                 }

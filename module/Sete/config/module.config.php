@@ -9,6 +9,7 @@ return [
             \Sete\V1\Rest\Alunos\AlunosResource::class => \Sete\V1\Rest\Alunos\AlunosResourceFactory::class,
             \Sete\V1\Rest\Escolas\EscolasResource::class => \Sete\V1\Rest\Escolas\EscolasResourceFactory::class,
             \Sete\V1\Rest\Registro\RegistroResource::class => \Sete\V1\Rest\Registro\RegistroResourceFactory::class,
+            \Sete\V1\Rest\Rotas\RotasResource::class => \Sete\V1\Rest\Rotas\RotasResourceFactory::class,
         ],
     ],
     'router' => [
@@ -76,6 +77,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.rotas' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/rotas[/:codigo_cidade[/:rotas_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Rotas\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -87,6 +97,7 @@ return [
             4 => 'sete.rest.alunos',
             5 => 'sete.rest.escolas',
             6 => 'sete.rest.registro',
+            7 => 'sete.rest.rotas',
         ],
     ],
     'api-tools-rest' => [
@@ -236,6 +247,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Registro\RegistroCollection::class,
             'service_name' => 'Registro',
         ],
+        'Sete\\V1\\Rest\\Rotas\\Controller' => [
+            'listener' => \Sete\V1\Rest\Rotas\RotasResource::class,
+            'route_name' => 'sete.rest.rotas',
+            'route_identifier_name' => 'rotas_id',
+            'collection_name' => 'rotas',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Rotas\RotasEntity::class,
+            'collection_class' => \Sete\V1\Rest\Rotas\RotasCollection::class,
+            'service_name' => 'Rotas',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -246,6 +280,7 @@ return [
             'Sete\\V1\\Rest\\Alunos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Escolas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Registro\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Rotas\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -283,6 +318,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Rotas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -310,6 +350,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Registro\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Rotas\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -399,6 +443,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.registro',
                 'route_identifier_name' => 'registro_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Rotas\RotasEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.rotas',
+                'route_identifier_name' => 'rotas_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\Rotas\RotasCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.rotas',
+                'route_identifier_name' => 'rotas_id',
                 'is_collection' => true,
             ],
         ],

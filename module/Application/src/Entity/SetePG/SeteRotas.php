@@ -6,20 +6,20 @@ use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
-class SeteUsuarios extends AbstractDatabasePostgres {
+class SeteRotas extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_usuarios';
-        $this->primaryKey = 'id_escola';
+        $this->table = 'sete_rotas';
+        $this->primaryKey = 'id_rota';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
 
-    public function getById($idUsuario, $codigoCidade) {
+    public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$codigoCidade} AND id_usuario = {$idUsuario}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_rota = {$arIds['id_rota']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -28,7 +28,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['*'])
+                ->columns(['codigo_cidade', 'id_rota', 'nome'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -39,11 +39,21 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         return $arLista;
     }
 
-    public function usuarioExiste($cpf) {
+    public function qtdAlunosAtendidos($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("cpf = '{$cpf}'");
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+
+    public function rotaExiste($idRota, $codigoCidade) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("id_rota = '{$idRota}' AND codigo_cidade = '{$codigoCidade}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -56,7 +66,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_usuario)")]);
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_rota)")]);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['id'];
@@ -103,54 +113,6 @@ class SeteUsuarios extends AbstractDatabasePostgres {
             $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
         }
         return ['result' => $boResultado, 'messages' => $message];
-    }
-    
-    public function checkUsuarioAndPassword($usuario, $pass) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select(['us' => $this->tableIdentifier])
-                ->columns(['email', 'password'])
-                ->where("email = '{$usuario}'")
-                ->where("password = '{$pass}'")
-                ->where("is_ativo = 'S'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $execute = $prepare->execute();
-        if ($execute->count() > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    public function getUsuarioByAccessToken($accessToken){
-        $sql = "select su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado from api.api_access_token aat
-                    inner join sete.sete_usuarios su on su.id_usuario = aat.id_usuario and aat.codigo_cidade = su.codigo_cidade 
-                    where aat.access_token  = '{$accessToken}'";
-        $statement = $this->AdapterBD->createStatement($sql);
-        $statement->prepare();
-        $row = $statement->execute()->current();
-        return $row;
-    }
-    
-    public function getUsuarioByUsername($username){
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['*'])
-                ->where("email = '{$username}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $execute = $prepare->execute();
-        $row = $execute->current();
-        return $row;
-    }
-    
-    public function getIdUsuarioByUsername($usuario){
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['id_usuario'])
-                ->where("email = '{$usuario}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $execute = $prepare->execute();
-        $row = $execute->current();
-        return $row['id_usuario'];
     }
 
 }

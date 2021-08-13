@@ -93,6 +93,7 @@ class AccessToken extends AbstractDatabasePostgres {
     public function gerarAccessTokenUsuarioSETE($usuario) {
         $dbSIRUsuario = new \Db\SetePG\SeteUsuarios();
         $idUsuario = $dbSIRUsuario->getIdUsuarioByUsername($usuario);
+        $arUsuario = $dbSIRUsuario->getUsuarioByUsername($usuario);
         $accessToken = sha1(time()) . "-{$usuario}";
         $dataCriacao = date("Y-m-d H:i:s");
 
@@ -100,7 +101,8 @@ class AccessToken extends AbstractDatabasePostgres {
             'access_token' => $accessToken,
             'id_usuario' => $idUsuario,
             'expires' => self::EXPIRES_ACCESS_TOKEN,
-            'dt_criacao' => $dataCriacao
+            'dt_criacao' => $dataCriacao,
+            'codigo_cidade' => $arUsuario['codigo_cidade']
         ]);
 
         return [

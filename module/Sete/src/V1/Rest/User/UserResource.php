@@ -27,22 +27,28 @@ class UserResource extends API {
                 }
                 break;
             case 'sete':
-                if (!isset($codigoCidade) || empty($codigoCidade)) {
-                    $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
-                } else {
-                    $dbMunicipio = new \Db\SetePG\GlbMunicipios();
-                    if (!$dbMunicipio->municipioExiste($codigoCidade)) {
-                        $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
+                $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+                if ($usuarioPodeAcessarMunicipio) {
+                    if (!isset($codigoCidade) || empty($codigoCidade)) {
+                        $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
+                    } else {
+                        $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+                        if (!$dbMunicipio->municipioExiste($codigoCidade)) {
+                            $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
+                        }
                     }
-                }
-                $boValidate = $this->_model->validarUsuarioSETE($data);
-                if (!$boValidate['result']) {
-                    $this->populaResposta(400, $boValidate, false);
+                    $boValidate = $this->_model->validarUsuarioSETE($data);
+                    if (!$boValidate['result']) {
+                        $this->populaResposta(400, $boValidate, false);
+                    } else {
+                        $data->codigo_cidade = $codigoCidade;
+                        $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+                        $this->populaResposta(201, $arResult, false);
+                    }
                 } else {
-                    $data->codigo_cidade = $codigoCidade;
-                    $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
-                    $this->populaResposta(201, $arResult, false);
+                    $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
                 }
+
                 break;
         }
     }
@@ -81,7 +87,13 @@ class UserResource extends API {
 
                 break;
             case 'sete':
-                $this->populaResposta(200, $this->_model->getById($id, $codigoCidade), false);
+                $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+                if ($usuarioPodeAcessarMunicipio) {
+                    $this->populaResposta(200, $this->_model->getById($id, $codigoCidade), false);
+                } else {
+                    $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+                }
+
                 break;
         }
     }
@@ -103,24 +115,28 @@ class UserResource extends API {
                 $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
                 break;
             case 'sete':
-                if (isset($userId)) {
-                    $this->fetch($userId);
+                $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+                if ($usuarioPodeAcessarMunicipio) {
+                    if (isset($userId)) {
+                        $this->fetch($userId);
+                    } else {
+                        $this->populaResposta(200, $this->_model->getListaTodosUsuariosSETE($codigoCidade), true);
+                    }
                 } else {
-                    $this->populaResposta(200, $this->_model->getListaTodosUsuariosSETE($codigoCidade), true);
+                    $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
                 }
-
                 break;
             case 'logout':
                 $this->logout();
                 break;
         }
     }
-    
-    private function logout(){
+
+    private function logout() {
         $accessToken = $this->getAcessToken();
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $dbCoreAccessToken->_delete($accessToken);
-        $this->populaResposta(200, ['result' => true, 'messages' => 'Logout efetuado com sucesso!'] , false); 
+        $this->populaResposta(200, ['result' => true, 'messages' => 'Logout efetuado com sucesso!'], false);
     }
 
     /**

@@ -1,37 +1,34 @@
 <?php
 
-namespace Sete\V1\Rest\Alunos;
+namespace Sete\V1\Rest\Rotas;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class AlunosModel {
+class RotasModel {
 
     protected $_entity;
 
     public function __construct() {
-        $this->_entity = new \Db\SetePG\SeteAlunos();
+        $this->_entity = new \Db\SetePG\SeteRotas();
     }
 
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row){
+        /*foreach ($arDados as $key => $row){
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");
-        }
+        }*/
         return $arDados;
     }
 
-    public function getById($codigoCidade, $idAluno) {
+    public function getById($codigoCidade, $idRota) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['id_rota'] = $idRota;
         $arRow = $this->_entity->getById($arIds);
-        if (!empty($arRow)) {
-            $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
-        }
         $urlHelper = new \Application\Utils\UrlHelper();
-        $arRow['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoCidade}/{$idAluno}/escola");
+        $arRow['_links']['_self'] = $urlHelper->baseUrl("rotas/{$codigoCidade}/{$idRota}/veiculos");
         return $arRow;
     }
 
@@ -66,45 +63,24 @@ class AlunosModel {
         }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
+            $arErros['nome'] = "O nome da rota deve ser informado!";
         }
-        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
-            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbAluno = new \Db\SetePG\SeteAlunos();
-            if (!$cpfValido) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado é inválido!";
-            }
-            if ($dbAluno->alunoExiste($arPost['cpf'])) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado já existe!";
-            }
-        }
-        if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
+        if (!isset($arPost['km']) || empty($arPost['km'])) {
             $boValidate = false;
-            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
-        } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
-                $boValidate = false;
-                $arErros['data_nascimento'] = "A data informada é inválida!";
-            }
+            $arErros['km'] = "Informe a distância da rota para continuar!";
         }
-        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+        if (!isset($arPost['tempo']) || empty($arPost['tempo'])) {
             $boValidate = false;
-            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
-        }
-        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
-            $boValidate = false;
-            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+            $arErros['tempo'] = "Informe a duração em minutos da rota para continuar!";
         }
         if ($boValidate) {
-            return $this->validarParametrosInsertAluno($arPost);
+            return $this->validarParametrosInsertRota($arPost);
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    private function validarParametrosInsertAluno($arPost) {
+    private function validarParametrosInsertRota($arPost) {
         $boValidate = true;
         $arErros = [];
         $arValoresBooleanos = ['S', 'N'];
@@ -128,48 +104,22 @@ class AlunosModel {
             $boValidate = false;
             $arErros['da_ponterustica'] = "O o valor do objeto da_ponterustica deve ser S ou N";
         }
-        if (isset($arPost['def_caminhar']) && !in_array($arPost['def_caminhar'], $arValoresBooleanos)) {
+        if (isset($arPost['turno_matutino']) && !in_array($arPost['turno_matutino'], $arValoresBooleanos)) {
             $boValidate = false;
-            $arErros['def_caminhar'] = "O o valor do objeto def_caminhar deve ser S ou N";
+            $arErros['turno_matutino'] = "O o valor do objeto turno_matutino deve ser S ou N";
         }
-        if (isset($arPost['def_ouvir']) && !in_array($arPost['def_ouvir'], $arValoresBooleanos)) {
+        if (isset($arPost['turno_vespertino']) && !in_array($arPost['turno_vespertino'], $arValoresBooleanos)) {
             $boValidate = false;
-            $arErros['def_ouvir'] = "O o valor do objeto def_ouvir deve ser S ou N";
+            $arErros['turno_vespertino'] = "O o valor do objeto turno_vespertino deve ser S ou N";
         }
-        if (isset($arPost['def_enxergar']) && !in_array($arPost['def_enxergar'], $arValoresBooleanos)) {
+        if (isset($arPost['turno_noturno']) && !in_array($arPost['turno_noturno'], $arValoresBooleanos)) {
             $boValidate = false;
-            $arErros['def_enxergar'] = "O o valor do objeto def_enxergar deve ser S ou N";
+            $arErros['turno_noturno'] = "O o valor do objeto turno_noturno deve ser S ou N";
         }
-        if (isset($arPost['def_mental']) && !in_array($arPost['def_mental'], $arValoresBooleanos)) {
+        if (isset($arPost['tipo']) && !in_array($arPost['tipo'], \Db\Enum\Rota\Tipo::TIPO)) {
             $boValidate = false;
-            $arErros['def_mental'] = "O o valor do objeto def_mental deve ser S ou N";
+            $arErros['tipo'] = "O valor do objeto tipo está inválido. Verifique e tente novamente!";
         }
-        if (isset($arPost['sexo']) && !in_array($arPost['sexo'], \Db\Enum\Sexo::SEXOS)) {
-            $boValidate = false;
-            $arErros['sexo'] = "O valor do objeto sexo está inválido. Verifique e tente novamente!";
-        }
-        if (isset($arPost['cor']) && !in_array($arPost['cor'], \Db\Enum\CorRaca::COR_RACA)) {
-            $boValidate = false;
-            $arErros['cor'] = "O valor do objeto cor está inválido. Verifique e tente novamente!";
-        }
-        if (isset($arPost['turno']) && !in_array($arPost['turno'], \Db\Enum\Turno::TURNO)) {
-            $boValidate = false;
-            $arErros['turno'] = "O valor do objeto turno está inválido. Verifique e tente novamente!";
-        }
-
-        if (isset($arPost['nivel']) && !in_array($arPost['nivel'], \Db\Enum\NivelAluno::NIVEL)) {
-            $boValidate = false;
-            $arErros['nivel'] = "O valor do objeto nivel está inválido. Verifique e tente novamente!";
-        }
-        if (isset($arPost['grau_responsavel']) && !in_array($arPost['grau_responsavel'], \Db\Enum\GrauParentesco::GRAU_PARENTESCO)) {
-            $boValidate = false;
-            $arErros['grau_responsavel'] = "O valor do objeto grau_responsavel está inválido. Verifique e tente novamente!";
-        }
-        if (isset($arPost['mec_tp_localizacao']) && !in_array($arPost['mec_tp_localizacao'], \Db\Enum\MecTpLocalizacao::LOCALIZACAO)) {
-            $boValidate = false;
-            $arErros['mec_tp_localizacao'] = "O valor do objeto mec_tp_localizacao está inválido. Verifique e tente novamente!";
-        }
-
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
