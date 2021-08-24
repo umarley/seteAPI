@@ -122,7 +122,9 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     }
     
     public function getUsuarioByAccessToken($accessToken){
-        $sql = "select su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado from api.api_access_token aat
+        $sql = "select su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado, 
+                    su.cpf, su.telefone
+                    from api.api_access_token aat
                     inner join sete.sete_usuarios su on su.id_usuario = aat.id_usuario and aat.codigo_cidade = su.codigo_cidade 
                     where aat.access_token  = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);

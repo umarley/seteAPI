@@ -21,7 +21,7 @@ class AuthenticatorResource extends AbstractResourceListener {
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $conteudo = file_get_contents("php://input");
         $arPost = json_decode($conteudo, true);
-        if (isset($arParams['tipo'])) {
+        if (isset($arParams['tipo']) && $arParams['tipo'] === 'sete') {
             $arResult = $this->_model->autenticarUsuarioSETE($arPost);
         } else {
             $arResult = $this->_model->autenticarUsuario($arPost);
@@ -120,6 +120,8 @@ class AuthenticatorResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function replaceList($data) {
+        echo "Umarley";
+        exit;
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -131,7 +133,16 @@ class AuthenticatorResource extends AbstractResourceListener {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+       $arParams = $this->getEvent()->getRouteMatch()->getParams();
+       var_dump($arParams);
+       exit;
+        $conteudo = file_get_contents("php://input");
+        $arPost = json_decode($conteudo, true);
+        if (isset($arParams['tipo']) && $arParams['tipo'] === 'sete') {
+            $arResult = $this->_model->autenticarUsuarioSETE($arPost);
+        } else {
+            $arResult = $this->_model->autenticarUsuario($arPost);
+        }
     }
 
 }

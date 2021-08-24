@@ -20,7 +20,7 @@ class AuthenticatorModel {
             $arResult['messages'] = "Login efetuado com sucesso!";
         }else{
             $arResult['result'] = false;
-            $arResult['status'] =  403;
+            $arResult['status'] =  400;
             $arResult['messages'] = "Usuário / Senha não conferem!";
         }
         return $arResult;
@@ -43,6 +43,7 @@ class AuthenticatorModel {
             $arDadosUsuario = $dbCoreUsuarioPG->getUsuarioByUsername($arPost['usuario']);
             $arAccessToken = $dbCoreAccessToken->gerarAccessTokenUsuarioSETE($arDadosUsuario['email']);
             $arAccessToken['tipo_permissao'] = $arDadosUsuario['nivel_permissao'];
+            $arResult['data'] = $dbCoreUsuarioPG->getUsuarioByAccessToken($arAccessToken['access_token']);
             $arResult['result'] = true;
             $arResult['access_token'] = $arAccessToken;
             $arResult['messages'] = "Login efetuado com sucesso!";

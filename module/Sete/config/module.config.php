@@ -26,7 +26,7 @@ return [
             'sete.rest.authenticator' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/authenticator[/:tipo]',
+                    'route' => '/authenticator[/:tipo[/:authenticator_id]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Authenticator\\Controller',
                     ],
@@ -127,10 +127,13 @@ return [
             'route_name' => 'sete.rest.authenticator',
             'route_identifier_name' => 'authenticator_id',
             'collection_name' => 'authenticator',
-            'entity_http_methods' => [],
+            'entity_http_methods' => [
+                0 => 'PUT',
+            ],
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
