@@ -125,6 +125,7 @@ return [
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PUT',
+                3 => 'PATCH',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,

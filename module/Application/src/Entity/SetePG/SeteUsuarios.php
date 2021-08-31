@@ -10,7 +10,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
 
     public function __construct() {
         $this->table = 'sete_usuarios';
-        $this->primaryKey = 'id_escola';
+        $this->primaryKey = 'id_usuario';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -66,7 +66,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_escola' => $arId['id_escola']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_usuario' => $arId['id_usuario']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -122,7 +122,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     }
     
     public function getUsuarioByAccessToken($accessToken){
-        $sql = "select su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado, 
+        $sql = "select su.id_usuario, su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado, 
                     su.cpf, su.telefone
                     from api.api_access_token aat
                     inner join sete.sete_usuarios su on su.id_usuario = aat.id_usuario and aat.codigo_cidade = su.codigo_cidade 

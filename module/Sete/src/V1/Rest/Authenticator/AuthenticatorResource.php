@@ -140,7 +140,7 @@ class AuthenticatorResource extends AbstractResourceListener {
         $arPost = json_decode($conteudo, true);
         if (isset($arParams['tipo']) && $arParams['tipo'] === 'sete') {
             $arResult = $this->_model->autenticarUsuarioSETE($arPost);
-        } else {
+        }else{
             $arResult = $this->_model->autenticarUsuario($arPost);
         }
     }
