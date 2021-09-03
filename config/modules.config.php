@@ -6,7 +6,7 @@
  * The previous config file has been stored in ./config/modules.config.old
  */
 return [
-    'Laminas\Cache',
+    'Laminas\\Cache',
     'Laminas\\Db',
     'Laminas\\Filter',
     'Laminas\\Hydrator',
@@ -16,7 +16,7 @@ return [
     'Laminas\\Validator',
     'Laminas\\ApiTools',
     'Laminas\\ApiTools\\Documentation',
-    'Laminas\ApiTools\Documentation\Swagger',
+    'Laminas\\ApiTools\\Documentation\\Swagger',
     'Laminas\\ApiTools\\ApiProblem',
     'Laminas\\ApiTools\\Configuration',
     'Laminas\\ApiTools\\OAuth2',

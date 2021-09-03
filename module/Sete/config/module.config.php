@@ -10,6 +10,7 @@ return [
             \Sete\V1\Rest\Escolas\EscolasResource::class => \Sete\V1\Rest\Escolas\EscolasResourceFactory::class,
             \Sete\V1\Rest\Registro\RegistroResource::class => \Sete\V1\Rest\Registro\RegistroResourceFactory::class,
             \Sete\V1\Rest\Rotas\RotasResource::class => \Sete\V1\Rest\Rotas\RotasResourceFactory::class,
+            \Sete\V1\Rest\Veiculo\VeiculoResource::class => \Sete\V1\Rest\Veiculo\VeiculoResourceFactory::class,
         ],
     ],
     'router' => [
@@ -86,6 +87,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.veiculos' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/veiculos[/:veiculos_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Veiculos\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -98,6 +108,7 @@ return [
             5 => 'sete.rest.escolas',
             6 => 'sete.rest.registro',
             7 => 'sete.rest.rotas',
+            9 => 'sete.rest.veiculo',
         ],
     ],
     'api-tools-rest' => [
@@ -270,6 +281,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Rotas\RotasCollection::class,
             'service_name' => 'Rotas',
         ],
+        'Sete\\V1\\Rest\\Veiculos\\Controller' => [
+            'listener' => \Sete\V1\Rest\Veiculos\VeiculosResource::class,
+            'route_name' => 'sete.rest.veiculos',
+            'route_identifier_name' => 'veiculos_id',
+            'collection_name' => 'veiculos',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Veiculos\VeiculosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Veiculos\VeiculosCollection::class,
+            'service_name' => 'Veiculos',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -281,6 +315,7 @@ return [
             'Sete\\V1\\Rest\\Escolas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Registro\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Rotas\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Veiculos\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -323,6 +358,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Veiculos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -354,6 +394,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Rotas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Veiculos\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -457,6 +501,18 @@ return [
                 'route_identifier_name' => 'rotas_id',
                 'is_collection' => true,
             ],
+            \Sete\V1\Rest\Veiculos\VeiculosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.veiculos',
+                'route_identifier_name' => 'veiculos_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Veiculos\VeiculosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.veiculos',
+                'route_identifier_name' => 'veiculos_id',
+                'is_collection' => true,
+            ],
         ],
     ],
     'api-tools-content-validation' => [
@@ -490,6 +546,22 @@ return [
                 'collection' => [
                     'GET' => false,
                     'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+                'entity' => [
+                    'GET' => false,
+                    'POST' => false,
+                    'PUT' => false,
+                    'PATCH' => false,
+                    'DELETE' => false,
+                ],
+            ],
+            'Sete\\V1\\Rest\\Veiculos\\Controller' => [
+                'collection' => [
+                    'GET' => false,
+                    'POST' => true,
                     'PUT' => false,
                     'PATCH' => false,
                     'DELETE' => false,

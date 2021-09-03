@@ -38,7 +38,7 @@ class EscolasResource extends API {
         $codigoCidade = $arParams['codigo_cidade'];
         $idEscola = $arParams['escolas_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idAluno;
+        $arDados->id_aluno = $idEscola;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
             case 'aluno':
