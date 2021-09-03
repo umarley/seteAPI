@@ -10,7 +10,8 @@ return [
             \Sete\V1\Rest\Escolas\EscolasResource::class => \Sete\V1\Rest\Escolas\EscolasResourceFactory::class,
             \Sete\V1\Rest\Registro\RegistroResource::class => \Sete\V1\Rest\Registro\RegistroResourceFactory::class,
             \Sete\V1\Rest\Rotas\RotasResource::class => \Sete\V1\Rest\Rotas\RotasResourceFactory::class,
-            \Sete\V1\Rest\Veiculo\VeiculoResource::class => \Sete\V1\Rest\Veiculo\VeiculoResourceFactory::class,
+            \Sete\V1\Rest\Localidades\LocalidadesResource::class => \Sete\V1\Rest\Localidades\LocalidadesResourceFactory::class,
+            \Sete\V1\Rest\Veiculos\VeiculosResource::class => \Sete\V1\Rest\Veiculos\VeiculosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -27,7 +28,7 @@ return [
             'sete.rest.authenticator' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/authenticator[/:tipo]',
+                    'route' => '/authenticator[/:tipo[/:authenticator_id]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Authenticator\\Controller',
                     ],
@@ -87,6 +88,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.localidades' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/localidades[/:entidade[/:codigo_estado]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Localidades\\Controller',
+                    ],
+                ],
+            ],
             'sete.rest.veiculos' => [
                 'type' => 'Segment',
                 'options' => [
@@ -108,7 +118,8 @@ return [
             5 => 'sete.rest.escolas',
             6 => 'sete.rest.registro',
             7 => 'sete.rest.rotas',
-            9 => 'sete.rest.veiculo',
+            8 => 'sete.rest.localidades',
+            9 => 'sete.rest.veiculos',
         ],
     ],
     'api-tools-rest' => [
@@ -125,6 +136,7 @@ return [
                 0 => 'GET',
                 1 => 'POST',
                 2 => 'PUT',
+                3 => 'PATCH',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -138,10 +150,13 @@ return [
             'route_name' => 'sete.rest.authenticator',
             'route_identifier_name' => 'authenticator_id',
             'collection_name' => 'authenticator',
-            'entity_http_methods' => [],
+            'entity_http_methods' => [
+                0 => 'PUT',
+            ],
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -281,6 +296,27 @@ return [
             'collection_class' => \Sete\V1\Rest\Rotas\RotasCollection::class,
             'service_name' => 'Rotas',
         ],
+        'Sete\\V1\\Rest\\Localidades\\Controller' => [
+            'listener' => \Sete\V1\Rest\Localidades\LocalidadesResource::class,
+            'route_name' => 'sete.rest.localidades',
+            'route_identifier_name' => 'codigo_estado',
+            'collection_name' => 'localidades',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Localidades\LocalidadesEntity::class,
+            'collection_class' => \Sete\V1\Rest\Localidades\LocalidadesCollection::class,
+            'service_name' => 'Localidades',
+        ],
         'Sete\\V1\\Rest\\Veiculos\\Controller' => [
             'listener' => \Sete\V1\Rest\Veiculos\VeiculosResource::class,
             'route_name' => 'sete.rest.veiculos',
@@ -291,7 +327,6 @@ return [
                 1 => 'PATCH',
                 2 => 'PUT',
                 3 => 'DELETE',
-                4 => 'POST',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -315,6 +350,7 @@ return [
             'Sete\\V1\\Rest\\Escolas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Registro\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Rotas\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Localidades\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Veiculos\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
@@ -358,6 +394,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Localidades\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
             'Sete\\V1\\Rest\\Veiculos\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/hal+json',
@@ -394,6 +435,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Rotas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Localidades\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -501,6 +546,18 @@ return [
                 'route_identifier_name' => 'rotas_id',
                 'is_collection' => true,
             ],
+            \Sete\V1\Rest\Localidades\LocalidadesEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.localidades',
+                'route_identifier_name' => 'codigo_estado',
+                'hydrator' => \Laminas\Hydrator\ArraySerializable::class,
+            ],
+            \Sete\V1\Rest\Localidades\LocalidadesCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.localidades',
+                'route_identifier_name' => 'codigo_estado',
+                'is_collection' => true,
+            ],
             \Sete\V1\Rest\Veiculos\VeiculosEntity::class => [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.veiculos',
@@ -546,22 +603,6 @@ return [
                 'collection' => [
                     'GET' => false,
                     'POST' => false,
-                    'PUT' => false,
-                    'PATCH' => false,
-                    'DELETE' => false,
-                ],
-                'entity' => [
-                    'GET' => false,
-                    'POST' => false,
-                    'PUT' => false,
-                    'PATCH' => false,
-                    'DELETE' => false,
-                ],
-            ],
-            'Sete\\V1\\Rest\\Veiculos\\Controller' => [
-                'collection' => [
-                    'GET' => false,
-                    'POST' => true,
                     'PUT' => false,
                     'PATCH' => false,
                     'DELETE' => false,

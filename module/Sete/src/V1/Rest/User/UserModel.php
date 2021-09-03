@@ -160,5 +160,23 @@ class UserModel {
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
         return $dbSeteUsuario->getUsuariosLiberadosSistemaByCidade($codigoCidade, $busca);
     }
+    
+    public function validarTrocaSenhaUsuario($arPost){
+        $boValidate = true;
+        $arErros = [];
+        if (empty($arPost->id_usuario)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro id_usuario é obrigatório!";
+        }
+        if (empty($arPost->senha_atual) || !$this->isValidMd5($arPost->senha_atual)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro senha_atual deve ser um hash md5!";
+        }
+        if (empty($arPost->nova_senha) || !$this->isValidMd5($arPost->nova_senha)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro nova_senha deve ser um hash md5!";
+        }
+        return ['result' => $boValidate, 'messages' => $arErros];
+    }
 
 }

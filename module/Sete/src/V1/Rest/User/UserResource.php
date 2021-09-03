@@ -178,7 +178,7 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
-        $params = $this->event->getParams();
+        $params = $this->event->getRouteMatch()->getParams();
         $userType = $this->event->getRouteMatch()->getParam('user_type');
         switch ($userType) {
             case 'api':
@@ -191,8 +191,36 @@ class UserResource extends API {
                 }
                 break;
             case 'sete':
+                $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($params['codigo_cidade']);
+                if ($params['user_id'] === 'alterar-senha' && $usuarioPodeAcessarMunicipio) {
+                    $this->processarAlterarSenhaUsuario($params['codigo_cidade'], $data);
+                } else if (!$usuarioPodeAcessarMunicipio) {
+                    $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+                }
+
+
 
                 break;
+        }
+    }
+
+    private function processarAlterarSenhaUsuario($codigoCidade, $arData) {
+        $modelUsuario = new UserModel();
+        $boValidate = $modelUsuario->validarTrocaSenhaUsuario($arData);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, $boValidate, false);
+        } else {
+            $dbCoreUsuario = new \Db\SetePG\SeteUsuarios();
+            $arUsuario = $dbCoreUsuario->getById($arData->id_usuario, $codigoCidade);
+            if ($arUsuario['password'] === $arData->senha_atual) {
+                $arResult = $dbCoreUsuario->_atualizar([
+                    'codigo_cidade' => $codigoCidade,
+                    'id_usuario' => $arData->id_usuario
+                        ], ['password' => $arData->nova_senha]);
+                $this->populaResposta(200, $arResult, false);
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => 'Senha não confere. Tente novamente!'], false);
+            }
         }
     }
 
