@@ -20,7 +20,7 @@ class API extends AbstractResourceListener {
                 $valido = $dbModelAuthenticator->validarAccessToken($accessToken);
                 if (!$valido) {
                     header('Access-Control-Allow-Origin: *');
-                    header('Content-Type: application/json', true, 401);
+                    header('Content-Type: application/json', true, 403);
                     echo json_encode(['result' => false, 'messages' => 'Access Token inválido!']);
                     exit;
                 }

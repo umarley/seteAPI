@@ -46,6 +46,7 @@ class AuthenticatorModel {
             $arResult['data'] = $dbCoreUsuarioPG->getUsuarioByAccessToken($arAccessToken['access_token']);
             $arResult['result'] = true;
             $arResult['access_token'] = $arAccessToken;
+            $arResult['status'] =  201;
             $arResult['messages'] = "Login efetuado com sucesso!";
         }else{
             $arResult['result'] = false;
