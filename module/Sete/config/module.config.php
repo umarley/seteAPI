@@ -12,6 +12,8 @@ return [
             \Sete\V1\Rest\Rotas\RotasResource::class => \Sete\V1\Rest\Rotas\RotasResourceFactory::class,
             \Sete\V1\Rest\Localidades\LocalidadesResource::class => \Sete\V1\Rest\Localidades\LocalidadesResourceFactory::class,
             \Sete\V1\Rest\Veiculos\VeiculosResource::class => \Sete\V1\Rest\Veiculos\VeiculosResourceFactory::class,
+            \Sete\V1\Rest\Garagens\GaragensResource::class => \Sete\V1\Rest\Garagens\GaragensResourceFactory::class,
+            \Sete\V1\Rest\Motoristas\MotoristasResource::class => \Sete\V1\Rest\Motoristas\MotoristasResourceFactory::class,
         ],
     ],
     'router' => [
@@ -106,6 +108,24 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.garagens' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/garagens[/:codigo_cidade[/:garagens_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Garagens\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.motoristas' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/motoristas[/:codigo_cidade[/:motoristas_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Motoristas\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -120,6 +140,8 @@ return [
             7 => 'sete.rest.rotas',
             8 => 'sete.rest.localidades',
             9 => 'sete.rest.veiculos',
+            10 => 'sete.rest.garagens',
+            11 => 'sete.rest.motoristas',
         ],
     ],
     'api-tools-rest' => [
@@ -339,6 +361,50 @@ return [
             'collection_class' => \Sete\V1\Rest\Veiculos\VeiculosCollection::class,
             'service_name' => 'Veiculos',
         ],
+        'Sete\\V1\\Rest\\Garagens\\Controller' => [
+            'listener' => \Sete\V1\Rest\Garagens\GaragensResource::class,
+            'route_name' => 'sete.rest.garagens',
+            'route_identifier_name' => 'garagens_id',
+            'collection_name' => 'garagens',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Garagens\GaragensEntity::class,
+            'collection_class' => \Sete\V1\Rest\Garagens\GaragensCollection::class,
+            'service_name' => 'Garagens',
+        ],
+        'Sete\\V1\\Rest\\Motoristas\\Controller' => [
+            'listener' => \Sete\V1\Rest\Motoristas\MotoristasResource::class,
+            'route_name' => 'sete.rest.motoristas',
+            'route_identifier_name' => 'motoristas_id',
+            'collection_name' => 'motoristas',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Motoristas\MotoristasEntity::class,
+            'collection_class' => \Sete\V1\Rest\Motoristas\MotoristasCollection::class,
+            'service_name' => 'Motoristas',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -352,6 +418,8 @@ return [
             'Sete\\V1\\Rest\\Rotas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Localidades\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Veiculos\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Garagens\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Motoristas\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -404,6 +472,16 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Garagens\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Motoristas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -443,6 +521,14 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Veiculos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Garagens\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Motoristas\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -568,6 +654,30 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.veiculos',
                 'route_identifier_name' => 'veiculos_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Garagens\GaragensEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.garagens',
+                'route_identifier_name' => 'garagens_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Garagens\GaragensCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.garagens',
+                'route_identifier_name' => 'garagens_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Motoristas\MotoristasEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.motoristas',
+                'route_identifier_name' => 'motoristas_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Motoristas\MotoristasCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.motoristas',
+                'route_identifier_name' => 'motoristas_id',
                 'is_collection' => true,
             ],
         ],
