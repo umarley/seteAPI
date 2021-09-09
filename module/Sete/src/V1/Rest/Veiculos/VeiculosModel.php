@@ -1,6 +1,6 @@
 <?php
 
-namespace Sete\V1\Rest\Veiculo;
+namespace Sete\V1\Rest\Veiculos;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

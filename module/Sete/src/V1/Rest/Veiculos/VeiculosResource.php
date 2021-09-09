@@ -2,8 +2,8 @@
 namespace Sete\V1\Rest\Veiculos;
 
 
-
 use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Sete\V1\Rest\Veiculos;
 use Sete\V1\API;
 
 class VeiculosResource extends API
@@ -24,9 +24,7 @@ class VeiculosResource extends API
     private function processarRequestPOST($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
-            
             $this->processarInsertVeiculo($arData);
-            
         } else {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }

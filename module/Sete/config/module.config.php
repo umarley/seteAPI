@@ -100,7 +100,7 @@ return [
             'sete.rest.veiculos' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/veiculos[/:veiculos_id]',
+                    'route' => '/veiculos[/:codigo_cidade[/:veiculos_id[/:rota]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Veiculos\\Controller',
                     ],
