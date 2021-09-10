@@ -30,7 +30,8 @@ class AuthenticatorResource extends AbstractResourceListener {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
         header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
-        header("Content-type: application/json", $arResult['status']);
+        header("Content-type: application/json");
+        http_response_code($arResult['status']);
         echo json_encode($arResult);
         exit;
     }
