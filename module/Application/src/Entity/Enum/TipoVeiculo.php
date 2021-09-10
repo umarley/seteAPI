@@ -3,7 +3,7 @@
 namespace Db\Enum;
 
 
-class Tipo_Veiculo {
+class TipoVeiculo {
     
     const ONIBUS= 1;
     const MICRO_ONIBUS = 2;

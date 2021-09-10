@@ -2,6 +2,7 @@
 
 namespace Sete\V1\Rest\Veiculos;
 
+use phpDocumentor\Reflection\PseudoTypes\False_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -11,27 +12,24 @@ class VeiculosModel {
     protected $_entity;
 
     public function __construct() {
-        $this->_entity = new \Db\SetePG\SeteAlunos();
+        $this->_entity = new \Db\SetePG\SeteVeiculos();
     }
 
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoMunicipio}/{$row['id_veiculo']}");
         }
         return $arDados;
     }
 
-    public function getById($codigoCidade, $idAluno) {
+    public function getById($codigoCidade, $idVeiculo) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['id_veiculo'] = $idVeiculo;
         $arRow = $this->_entity->getById($arIds);
-        if (!empty($arRow)) {
-            $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
-        }
         $urlHelper = new \Application\Utils\UrlHelper();
-        $arRow['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoCidade}/{$idAluno}/escola");
+        $arRow['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoCidade}/{$idVeiculo}");
         return $arRow;
     }
 
@@ -50,6 +48,7 @@ class VeiculosModel {
     }
 
     public function validarInsert($arPost) {
+        $regex = '/[A-Z]{3}[0-9][0-9A-Z][0-9]{2}/';
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
@@ -63,9 +62,20 @@ class VeiculosModel {
                 $arErros['codigo_cidade'] = "O código da cidade não existe. Verifique e tente novamente!";
             }
         }
-        if (!isset($arPost['placa']) || empty($arPost['placa'])) {
+        if ( !isset($arPost['placa']) || empty($arPost['placa']) ) {
             $boValidate = false;
             $arErros['placa'] = "A placa do veiculo deve ser informada!";
+        }else{
+            if($this->_entity->veiculoExiste($arPost['placa'], $arPost['codigo_cidade'])){
+                $boValidate = false;
+                $arErros['placa'] = "A placa informada já está cadastrada. Verifique e tente novamente!";
+            }
+            if($arPost['modo']===1){
+                if (preg_match($regex, $arPost['placa']) != 1) {
+                $boValidate = false;
+                $arErros['placa'] = "A placa do veiculo é invalida!";
+                }
+            }
         }
 
         if (!isset($arPost['modelo']) || empty($arPost['modelo'])) {
@@ -109,7 +119,7 @@ class VeiculosModel {
         }
 
         //Testando a tipo
-        if (isset($arPost['tipo']) && !in_array($arPost['tipo'], \Db\Enum\Tipo_Veiculo::TIPO_VEICULO)) {
+        if (isset($arPost['tipo']) && !in_array($arPost['tipo'], \Db\Enum\TipoVeiculo::TIPO_VEICULO)) {
             $boValidate = false;
             $arErros['tipo'] = "O valor do objeto tipo está inválido. Verifique e tente novamente!";
         }

@@ -24,6 +24,7 @@ class VeiculosResource extends API
     private function processarRequestPOST($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
+            $arData->codigo_cidade =  $codigoCidade;
             $this->processarInsertVeiculo($arData);
         } else {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
@@ -70,9 +71,26 @@ class VeiculosResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id)
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+    public function fetch($id) {
+        $modelVeiculos = new VeiculosModel();
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        $codigoCidade = $arParams['codigo_cidade'];
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
+        } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
+            $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
+        } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
+            $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
+        } else {
+            $idVeiculo = $arParams['veiculos_id'];
+            if ($idVeiculo != "" && is_numeric($idVeiculo) ) {
+                $arVeiculo = $modelVeiculos->getById($codigoCidade, $idVeiculo);
+                $this->populaResposta(count($arVeiculo) > 1 ? 200 : 404, $arVeiculo, false);
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_veiculo deve ser informado!"], false);
+            } 
+        }
     }
 
     /**
@@ -81,9 +99,28 @@ class VeiculosResource extends API
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = [])
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+    public function fetchAll($params = []) {
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
+        } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
+            $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
+        } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
+            $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
+        } else {
+            $this->obterTodosVeiculosCidade($codigoCidade);
+        }
+    }
+    private function obterTodosVeiculosCidade($codigoCidade) {
+        $modelVeiculos = new VeiculosModel();
+        $arVeiculos = $modelVeiculos->getAll($codigoCidade);
+        $arResultado['data'] = $arVeiculos;
+        $arResultado['total'] = count($arVeiculos);
+        header("Content-type: application/json");
+        echo json_encode($arResultado);
+        exit;
     }
 
     /**

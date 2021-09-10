@@ -19,7 +19,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_rota = {$arIds['id_rota']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -28,7 +28,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_rota', 'nome'])
+                ->columns(['codigo_cidade','id_veiculo', 'placa','modelo'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -49,11 +49,11 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function veiculoExiste($idVeiculo, $codigoCidade) {
+    public function veiculoExiste($placa, $codigoCidade, $idVeiculo = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("id_veiculo = '{$idVeiculo}' AND codigo_cidade = '{$codigoCidade}'");
+                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -66,7 +66,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_rota)")]);
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_veiculo)")]);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['id'];
