@@ -1,10 +1,11 @@
 <?php
 namespace Sete\V1\Rest\Motoristas;
 
+use Sete\V1\API;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
-use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Sete\V1\Rest\Motoristas\MotoristasModel;
 
-class MotoristasResource extends AbstractResourceListener
+class MotoristasResource extends API
 {
     /**
      * Create a resource
@@ -12,9 +13,49 @@ class MotoristasResource extends AbstractResourceListener
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function create($data)
-    {
-        return new ApiProblem(405, 'The POST method has not been defined');
+    public function create($data) {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $this->processarRequestPOST($codigoCidade, $data);
+    }
+
+    private function processarRequestPOST($codigoCidade, $arData) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arParams = $this->event->getRouteMatch()->getParams();
+            if (isset($arParams['rota'])) {
+                $this->processarRotasPOST($arParams, $arData);
+            } else {
+                $arData->codigo_cidade = $codigoCidade;
+                $this->processarInsertMotorista($arData);
+            }
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
+    }
+
+    private function processarRotasPOST($arParams, $arDados) {
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idAluno = $arParams['alunos_id'];
+        $rota = $arParams['rota'];
+        $arDados->id_aluno = $idAluno;
+        $arDados->codigo_cidade = $codigoCidade;
+        switch ($rota) {
+            case 'rota':
+                $this->associarRotaMotorista($arDados);
+                break;
+        }
+    }
+    
+    private function processarInsertMotorista($arData) {
+        $modelMotoristas = new MotoristasModel();
+        $boValidate = $modelMotoristas->validarInsert($arData);
+        if ($boValidate['result']) {
+            $arResult = $modelMotoristas->prepareInsert($arData);
+            $this->populaResposta(200, $arResult, false);
+        } else {
+            $this->populaResposta(400, $boValidate, false);
+        }
     }
 
     /**
