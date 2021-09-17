@@ -131,8 +131,7 @@ class VeiculosResource extends API
         $arVeiculos = $modelVeiculos->getAll($codigoCidade);
         $arResultado['data'] = $arVeiculos;
         $arResultado['total'] = count($arVeiculos);
-        header("Content-type: application/json");
-        echo json_encode($arResultado);
+        $this->populaResposta(200, $arResultado, false);
         exit;
     }
 
