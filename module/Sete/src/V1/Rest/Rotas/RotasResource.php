@@ -225,6 +225,9 @@ class RotasResource extends API
         $arRotas = $modelRotas->getAll($codigoCidade);
         $arResultado['data'] = $arRotas;
         $arResultado['total'] = count($arRotas);
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
         header("Content-type: application/json");
         echo json_encode($arResultado);
         exit;
