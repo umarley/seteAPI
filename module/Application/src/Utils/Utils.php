@@ -1960,6 +1960,14 @@ class Utils {
         }
     }
 
+    public static function validarPlaca($placa = null) {
+        $regex = '/[A-Z]{3}[0-9][0-9A-Z][0-9]{2}/';
+        if (preg_match($regex, $placa) != 1) {
+            return false;
+        }
+        return true;
+    }
+
     public static function validarCnpj($cnpj) {
         $cnpj = preg_replace('/[^0-9]/', '', (string) $cnpj);
         // Valida tamanho
