@@ -18,33 +18,37 @@ class MotoristasModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
         }
         return $arDados;
     }
 
-    public function getById($codigoCidade, $idAluno) {
+    public function getById($codigoCidade, $cpfMotorista) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['cpf_motorista'] = $cpfMotorista;
         $arRow = $this->_entity->getById($arIds);
         if (!empty($arRow)) {
             $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
         }
-        $urlHelper = new \Application\Utils\UrlHelper();
-        $arRow['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoCidade}/{$idAluno}/escola");
+        //$urlHelper = new \Application\Utils\UrlHelper();
+        //$arRow['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoCidade}/{$cpfMotorista}/escola");
         return $arRow;
     }
 
     public function prepareInsert($arPost) {
         $arPost = (Array) $arPost;
-        $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
-        $arPost['da_mataburro'] = isset($arPost['da_mataburro']) ? $arPost['da_mataburro'] : 'N';
-        $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
-        $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
-        $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
+        $arPost['turno_manha'] = isset($arPost['turno_manha']) ? $arPost['turno_manha'] : 'N';
+        $arPost['turno_tarde'] = isset($arPost['turno_tarde']) ? $arPost['turno_tarde'] : 'N';
+        $arPost['turno_noite'] = isset($arPost['turno_noite']) ? $arPost['turno_noite'] : 'N';
+        $arPost['tem_cnh_a'] = isset($arPost['tem_cnh_a']) ? $arPost['tem_cnh_a'] : 'N';
+        $arPost['tem_cnh_b'] = isset($arPost['tem_cnh_b']) ? $arPost['tem_cnh_b'] : 'N';
+        $arPost['tem_cnh_c'] = isset($arPost['tem_cnh_c']) ? $arPost['tem_cnh_c'] : 'N';
+        $arPost['tem_cnh_d'] = isset($arPost['tem_cnh_d']) ? $arPost['tem_cnh_d'] : 'N';
+        $arPost['tem_cnh_e'] = isset($arPost['tem_cnh_e']) ? $arPost['tem_cnh_e'] : 'N';
         $arResult = $this->_entity->_inserir($arPost);
         if ($arResult['result']) {
-            $arResult['messages']['id'] = $this->_entity->getUltimoIdInserido();
+            unset($arResult['messages']['id']);
+            $arResult['messages']['cpf'] = $arPost['cpf'];
         }
 
         return $arResult;
@@ -147,18 +151,6 @@ class MotoristasModel {
             $boValidate = false;
             $arErros['nome'] = "O nome do aluno deve ser informado!";
         }
-        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
-            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbMotorista = new \Db\SetePG\SeteMotoristas();
-            if (!$cpfValido) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado é inválido!";
-            }
-            if ($dbMotorista->motoristaExiste($arPost['cpf'])) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado já existe!";
-            }
-        }
         if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
             $boValidate = false;
             $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
@@ -175,24 +167,19 @@ class MotoristasModel {
         }
     }
 
-    public function prepareUpdate($codigoCidade, $idAluno, $arPost) {
+    public function prepareUpdate($codigoCidade, $cpfMotorista, $arPost) {
         $arPost = (Array) $arPost;
         unset($arPost['codigo_cidade']);
-        unset($arPost['id_aluno']);
-        $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
-        $arPost['da_mataburro'] = isset($arPost['da_mataburro']) ? $arPost['da_mataburro'] : 'N';
-        $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
-        $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
-        $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
+        unset($arPost['cpf']);
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_aluno'] = $idAluno;
+        $arId['cpf'] = $cpfMotorista;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
 
-    public function removerRegistroById($codigoCidade, $idAluno) {
+    public function removerRegistroById($codigoCidade, $cpfMotorista) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['cpf'] = $cpfMotorista;
         $arResult = $this->_entity->_delete($arIds);
         return $arResult;
     }

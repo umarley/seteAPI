@@ -218,9 +218,7 @@ class AlunosResource extends API {
         $arAlunos = $modelAlunos->getAll($codigoCidade);
         $arResultado['data'] = $arAlunos;
         $arResultado['total'] = count($arAlunos);
-        header("Content-type: application/json");
-        echo json_encode($arResultado);
-        exit;
+        $this->populaResposta(200, $arResultado, false);
     }
 
     /**
