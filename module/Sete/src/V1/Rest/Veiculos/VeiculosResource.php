@@ -49,11 +49,24 @@ class VeiculosResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+    public function delete($id) {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idVeiculo= $arParams['veiculos_id'];
+        $this->processarRequestDELETE($codigoCidade, $idVeiculo);
     }
 
+    private function processarRequestDELETE($codigoCidade, $idVeiculo) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arParams = $this->event->getRouteMatch()->getParams();
+            $modelVeiculos = new VeiculosModel();
+            $arResult = $modelVeiculos->removerRegistroById($codigoCidade, $idVeiculo);
+            $this->populaResposta(200, $arResult, false);
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
+    }
     /**
      * Delete a collection, or members of a collection
      *
@@ -118,8 +131,7 @@ class VeiculosResource extends API
         $arVeiculos = $modelVeiculos->getAll($codigoCidade);
         $arResultado['data'] = $arVeiculos;
         $arResultado['total'] = count($arVeiculos);
-        header("Content-type: application/json");
-        echo json_encode($arResultado);
+        $this->populaResposta(200, $arResultado, false);
         exit;
     }
 
@@ -154,6 +166,7 @@ class VeiculosResource extends API
      */
     public function replaceList($data)
     {
+        
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -164,8 +177,32 @@ class VeiculosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+    public function update($id, $data) {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $this->processarRequestPUT($codigoCidade, $data);
+    }
+    private function processarRequestPUT($codigoCidade, $arData) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arData->codigo_cidade = $codigoCidade;
+            $this->processarUpdateVeiculo($arData);
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
+    }
+    private function processarUpdateVeiculo($data) {
+        $modelVeiculos = new VeiculosModel();
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idVeiculo = $arParams['veiculos_id'];
+        $boValidate = $modelVeiculos->validarUpdate($data, $idVeiculo);
+        if (empty($codigoCidade) || $idVeiculo == "") {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O ID veiculo e código da cidade devem ser informados!"], false);
+        } else if ($boValidate['result']) {
+            $this->populaResposta(200, $modelVeiculos->prepareUpdate($codigoCidade, $idVeiculo, $data), false);
+        } else {
+            $this->populaResposta(400, $boValidate, false);
+        }
     }
 }

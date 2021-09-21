@@ -5,15 +5,12 @@ namespace Db\SetePG;
 use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
-use PHPUnit\Framework\Constraint\IsEmpty;
 
-use function PHPUnit\Framework\isEmpty;
-
-class SeteVeiculos extends AbstractDatabasePostgres {
+class SeteGaragens extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_veiculos';
-        $this->primaryKey = 'id_veiculo';
+        $this->table = 'sete_garagem';
+        $this->primaryKey = 'id_garagem';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -22,7 +19,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_garagem = {$arIds['id_garagem']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -31,7 +28,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade','id_veiculo', 'placa','modelo'])
+                ->columns(['codigo_cidade', 'id_escola', 'nome'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -42,12 +39,21 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         return $arLista;
     }
 
-
-    public function veiculoExiste($placa, $codigoCidade, $idVeiculo = null) {
+    public function qtdAlunosAtendidos($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}'");
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+
+    public function escolaExiste($idEscola, $codigoCidade) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("id_escola = '{$idEscola}' AND codigo_cidade = '{$codigoCidade}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -60,7 +66,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_veiculo)")]);
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_garagem)")]);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['id'];
@@ -70,7 +76,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_veiculo' => $arId['id_veiculo']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_escola' => $arId['id_escola']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -93,7 +99,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where(["codigo_cidade" => $arIds['codigo_cidade'], 'id_veiculo' => $arIds['id_veiculo']]);
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

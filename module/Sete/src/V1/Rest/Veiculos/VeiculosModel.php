@@ -48,7 +48,6 @@ class VeiculosModel {
     }
 
     public function validarInsert($arPost) {
-        $regex = '/[A-Z]{3}[0-9][0-9A-Z][0-9]{2}/';
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
@@ -70,11 +69,9 @@ class VeiculosModel {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já está cadastrada. Verifique e tente novamente!";
             }
-            if($arPost['modo']===1){
-                if (preg_match($regex, $arPost['placa']) != 1) {
+            if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
                 $boValidate = false;
-                $arErros['placa'] = "A placa do veiculo é invalida!";
-                }
+                $arErros['placa'] = "A placa informada é invalida. Verifique e tente novamente!";
             }
         }
 
@@ -128,42 +125,30 @@ class VeiculosModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUpdate($arPost, $idAluno) {
+    public function validarUpdate($arPost, $idVeiculo) {
         $arPost = (Array) $arPost;
+        $codigoCidade = $arPost['codigo_cidade'];
         $boValidate = true;
         $arErros = [];
-        if (!isset($arPost['nome']) || empty($arPost['nome'])) {
-            $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
-        }
-        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
-            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbAluno = new \Db\SetePG\SeteAlunos();
-            if (!$cpfValido) {
+        if (isset($arPost['placa']) && !empty($arPost['placa'])) {
+            $placaValida = \Application\Utils\Utils::validarPlaca($arPost['placa']);
+            $dbVeiculo = new \Db\SetePG\SeteVeiculos();
+            if (!$placaValida) {
                 $boValidate = false;
-                $arErros['cpf'] = "O cpf informado é inválido!";
+                $arErros['placa'] = "A placa informada é inválida!";
             }
-            if ($dbAluno->alunoExiste($arPost['cpf'], $idAluno)) {
+            if ($dbVeiculo->VeiculoExiste($arPost['placa'], $codigoCidade , $idVeiculo)) {
                 $boValidate = false;
-                $arErros['cpf'] = "O cpf informado já existe!";
+                $arErros['placa'] = "A placa informada já existe!";
             }
-        }
-        if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
+            
+        }else{
             $boValidate = false;
-            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
-        } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
-                $boValidate = false;
-                $arErros['data_nascimento'] = "A data informada é inválida!";
-            }
+            $arErros['placa'] = "A placa do veiculo deve ser informado!";
         }
-        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+        if (!isset($arPost['modelo']) || empty($arPost['modelo'])) {
             $boValidate = false;
-            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
-        }
-        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
-            $boValidate = false;
-            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+            $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
         if ($boValidate) {
             return $this->validarParametrosInsertVeiculo($arPost);
@@ -172,24 +157,26 @@ class VeiculosModel {
         }
     }
 
-    public function prepareUpdate($codigoCidade, $idAluno, $arPost) {
+    public function prepareUpdate($codigoCidade, $idVeiculo, $arPost) {
         $arPost = (Array) $arPost;
         unset($arPost['codigo_cidade']);
-        unset($arPost['id_aluno']);
-        $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
-        $arPost['da_mataburro'] = isset($arPost['da_mataburro']) ? $arPost['da_mataburro'] : 'N';
-        $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
-        $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
-        $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
+        unset($arPost['id_veiculo']);
+        $arPost['ano'] = isset($arPost['ano']) ? $arPost['ano'] : '0';
+        $arPost['modo'] = isset($arPost['modo']) ? $arPost['modo'] : '1';
+        $arPost['origem'] = isset($arPost['origem']) ? $arPost['origem'] : '1';
+        $arPost['km_inicial'] = isset($arPost['km_inicial']) ? $arPost['km_inicial'] : '0';
+        $arPost['km_atual'] = isset($arPost['km_atual']) ? $arPost['km_atual'] : '0';
+        $arPost['capacidade'] = isset($arPost['capacidade']) ? $arPost['capacidade'] : '0';
+        $arPost['tipo'] = isset($arPost['tipo']) ? $arPost['tipo'] : '1';
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_aluno'] = $idAluno;
+        $arId['id_veiculo'] = $idVeiculo;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
 
-    public function removerRegistroById($codigoCidade, $idAluno) {
+    public function removerRegistroById($codigoCidade, $idVeiculo) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['id_veiculo'] = $idVeiculo;
         $arResult = $this->_entity->_delete($arIds);
         return $arResult;
     }

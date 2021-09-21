@@ -3,8 +3,9 @@ namespace Sete\V1\Rest\Garagens;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Sete\V1\API;
 
-class GaragensResource extends AbstractResourceListener
+class GaragensResource extends API
 {
     /**
      * Create a resource
@@ -14,7 +15,31 @@ class GaragensResource extends AbstractResourceListener
      */
     public function create($data)
     {
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $this->processarRequestPOST($codigoCidade, $data);
+    }
+
+    private function processarRequestPOST($codigoCidade, $arData) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arParams = $this->event->getRouteMatch()->getParams();
+                $arData->codigo_cidade = $codigoCidade;
+                $this->processarInsertGaragem($arData);
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
+    }
+
+    private function processarInsertGaragem($data) {
+        $modelGaragens = new GaragensModel();
+        $boValidate = $modelGaragens->validarInsert($data);
+        if ($boValidate['result']) {
+            $arResult = $modelGaragens->prepareInsert($data);
+            $this->populaResposta($arResult['result'] ? 201 : 400, $arResult, false);
+        } else {
+            $this->populaResposta(400, $boValidate, false);
+        }
     }
 
     /**
@@ -45,11 +70,34 @@ class GaragensResource extends AbstractResourceListener
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id)
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+    public function fetch($id) {
+        $modelGaragem = new GaragensModel();
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        $codigoCidade = $arParams['codigo_cidade'];
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
+        } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
+            $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
+        } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
+            $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
+        } else {
+            $idGaragem = $id;
+            if ($idGaragem != "" && is_numeric($idGaragem)) {
+                $arGaragem = $modelGaragem->getById($codigoCidade, $idGaragem);
+                $this->populaResposta(count($arGaragem) > 1 ? 200 : 404, $arGaragem, false);
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_veiculo deve ser informado!"], false);
+            }
+        }
     }
 
+
+    private function getVeiculosGaragem($codigoCidade, $idGaragem){
+        $dbSeteEscolaTemAluno = new \Db\SetePG\SeteGaragemTemVeiculo();
+        $arResult = $dbSeteEscolaTemAluno->getVeiculosByGaragem($codigoCidade, $idGaragem);
+        $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult);
+    }
     /**
      * Fetch all or a subset of resources
      *
