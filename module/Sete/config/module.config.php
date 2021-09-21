@@ -21,7 +21,7 @@ return [
             'sete.rest.user' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/users[/:user_type[/:codigo_cidade[/:user_id]]]',
+                    'route' => '/users[/:user_type[/:codigo_cidade[/:user_id[/:recurso]]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\User\\Controller',
                     ],
@@ -153,6 +153,7 @@ return [
             'entity_http_methods' => [
                 0 => 'GET',
                 1 => 'PUT',
+                2 => 'POST',
             ],
             'collection_http_methods' => [
                 0 => 'GET',

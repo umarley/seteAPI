@@ -14,6 +14,7 @@ class UserResource extends API {
     }
 
     public function create($data) {
+        $arParams = $this->event->getRouteMatch()->getParams();
         $userType = $this->event->getRouteMatch()->getParam('user_type');
         $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
         switch ($userType) {
@@ -37,19 +38,49 @@ class UserResource extends API {
                             $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
                         }
                     }
-                    $boValidate = $this->_model->validarUsuarioSETE($data);
-                    if (!$boValidate['result']) {
-                        $this->populaResposta(400, $boValidate, false);
+
+                    if (isset($arParams['recurso'])) {
+                        $this->processarRecursoUsuarios($arParams);
                     } else {
-                        $data->codigo_cidade = $codigoCidade;
-                        $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
-                        $this->populaResposta(201, $arResult, false);
+                        $boValidate = $this->_model->validarUsuarioSETE($data);
+                        if (!$boValidate['result']) {
+                            $this->populaResposta(400, $boValidate, false);
+                        } else {
+                            $data->codigo_cidade = $codigoCidade;
+                            $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+                            $this->populaResposta(201, $arResult, false);
+                        }
                     }
                 } else {
                     $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
                 }
-
                 break;
+        }
+    }
+    
+    private function processarRecursoUsuarios($arParams){
+        switch ($arParams['recurso']){
+            case 'foto':
+                $this->uploadFotoUsuario($arParams);
+                break;
+            default:
+                $this->populaResposta(404, ['result' => false, 'messages' => 'Recurso não encontrado.'], false);
+                break;
+        }
+        
+    }
+    
+    private function uploadFotoUsuario($arParams){
+        $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
+        $idUsuario = $arParams['user_id'];
+        $usuarioExiste = $dbSeteUsuarios->usuarioExisteById($idUsuario, $arParams['codigo_cidade']);
+        if(!$usuarioExiste){
+            $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
+        }else{
+            var_dump($_FILES);
+            
+            
+            exit;
         }
     }
 

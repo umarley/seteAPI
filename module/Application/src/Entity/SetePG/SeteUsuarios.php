@@ -52,6 +52,20 @@ class SeteUsuarios extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function usuarioExisteById($idUsuario, $codigoCidade) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("id_usuario = '{$idUsuario}' AND codigo_cidade = {$codigoCidade}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
