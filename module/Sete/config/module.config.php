@@ -428,6 +428,7 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/hal+json',
                 2 => 'application/json',
+                3 => 'multipart/form-data',
             ],
             'Sete\\V1\\Rest\\Authenticator\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
@@ -489,6 +490,7 @@ return [
             'Sete\\V1\\Rest\\User\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
+                2 => 'multipart/form-data',
             ],
             'Sete\\V1\\Rest\\Authenticator\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
