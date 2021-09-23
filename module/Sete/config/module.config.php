@@ -690,6 +690,9 @@ return [
         'Sete\\V1\\Rest\\Authenticator\\Controller' => [
             'input_filter' => 'Sete\\V1\\Rest\\Authenticator\\Validator',
         ],
+        'Sete\\V1\\Rest\\User\\Controller' => [
+            'input_filter' => 'Sete\\V1\\Rest\\User\\Validator',
+        ],
     ],
     'input_filter_specs' => [
         'Sete\\V1\\Rest\\Authenticator\\Validator' => [
@@ -710,6 +713,7 @@ return [
                 'error_message' => 'Campo obrigatório!',
             ],
         ],
+        'Sete\\V1\\Rest\\User\\Validator' => [],
     ],
     'api-tools-mvc-auth' => [
         'authorization' => [

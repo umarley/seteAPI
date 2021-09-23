@@ -57,9 +57,9 @@ class UserResource extends API {
                 break;
         }
     }
-    
-    private function processarRecursoUsuarios($arParams){
-        switch ($arParams['recurso']){
+
+    private function processarRecursoUsuarios($arParams) {
+        switch ($arParams['recurso']) {
             case 'foto':
                 $this->uploadFotoUsuario($arParams);
                 break;
@@ -67,20 +67,33 @@ class UserResource extends API {
                 $this->populaResposta(404, ['result' => false, 'messages' => 'Recurso não encontrado.'], false);
                 break;
         }
-        
     }
-    
-    private function uploadFotoUsuario($arParams){
+
+    private function uploadFotoUsuario($arParams) {
+        
+        var_dump($arParams);
+        
+        var_dump($_POST);
+        
+        exit;
         $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
         $idUsuario = $arParams['user_id'];
         $usuarioExiste = $dbSeteUsuarios->usuarioExisteById($idUsuario, $arParams['codigo_cidade']);
-        if(!$usuarioExiste){
+        if (!$usuarioExiste) {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
-        }else{
-            var_dump($_FILES);
-            
-            
-            exit;
+        } else {
+            if (!isset($_FILES['picture']) || !empty($_FILES['picture'])) {
+
+
+                //$uploaddir = '/var/www/uploads/';
+                //$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
+
+                var_dump($_FILES);
+                //if (move_uploaded_file($_FILES['picture']['tmp_name'], $uploadfile)) {
+
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => 'Campo picture vazio.'], false);
+            }
         }
     }
 
