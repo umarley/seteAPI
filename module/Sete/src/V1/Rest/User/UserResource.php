@@ -7,6 +7,9 @@ use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
 class UserResource extends API {
+    
+    const TYPE_IMAGES = ['image/jpeg', 'image/png', 'image/gif'];
+    const SIZE_IMAGE_UPLOAD = 5000000; //5 MB
 
     public function __construct() {
         parent::__construct();
@@ -70,31 +73,48 @@ class UserResource extends API {
     }
 
     private function uploadFotoUsuario($arParams) {
-        
-        var_dump($arParams);
-        
-        var_dump($_POST);
-        
-        exit;
         $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
         $idUsuario = $arParams['user_id'];
         $usuarioExiste = $dbSeteUsuarios->usuarioExisteById($idUsuario, $arParams['codigo_cidade']);
         if (!$usuarioExiste) {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
         } else {
-            if (!isset($_FILES['picture']) || !empty($_FILES['picture'])) {
-
-
-                //$uploaddir = '/var/www/uploads/';
+            if (key_exists('picture', $_FILES)) {  
+                $uploaddir = getcwd() . '/public/storage/profile/';
+                $nomeImg = $arParams['codigo_cidade']."-".$idUsuario.".".$this->getExtensaoImage($_FILES['picture']['type']);
+                if(!in_array($_FILES['picture']['type'], self::TYPE_IMAGES)){
+                    $this->populaResposta(400, ['result' => false, 'messages' => 'Imagem deve ser PNG, JPEG ou GIF.'], false);
+                }else if($_FILES['picture']['size'] > self::SIZE_IMAGE_UPLOAD){
+                    $this->populaResposta(400, ['result' => false, 'messages' => 'O tamanho da imagem deve ser de até 5 MB.'], false);
+                }else{
+                    if (move_uploaded_file($_FILES['picture']['tmp_name'], $uploaddir.$nomeImg)) {
+                        $dbSeteUsuarios->_atualizar([
+                            'codigo_cidade' => $arParams['codigo_cidade'],
+                            'id_usuario' => $idUsuario
+                        ], [
+                            'foto' => "storage/profile/{$nomeImg}"
+                            ]);
+                        
+                        $this->populaResposta(201, ['result' => true, 'messages' => 'Foto do perfil atualizada com sucesso.'], false);
+                    }else{
+                        $this->populaResposta(400, ['result' => false, 'messages' => 'O tamanho da imagem deve ser de até 5 MB.'], false);
+                    }
+                }
+                exit;
                 //$uploadfile = $uploaddir . basename($_FILES['userfile']['name']);
 
-                var_dump($_FILES);
+                ///var_dump($_FILES['picture']);
                 //if (move_uploaded_file($_FILES['picture']['tmp_name'], $uploadfile)) {
 
             } else {
                 $this->populaResposta(400, ['result' => false, 'messages' => 'Campo picture vazio.'], false);
             }
         }
+    }
+    
+    private function getExtensaoImage($type){
+        $arParts = explode("/", $type);
+        return $arParts[1];
     }
 
     /**
