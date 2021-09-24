@@ -118,6 +118,8 @@ class VeiculosResource extends API
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         if (!isset($codigoCidade) || empty($codigoCidade)) {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
+        } else if($codigoCidade === 'marcas'){
+            $this->getMarcasVeiculos();
         } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
             $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
         } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
@@ -126,6 +128,13 @@ class VeiculosResource extends API
             $this->obterTodosVeiculosCidade($codigoCidade);
         }
     }
+    
+    private function getMarcasVeiculos(){
+        $dbSetePGGlbMarcaVeiculos = new \Db\SetePG\GlbMarcasVeiculos();
+        $arMarcas = $dbSetePGGlbMarcaVeiculos->getLista();
+        $this->populaResposta(200, $arMarcas);
+    }
+    
     private function obterTodosVeiculosCidade($codigoCidade) {
         $modelVeiculos = new VeiculosModel();
         $arVeiculos = $modelVeiculos->getAll($codigoCidade);
