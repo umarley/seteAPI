@@ -79,8 +79,8 @@ class UserResource extends API {
         if (!$usuarioExiste) {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
         } else {
-            var_dump($_FILES);
-            
+            var_dump($_FILES['picture']['size']);
+            echo "====================<br />";
             var_dump(self::SIZE_IMAGE_UPLOAD);
             
             exit;
