@@ -9,7 +9,7 @@ use Laminas\ApiTools\Rest\AbstractResourceListener;
 class UserResource extends API {
     
     const TYPE_IMAGES = ['image/jpeg', 'image/png', 'image/gif'];
-    const SIZE_IMAGE_UPLOAD = 5000000; //5 MB
+    const SIZE_IMAGE_UPLOAD = 5 * 1024 * 1024; //5 MB
 
     public function __construct() {
         parent::__construct();
@@ -80,6 +80,8 @@ class UserResource extends API {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
         } else {
             var_dump($_FILES);
+            
+            var_dump(self::SIZE_IMAGE_UPLOAD);
             
             exit;
             if (key_exists('picture', $_FILES)) {  
