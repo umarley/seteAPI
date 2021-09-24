@@ -74,6 +74,10 @@ class VeiculosModel {
                 $arErros['placa'] = "A placa informada é invalida. Verifique e tente novamente!";
             }
         }
+        if (!isset($arPost['marca']) || empty($arPost['marca'])) {
+            $boValidate = false;
+            $arErros['marca'] = "A marca do veiculo deve ser informada!";
+        }
 
         if (!isset($arPost['modelo']) || empty($arPost['modelo'])) {
             $boValidate = false;

@@ -2,10 +2,9 @@
 
 namespace Db\Enum;
 
-
 class TipoVeiculo {
-    
-    const ONIBUS= 1;
+
+    const ONIBUS = 1;
     const MICRO_ONIBUS = 2;
     const VAN = 3;
     const KOMBI = 4;
@@ -18,7 +17,6 @@ class TipoVeiculo {
     const BARCO_DE_ALUMINIO = 11;
     const CANOA_MOTORIZADA = 12;
     const CANOA_A_REMO = 13;
-    
     const TIPO_VEICULO = [
         self::ONIBUS,
         self::MICRO_ONIBUS,
@@ -34,30 +32,30 @@ class TipoVeiculo {
         self::CANOA_MOTORIZADA,
         self::CANOA_A_REMO,
     ];
-    
-    public function getLabel($valor){
-        switch ($valor){
+
+    public function getLabel($valor) {
+        switch ($valor) {
             case self::ONIBUS:
                 return "Ônibus";
                 break;
             case self::MICRO_ONIBUS:
-                return "Micro-Onibus";
+                return "Micro-Ônibus";
                 break;
             case self::VAN:
                 return "Van";
                 break;
             case self::KOMBI:
                 return "Kombi";
-                break; 
+                break;
             case self::CAMINHAO:
                 return "Caminhão";
-                break;  
+                break;
             case self::CAMINHONETE:
                 return "Caminhonete";
                 break;
             case self::MOTOCICLETA:
                 return "Motocicleta";
-                break; 
+                break;
             case self::ANIMAL_DE_TRACAO:
                 return "Animal de tração";
                 break;
@@ -78,6 +76,23 @@ class TipoVeiculo {
                 break;
         }
     }
-    
+
+    public static function getLista() {
+        return [
+            ['id' => self::ONIBUS, 'tipo' => 'Ônibus'],
+            ['id' => self::MICRO_ONIBUS, 'tipo' => 'Micro-Ônibus'],
+            ['id' => self::VAN, 'tipo' => 'Van'],
+            ['id' => self::KOMBI, 'tipo' => 'Kombi'],
+            ['id' => self::CAMINHAO, 'tipo' => 'Caminhão'],
+            ['id' => self::CAMINHONETE, 'tipo' => 'Caminhonete'],
+            ['id' => self::MOTOCICLETA, 'tipo' => 'Motocicleta'],
+            ['id' => self::ANIMAL_DE_TRACAO, 'tipo' => 'Animal de tração'],
+            ['id' => self::LANCHA_VOADEIRA, 'tipo' => 'Lancha/Voadeira'],
+            ['id' => self::BARCO_DE_MADEIRA, 'tipo' => 'Barco de madeira'],
+            ['id' => self::BARCO_DE_ALUMINIO, 'tipo' => 'Barco de alumínio'],
+            ['id' => self::CANOA_MOTORIZADA, 'tipo' => 'Canoa motorizada'],
+            ['id' => self::CANOA_A_REMO, 'tipo' => 'Canoa a remo']
+        ];
+    }
 
 }
