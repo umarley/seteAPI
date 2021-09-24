@@ -79,6 +79,9 @@ class UserResource extends API {
         if (!$usuarioExiste) {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
         } else {
+            var_dump($_FILES);
+            
+            exit;
             if (key_exists('picture', $_FILES)) {  
                 $uploaddir = getcwd() . '/public/storage/profile/';
                 $nomeImg = $arParams['codigo_cidade']."-".$idUsuario.".".$this->getExtensaoImage($_FILES['picture']['type']);
