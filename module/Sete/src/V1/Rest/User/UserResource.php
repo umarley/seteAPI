@@ -79,11 +79,6 @@ class UserResource extends API {
         if (!$usuarioExiste) {
             $this->populaResposta(404, ['result' => false, 'messages' => 'Usuário não encontrado.'], false);
         } else {
-            var_dump($_FILES['picture']['size']);
-            echo "====================<br />";
-            var_dump(self::SIZE_IMAGE_UPLOAD);
-            
-            exit;
             if (key_exists('picture', $_FILES)) {  
                 $uploaddir = getcwd() . '/public/storage/profile/';
                 $nomeImg = $arParams['codigo_cidade']."-".$idUsuario.".".$this->getExtensaoImage($_FILES['picture']['type']);
@@ -102,7 +97,7 @@ class UserResource extends API {
                         
                         $this->populaResposta(201, ['result' => true, 'messages' => 'Foto do perfil atualizada com sucesso.'], false);
                     }else{
-                        $this->populaResposta(400, ['result' => false, 'messages' => 'O tamanho da imagem deve ser de até 5 MB.'], false);
+                        $this->populaResposta(400, ['result' => false, 'messages' => 'Erro ao gravar o arquivo no servidor. Tente movamente!.'], false);
                     }
                 }
                 exit;
