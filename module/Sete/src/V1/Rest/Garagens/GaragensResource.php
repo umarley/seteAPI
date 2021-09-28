@@ -23,7 +23,7 @@ class GaragensResource extends API
     private function processarRequestPOST($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
-            $arParams = $this->event->getRouteMatch()->getParams();
+                $arParams = $this->event->getRouteMatch()->getParams();
                 $arData->codigo_cidade = $codigoCidade;
                 $this->processarInsertGaragem($arData);
         } else {
@@ -48,9 +48,22 @@ class GaragensResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+    public function delete($id) {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idGaragem= $arParams['garagens_id'];
+        $this->processarRequestDELETE($codigoCidade, $idGaragem);
+    }
+    private function processarRequestDELETE($codigoCidade, $idGaragem) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arParams = $this->event->getRouteMatch()->getParams();
+            $modelGaragens = new GaragensModel();
+            $arResult = $modelGaragens->removerRegistroById($codigoCidade, $idGaragem);
+            $this->populaResposta(200, $arResult, false);
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
     }
 
     /**
@@ -104,9 +117,25 @@ class GaragensResource extends API
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = [])
-    {
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
+    public function fetchAll($params = []) {
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
+        } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
+            $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
+        } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
+            $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
+        } else {
+            $this->obterTodasGaragensCidade($codigoCidade);
+        }
+    }
+
+    private function obterTodasGaragensCidade($codigoCidade) {
+        $modelGaragens = new GaragensModel();
+        $arGaragens = $modelGaragens->getAll($codigoCidade);
+        $this->populaResposta(200, $arGaragens);
     }
 
     /**
@@ -150,8 +179,18 @@ class GaragensResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data)
-    {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+    public function update($id, $data) {
+        $modelGaragens = new GaragensModel();
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idGaragem = $arParams['garagens_id'];
+        $boValidate = $modelGaragens->validarUpdate($data);
+        if (empty($codigoCidade) || $idGaragem == "") {
+            return ['result' => false, 'messages' => "O ID garagem e código da cidade devem ser informados!"];
+        } else if ($boValidate['result']) {
+            return $modelGaragens->prepareUpdate($codigoCidade, $idGaragem, $data);
+        } else {
+            return $boValidate;
+        }
     }
 }

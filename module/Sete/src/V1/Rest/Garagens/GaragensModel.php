@@ -60,6 +60,31 @@ class GaragensModel {
             $boValidate = false;
             $arErros['nome'] = "O nome da garagem deve ser informado!";
         }
+        if (!isset($arPost['loc_latitude']) || empty($arPost['loc_latitude'])) {
+            $boValidate = false;
+            $arErros['loc_latitude'] = "A latitude da garagem deve ser informado!";
+        }
+        if (!isset($arPost['loc_longitude']) || empty($arPost['loc_longitude'])) {
+            $boValidate = false;
+            $arErros['loc_longitude'] = "A longitude da garagem deve ser informado!";
+        }
+        if (!isset($arPost['loc_endereco']) || empty($arPost['loc_endereco'])) {
+            $boValidate = false;
+            $arErros['loc_endereco'] = "O endereço da garagem deve ser informado!";
+        }
+        if (!isset($arPost['loc_cep']) || empty($arPost['loc_cep'])) {
+            $boValidate = false;
+            $arErros['loc_cep'] = "O cep da garagem deve ser informado!";
+        }
+        else{
+            $cep = trim($arPost['loc_cep']);
+            $avaliaCep = preg_match("/[0-9]{5}-[0-9]{3}/", $cep);
+            $avaliaCepSB = preg_match("/[0-9]{8}/", $cep);
+            if(!$avaliaCep && !$avaliaCepSB) { 
+                $boValidate = false;
+                $arErros['loc_cep'] = "O cep informado é inválido!";
+            }
+        }
         if ($boValidate) {
             $boValidate = true;
             $arErros = [];
@@ -76,40 +101,54 @@ class GaragensModel {
         $arErros = [];
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
+            $arErros['nome'] = "O nome da garagem deve ser informada!";
+        }
+        if (!isset($arPost['loc_latitude']) || empty($arPost['loc_latitude'])) {
+            $boValidate = false;
+            $arErros['loc_latitude'] = "A latitude da garagem deve ser informada!";
+        }
+        if (!isset($arPost['loc_longitude']) || empty($arPost['loc_longitude'])) {
+            $boValidate = false;
+            $arErros['loc_longitude'] = "A longitude da garagem deve ser informada!";
+        }
+        if (!isset($arPost['loc_endereco']) || empty($arPost['loc_endereco'])) {
+            $boValidate = false;
+            $arErros['loc_endereco'] = "O endereco da garagem deve ser informado!";
+        }
+        if (!isset($arPost['loc_cep']) || empty($arPost['loc_cep'])) {
+            $boValidate = false;
+            $arErros['loc_cep'] = "O cep da garagem deve ser informado!";
+        }
+        else{
+            $cep = trim($arPost['loc_cep']);
+            $avaliaCep = preg_match("/[0-9]{5}-[0-9]{3}/", $cep);
+            $avaliaCepSB = preg_match("/[0-9]{8}/", $cep);
+            if(!$avaliaCep && !$avaliaCepSB) { 
+                $boValidate = false;
+                $arErros['loc_cep'] = "O cep informado é inválido!";
+            }
         }
         if ($boValidate) {
-            return $this->validarParametrosInsertEscola($arPost);
+            return ['result' => $boValidate, 'messages' => $arErros];
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    public function prepareUpdate($codigoCidade, $idEscola, $arPost) {
+    public function prepareUpdate($codigoCidade, $idGaragem, $arPost) {
         $arPost = (Array) $arPost;
         unset($arPost['codigo_cidade']);
-        unset($arPost['id_aluno']);
+        unset($arPost['id_garagem']);
         $arPost = (Array) $arPost;
-        $arPost['mec_in_regular'] = isset($arPost['mec_in_regular']) ? $arPost['mec_in_regular'] : 'N';
-        $arPost['mec_in_eja'] = isset($arPost['mec_in_eja']) ? $arPost['mec_in_eja'] : 'N';
-        $arPost['mec_in_profissionalizante'] = isset($arPost['mec_in_profissionalizante']) ? $arPost['mec_in_profissionalizante'] : 'N';
-        $arPost['mec_in_especial_exclusiva'] = isset($arPost['mec_in_especial_exclusiva']) ? $arPost['mec_in_especial_exclusiva'] : 'N';
-        $arPost['horario_matutino'] = isset($arPost['horario_matutino']) ? $arPost['horario_matutino'] : 'N';
-        $arPost['horario_vespertino'] = isset($arPost['horario_vespertino']) ? $arPost['horario_vespertino'] : 'N';
-        $arPost['horario_noturno'] = isset($arPost['horario_noturno']) ? $arPost['horario_noturno'] : 'N';
-        $arPost['ensino_superior'] = isset($arPost['ensino_superior']) ? $arPost['ensino_superior'] : 'N';
-        $arPost['ensino_medio'] = isset($arPost['ensino_medio']) ? $arPost['ensino_medio'] : 'N';
-        $arPost['ensino_fundamental'] = isset($arPost['ensino_fundamental']) ? $arPost['ensino_fundamental'] : 'N';
-        $arPost['ensino_pre_escola'] = isset($arPost['ensino_pre_escola']) ? $arPost['ensino_pre_escola'] : 'N';
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_escola'] = $idEscola;
+        $arId['id_garagem'] = $idGaragem;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
     
-    public function removerRegistroById($codigoCidade, $idEscola){
+    public function removerRegistroById($codigoCidade, $idGaragem){
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_escola'] = $idEscola;
+        $arIds['id_garagem'] = $idGaragem;
         $arResult = $this->_entity->_delete($arIds);
         return $arResult;
     }
