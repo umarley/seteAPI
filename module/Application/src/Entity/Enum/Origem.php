@@ -13,7 +13,7 @@ class Origem {
         self::TERCEIRIZADO,
     ];
     
-    public function getLabel($valor){
+    public static function getLabel($valor){
         switch ($valor){
             case self::PROPRIO:
                 return "Próprio";

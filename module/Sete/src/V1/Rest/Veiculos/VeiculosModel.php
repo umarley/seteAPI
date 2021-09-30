@@ -2,6 +2,8 @@
 
 namespace Sete\V1\Rest\Veiculos;
 
+use Db\SetePG\GlbMarcasVeiculos;
+use Laminas\Validator\NotEmpty;
 use phpDocumentor\Reflection\PseudoTypes\False_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -19,6 +21,14 @@ class VeiculosModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
+            $arDados[$key]['tipo'] = \Db\Enum\TipoVeiculo::getLabel($row['tipo']);
+            $arDados[$key]['origem'] = \Db\Enum\Origem::getLabel($row['origem']); 
+            $arDados[$key]['manutencao'] = ($row['manutencao'] == 'N' ? "Não" : "Sim");
+            if(!empty($row['marca'])){
+                $dbGlbMarcas = new \Db\SetePG\GlbMarcasVeiculos();
+                $arDados[$key]['marca'] = $dbGlbMarcas->getNomeById($row['marca']);
+            }
+
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoMunicipio}/{$row['id_veiculo']}");
         }
         return $arDados;

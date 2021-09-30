@@ -33,7 +33,7 @@ class TipoVeiculo {
         self::CANOA_A_REMO,
     ];
 
-    public function getLabel($valor) {
+    public static function getLabel($valor) {
         switch ($valor) {
             case self::ONIBUS:
                 return "Ônibus";

@@ -29,7 +29,16 @@ class GlbMarcasVeiculos extends AbstractDatabasePostgres {
         }
         return $arLista;
     }
-    
+
+    public function getNomeById($id){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['marc' => $this->tableIdentifier])
+            ->columns(['marca' => 'nm_marca'])
+            ->where("marc.id_marca = {$id}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['marca'];        
+    }
     
 
 }
