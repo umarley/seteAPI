@@ -15,5 +15,7 @@ class SeteRotaPossuiVeiculo extends AbstractDatabase {
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
     
-
+    public function __destruct() {
+        $this->closeConnection();
+    }
 }

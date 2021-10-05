@@ -14,8 +14,9 @@ class SeteEscolaTemAlunos extends AbstractDatabase {
         $this->primaryKey = 'id_escola';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    
-    
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
 
 }

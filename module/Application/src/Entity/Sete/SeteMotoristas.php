@@ -14,6 +14,10 @@ class SeteMotoristas extends AbstractDatabase {
         $this->primaryKey = 'cpf';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
     
     public function getCPFByIdFirebase($municipio, $idFirebase){
         $sql = new Sql($this->AdapterBD);

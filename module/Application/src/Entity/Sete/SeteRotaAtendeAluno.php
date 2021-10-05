@@ -14,8 +14,9 @@ class SeteRotaAtendeAluno extends AbstractDatabase {
         $this->primaryKey = 'id_rota';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    
-    
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
 
 }

@@ -14,8 +14,12 @@ class SeteEscolas extends AbstractDatabase {
         $this->primaryKey = 'id_escola';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    public function getIdEscolaByIdFirebase($municipio, $idFirebase){
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
+
+    public function getIdEscolaByIdFirebase($municipio, $idFirebase) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['id_escola'])
@@ -23,29 +27,27 @@ class SeteEscolas extends AbstractDatabase {
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
-        if($row->count() > 0){
+        if ($row->count() > 0) {
             $row = $row->current();
             return $row['id_escola'];
-        }else{
+        } else {
             return false;
         }
     }
 
-    public function qtdEscolasAtendidas($municipio){
+    public function qtdEscolasAtendidas($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
-        if($row->count() > 0){
+        if ($row->count() > 0) {
             $row = $row->current();
             return $row['qtd'];
-        }else{
+        } else {
             return 0;
         }
-    }    
-    
-    
+    }
 
 }

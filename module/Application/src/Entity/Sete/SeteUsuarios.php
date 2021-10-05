@@ -15,6 +15,10 @@ class SeteUsuarios extends AbstractDatabase {
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
     
+    public function __destruct() {
+        $this->closeConnection();
+    }
+    
     public function getById($uid){
         $arRow = $this->select("uid = {$uid}")->current();
         return $arRow;

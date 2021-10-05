@@ -14,8 +14,9 @@ class SeteGaragem extends AbstractDatabase {
         $this->primaryKey = 'id_garagem';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    
-    
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
 
 }

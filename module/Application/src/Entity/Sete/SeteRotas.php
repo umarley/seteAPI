@@ -14,8 +14,12 @@ class SeteRotas extends AbstractDatabase {
         $this->primaryKey = 'id_rota';
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
-    
-    public function getIdRotaByIdFirebase($municipio, $codigoFirebase){
+
+    public function __destruct() {
+        $this->closeConnection();
+    }
+
+    public function getIdRotaByIdFirebase($municipio, $codigoFirebase) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['id_rota'])
@@ -23,15 +27,15 @@ class SeteRotas extends AbstractDatabase {
                 ->where("codigo_cidade = {$municipio}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute();
-        if($row->count() > 0){
+        if ($row->count() > 0) {
             $row = $row->current();
             return $row['id_rota'];
-        }else{
+        } else {
             return false;
         }
     }
-    
-    public function qtdRotas($municipio){
+
+    public function qtdRotas($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
@@ -40,8 +44,8 @@ class SeteRotas extends AbstractDatabase {
         $row = $prepare->execute()->current();
         return $row['qtd'];
     }
-    
-    public function qtdRotasKilometragemTotal($municipio){
+
+    public function qtdRotasKilometragemTotal($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("sum(km)")])
@@ -49,9 +53,9 @@ class SeteRotas extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    } 
-    
-    public function qtdRotasKilometragemMedia($municipio){
+    }
+
+    public function qtdRotasKilometragemMedia($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("avg(km)")])
@@ -59,21 +63,18 @@ class SeteRotas extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    } 
-    
-    public function qtdRotasTempoMedio($municipio){
+    }
+
+    public function qtdRotasTempoMedio($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("avg(tempo)")])
                 ->where("codigo_cidade = {$municipio}");
-                //echo $sql->prepareStatementForSqlObject($select);
-                //exit;
+        //echo $sql->prepareStatementForSqlObject($select);
+        //exit;
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    } 
-    
-    
-    
+    }
 
 }

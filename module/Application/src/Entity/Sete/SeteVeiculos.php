@@ -15,6 +15,10 @@ class SeteVeiculos extends AbstractDatabase {
         parent::__construct(AbstractDatabase::DATABASE_CORE);
     }
 
+    public function __destruct() {
+        $this->closeConnection();
+    }
+
     public function getIdVeiculoByIdFirebase($municipio, $idFirebase) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
@@ -25,9 +29,8 @@ class SeteVeiculos extends AbstractDatabase {
         $row = $prepare->execute()->current();
         return $row['id_veiculo'];
     }
-    
-    
-     public function qtdVeiculosFuncionando($municipio){
+
+    public function qtdVeiculosFuncionando($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
@@ -36,9 +39,9 @@ class SeteVeiculos extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    }  
-    
-    public function qtdVeiculosManutencao($municipio){
+    }
+
+    public function qtdVeiculosManutencao($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
@@ -47,6 +50,6 @@ class SeteVeiculos extends AbstractDatabase {
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
-    }  
+    }
 
 }
