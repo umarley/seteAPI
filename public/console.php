@@ -59,12 +59,12 @@ mainLoadData();
 function mainLoadData() {
     $dbCoreCargaDados = new \Db\Core\CargaDados();
     if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_MUNICIPIOS)) {
-        cargaMunicipios();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_MUNICIPIOS, ['data_carga' => date('Y-m-d H:i:s')]);
+        cargaMunicipios();
     }
     if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)) {
-        cargaUsers();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_USERS, ['data_carga' => date('Y-m-d H:i:s')]);
+        cargaUsers();
         cargaUsuariosLiberados();
     }
 }
