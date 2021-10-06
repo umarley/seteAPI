@@ -18,6 +18,7 @@ class EscolasModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
+            $arDados[$key]['qtd_alunos'] = $this->_entity->qtdAlunosPorEscola($codigoMunicipio, $row['id_escola']);
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoMunicipio}/{$row['id_escola']}");
         }
         return $arDados;

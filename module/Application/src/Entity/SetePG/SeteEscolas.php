@@ -28,7 +28,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_escola', 'nome'])
+                ->columns(['codigo_cidade', 'id_escola', 'nome', 'loc_latitude', 'loc_longitude', 'horario_matutino', 'horario_vespertino', 'horario_noturno', 'ensino_medio', 'ensino_fundamental', 'ensino_superior', 'ensino_pre_escola'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -44,6 +44,19 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+    
+    public function qtdAlunosPorEscola($municipio, $idEscola = null) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(new \Laminas\Db\Sql\TableIdentifier('sete_escola_tem_alunos', 'sete'))
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("codigo_cidade = {$municipio}");
+        if (!empty($idEscola)) {
+            $select->where("id_escola = {$idEscola}");
+        }
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['qtd'];
