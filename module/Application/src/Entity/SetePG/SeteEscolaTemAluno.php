@@ -38,6 +38,21 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
         }
         return $arLista;
     }
+    
+    public function getNomeEscolaAssociadaAluno($codigoCidade, $idAluno){
+        $sql = "SELECT coalesce(r.nome, 'Não Informada') as nome FROM sete.sete_escola_tem_alunos raa 
+                    inner join sete.sete_escolas r on raa.id_escola  = r.id_escola  and raa.codigo_cidade  = r.codigo_cidade 
+                    WHERE raa.codigo_cidade = '{$codigoCidade}' AND raa.id_aluno = {$idAluno}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $execute = $statement->execute();
+        if($execute->count() > 0){
+            $row = $execute->current();
+            return $row['nome'];
+        }else{
+            return 'Não informada';
+        }
+    }
 
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
