@@ -399,7 +399,7 @@ function deParaRotas($key, $arRotas) {
 }
 
 function deParaMotoristas($key, $arMotorista) {
-    $arData['nome'] = $arMotorista['ANT_CRIMINAIS'];
+    $arData['nome'] = $arMotorista['NOME'];
     $arData['data_nascimento'] = formatDateSQL($arMotorista['DATA_NASCIMENTO']);
     $arData['sexo'] = $arMotorista['SEXO'] == '1' ? 'M' : $arMotorista['SEXO'] == '2' ? 'F' : 'N';
     $arData['cpf'] = $arMotorista['CPF'];
