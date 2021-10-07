@@ -15,6 +15,7 @@ class GaragensResource extends API
      */
     public function create($data)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -49,6 +50,7 @@ class GaragensResource extends API
      * @return ApiProblem|mixed
      */
     public function delete($id) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idGaragem= $arParams['garagens_id'];
@@ -180,6 +182,7 @@ class GaragensResource extends API
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
+        $this->usuarioPodeGravar();
         $modelGaragens = new GaragensModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];

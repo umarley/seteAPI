@@ -14,6 +14,7 @@ class RotasResource extends API
      */
     public function create($data)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -89,6 +90,7 @@ class RotasResource extends API
      */
     public function delete($id)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idRota = $arParams['rotas_id'];
@@ -276,6 +278,7 @@ class RotasResource extends API
      */
     public function update($id, $data)
     {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }
