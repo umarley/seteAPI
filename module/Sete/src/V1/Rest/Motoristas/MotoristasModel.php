@@ -18,6 +18,9 @@ class MotoristasModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row) {
+            if (!empty($row['data_validade_cnh'])) {
+                $arRow['data_validade_cnh'] = date("d/m/Y", strtotime($arRow['data_validade_cnh']));
+            }
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
         }
         return $arDados;
