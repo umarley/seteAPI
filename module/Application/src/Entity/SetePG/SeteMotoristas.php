@@ -28,7 +28,7 @@ class SeteMotoristas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'cpf', 'nome'])
+                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'cnh', 'turno_manha', 'turno_tarde', 'turno_noite'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
