@@ -14,6 +14,7 @@ return [
             \Sete\V1\Rest\Veiculos\VeiculosResource::class => \Sete\V1\Rest\Veiculos\VeiculosResourceFactory::class,
             \Sete\V1\Rest\Garagens\GaragensResource::class => \Sete\V1\Rest\Garagens\GaragensResourceFactory::class,
             \Sete\V1\Rest\Motoristas\MotoristasResource::class => \Sete\V1\Rest\Motoristas\MotoristasResourceFactory::class,
+            \Sete\V1\Rest\OrdensServicos\OrdensServicosResource::class => \Sete\V1\Rest\OrdensServicos\OrdensServicosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -126,6 +127,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.ordens-servicos' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/ordens-servicos[/:codigo_cidade[/:ordens_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\OrdensServicos\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -142,6 +152,7 @@ return [
             9 => 'sete.rest.veiculos',
             10 => 'sete.rest.garagens',
             11 => 'sete.rest.motoristas',
+            12 => 'sete.rest.ordens-servicos',
         ],
     ],
     'api-tools-rest' => [
@@ -407,6 +418,28 @@ return [
             'collection_class' => \Sete\V1\Rest\Motoristas\MotoristasCollection::class,
             'service_name' => 'Motoristas',
         ],
+        'Sete\\V1\\Rest\\OrdensServicos\\Controller' => [
+            'listener' => \Sete\V1\Rest\OrdensServicos\OrdensServicosResource::class,
+            'route_name' => 'sete.rest.ordens-servicos',
+            'route_identifier_name' => 'ordens_id',
+            'collection_name' => 'ordens_servicos',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\OrdensServicos\OrdensServicosEntity::class,
+            'collection_class' => \Sete\V1\Rest\OrdensServicos\OrdensServicosCollection::class,
+            'service_name' => 'OrdensServicos',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -422,6 +455,7 @@ return [
             'Sete\\V1\\Rest\\Veiculos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Garagens\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Motoristas\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\OrdensServicos\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -485,6 +519,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\OrdensServicos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -533,6 +572,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Motoristas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\OrdensServicos\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -682,6 +725,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.motoristas',
                 'route_identifier_name' => 'motoristas_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\OrdensServicos\OrdensServicosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.ordens-servicos',
+                'route_identifier_name' => 'ordens_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\OrdensServicos\OrdensServicosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.ordens-servicos',
+                'route_identifier_name' => 'ordens_id',
                 'is_collection' => true,
             ],
         ],
