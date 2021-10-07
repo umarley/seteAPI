@@ -26,13 +26,20 @@ class SeteAlunos extends AbstractDatabasePostgres {
     }
 
     public function getLista($municipio) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_aluno', 'nome', 'cpf', 'loc_latitude', 'loc_longitude', 'nivel', 'turno'])
-                ->where("codigo_cidade = {$municipio}");
+        $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno,
+                    coalesce(esc.nome, 'Não Informada') as escola,
+                    coalesce(rta.nome, 'Não Informada') as rota
+                    from sete.sete_alunos a 
+                    left join sete.sete_escola_tem_alunos eta on a.id_aluno = eta.id_aluno and a.codigo_cidade  = eta.codigo_cidade
+                    left join sete.sete_escolas esc on esc.id_escola  = eta.id_escola and esc.codigo_cidade  = eta.codigo_cidade 
+                    left join sete.sete_rota_atende_aluno raa on raa.id_aluno = a.id_aluno and raa.codigo_cidade = a.codigo_cidade 
+                    left join sete.sete_rotas rta on rta.id_rota = raa.id_rota and rta.codigo_cidade = raa.codigo_cidade 
+                    where a.codigo_cidade  = {$municipio}";
         $arLista = [];
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $this->getResultSet($prepare->execute());
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        //$execute = $statement->execute();
+        $this->getResultSet($statement->execute());
         foreach ($this->resultSet as $row) {
             $arLista[] = $row;
         }

@@ -20,8 +20,6 @@ class AlunosModel {
         $dbSeteRotaAluno = new \Db\SetePG\SeteRotaAtendeAluno();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
-            $arDados[$key]['escola'] = $dbSeteEscolaAluno->getNomeEscolaAssociadaAluno($codigoMunicipio, $row['id_aluno']);
-            $arDados[$key]['rota'] = $dbSeteRotaAluno->getNomeRotaAssociadoAluno($codigoMunicipio, $row['id_aluno']);
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");
         }
         return $arDados;
