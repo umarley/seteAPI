@@ -17,7 +17,7 @@ class MotoristasModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row){
+        foreach ($arDados as $key => $row) {
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
         }
         return $arDados;
@@ -90,7 +90,16 @@ class MotoristasModel {
         } else {
             if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
                 $boValidate = false;
-                $arErros['data_nascimento'] = "A data informada é inválida!";
+                $arErros['data_nascimento'] = "A data de nascimento informada é inválida!";
+            }
+        }
+        if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
+            $boValidate = false;
+            $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
+        } else {
+            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
+                $boValidate = false;
+                $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
             }
         }
         if ($boValidate) {
@@ -158,6 +167,15 @@ class MotoristasModel {
             if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
                 $boValidate = false;
                 $arErros['data_nascimento'] = "A data informada é inválida!";
+            }
+        }
+        if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
+            $boValidate = false;
+            $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
+        } else {
+            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
+                $boValidate = false;
+                $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
             }
         }
         if ($boValidate) {
