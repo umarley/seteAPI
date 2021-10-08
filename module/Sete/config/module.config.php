@@ -15,6 +15,7 @@ return [
             \Sete\V1\Rest\Garagens\GaragensResource::class => \Sete\V1\Rest\Garagens\GaragensResourceFactory::class,
             \Sete\V1\Rest\Motoristas\MotoristasResource::class => \Sete\V1\Rest\Motoristas\MotoristasResourceFactory::class,
             \Sete\V1\Rest\OrdensServicos\OrdensServicosResource::class => \Sete\V1\Rest\OrdensServicos\OrdensServicosResourceFactory::class,
+            \Sete\V1\Rest\Fornecedores\FornecedoresResource::class => \Sete\V1\Rest\Fornecedores\FornecedoresResourceFactory::class,
         ],
     ],
     'router' => [
@@ -136,6 +137,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.fornecedores' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/fornecedores[/:codigo_cidade[/:fornecedores_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Fornecedores\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -153,6 +163,7 @@ return [
             10 => 'sete.rest.garagens',
             11 => 'sete.rest.motoristas',
             12 => 'sete.rest.ordens-servicos',
+            13 => 'sete.rest.fornecedores',
         ],
     ],
     'api-tools-rest' => [
@@ -440,6 +451,28 @@ return [
             'collection_class' => \Sete\V1\Rest\OrdensServicos\OrdensServicosCollection::class,
             'service_name' => 'OrdensServicos',
         ],
+        'Sete\\V1\\Rest\\Fornecedores\\Controller' => [
+            'listener' => \Sete\V1\Rest\Fornecedores\FornecedoresResource::class,
+            'route_name' => 'sete.rest.fornecedores',
+            'route_identifier_name' => 'fornecedores_id',
+            'collection_name' => 'fornecedores',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Fornecedores\FornecedoresEntity::class,
+            'collection_class' => \Sete\V1\Rest\Fornecedores\FornecedoresCollection::class,
+            'service_name' => 'Fornecedores',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -456,6 +489,7 @@ return [
             'Sete\\V1\\Rest\\Garagens\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Motoristas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\OrdensServicos\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Fornecedores\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -524,6 +558,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Fornecedores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -576,6 +615,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\OrdensServicos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Fornecedores\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -737,6 +780,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.ordens-servicos',
                 'route_identifier_name' => 'ordens_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Fornecedores\FornecedoresEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.fornecedores',
+                'route_identifier_name' => 'fornecedores_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Fornecedores\FornecedoresCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.fornecedores',
+                'route_identifier_name' => 'fornecedores_id',
                 'is_collection' => true,
             ],
         ],
