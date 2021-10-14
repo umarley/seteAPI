@@ -190,7 +190,7 @@ class AlunosModel {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado é inválido!";
             }
-            if ($dbAluno->alunoExiste($arPost['cpf'], $idAluno)) {
+            if ($dbAluno->alunoExistePUT($arPost['cpf'], $idAluno)) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado já existe!";
             }
