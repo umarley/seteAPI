@@ -5,6 +5,7 @@ namespace Db\Enum;
 
 class CorRaca {
     
+    const NAO_INFORMADA = -1;
     const AMARELO = 1;
     const BRANCO = 2;
     const INDIGENA = 3;
@@ -12,6 +13,7 @@ class CorRaca {
     const PRETO = 5;
     
     const COR_RACA = [
+        self::NAO_INFORMADA,
         self::AMARELO,
         self::BRANCO,
         self::INDIGENA,
@@ -21,6 +23,9 @@ class CorRaca {
     
     public function getLabel($valor){
         switch ($valor){
+            case self::NAO_INFORMADA:
+                return "Não informado";
+                break;
             case self::AMARELO:
                 return "Amarelo";
                 break;
