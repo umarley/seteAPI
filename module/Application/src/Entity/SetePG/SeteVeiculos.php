@@ -56,6 +56,20 @@ class SeteVeiculos extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function veiculoExistePUT($placa, $codigoCidade, $idVeiculo) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}' AND id_veiculo <> {$idVeiculo}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);

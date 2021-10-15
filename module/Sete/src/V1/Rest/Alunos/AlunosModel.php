@@ -66,6 +66,10 @@ class AlunosModel {
                 $arErros['codigo_cidade'] = "O código da cidade não existe. Verifique e tente novamente!";
             }
         }
+        if (!isset($arPost['mec_tp_localizacao']) || empty($arPost['mec_tp_localizacao'])) {
+            $boValidate = false;
+            $arErros['nome'] = "O tipo da localização do aluno deve ser informada!";
+        }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
             $arErros['nome'] = "O nome do aluno deve ser informado!";
@@ -91,13 +95,17 @@ class AlunosModel {
                 $arErros['data_nascimento'] = "A data informada é inválida!";
             }
         }
-        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+        if (!isset($arPost['sexo']) || empty($arPost['sexo'])) {
             $boValidate = false;
-            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
+            $arErros['sexo'] = "O sexo do aluno deve ser informado!";
         }
-        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
+        if (!isset($arPost['cor']) || empty($arPost['cor'])) {
             $boValidate = false;
-            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+            $arErros['cor'] = "A cor do aluno deve ser informada!";
+        }
+        if (!isset($arPost['turno']) || empty($arPost['turno'])) {
+            $boValidate = false;
+            $arErros['turno'] = "O turno do aluno deve ser informado!";
         }
         if ($boValidate) {
             return $this->validarParametrosInsertAluno($arPost);
