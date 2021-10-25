@@ -72,6 +72,14 @@ class EscolasModel {
             $boValidate = false;
             $arErros['nome'] = "O nome da escola deve ser informado!";
         }
+        if (!isset($arPost['mec_co_municipio']) || empty($arPost['mec_co_municipio'])) {
+            $boValidate = false;
+            $arErros['mec_co_municipio'] = "O mec_co_municipio da escola deve ser informado!";
+        }
+        if (!isset($arPost['mec_tp_localizacao_diferenciada']) || empty($arPost['mec_tp_localizacao_diferenciada'])) {
+            $boValidate = false;
+            $arErros['mec_tp_localizacao_diferenciada'] = "O mec_tp_localizacao_diferenciada da escola deve ser informado!";
+        }
         if ($boValidate) {
             return $this->validarParametrosInsertEscola($arPost);
         } else {
@@ -135,6 +143,11 @@ class EscolasModel {
             $boValidate = false;
             $arErros['mec_tp_localizacao'] = "O valor do objeto mec_tp_localizacao está inválido. Verifique e tente novamente!";
         }
+        if (isset($arPost['mec_tp_localizacao_diferenciada']) && !in_array($arPost['mec_tp_localizacao_diferenciada'], \Db\Enum\MecTpLocalizacaoDiferenciada::LOCALIZACAO_DIFERENCIADA)) {
+            $boValidate = false;
+            $arErros['mec_tp_localizacao_diferenciada'] = "O valor do objeto mec_tp_localizacao_diferenciada está inválido. Verifique e tente novamente!";
+        }
+        
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
