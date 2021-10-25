@@ -99,7 +99,7 @@ class AlunosModel {
             $boValidate = false;
             $arErros['sexo'] = "O sexo do aluno deve ser informado!";
         }
-        if (!isset($arPost['cor']) || empty($arPost['cor'])) {
+        if (!isset($arPost['cor']) || $arPost['cor'] === "") {
             $boValidate = false;
             $arErros['cor'] = "A cor do aluno deve ser informada!";
         }

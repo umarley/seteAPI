@@ -5,7 +5,7 @@ namespace Db\Enum;
 
 class CorRaca {
     
-    const NAO_INFORMADA = -1;
+    const NAO_INFORMADA = 0;
     const AMARELO = 1;
     const BRANCO = 2;
     const INDIGENA = 3;

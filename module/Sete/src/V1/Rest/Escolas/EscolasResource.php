@@ -48,6 +48,13 @@ class EscolasResource extends API {
                     $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array alunos com os ids dos alunos que se desejam associar a escola."], false);
                 }
                 break;
+            case 'rotas':
+                if (isset($arDados->rotas)) {
+                    $this->processarAssociacaoRotas($arDados);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array rotas com os ids das rotas que se desejam associar a escola."], false);
+                }
+                break;
             default:
                 $this->populaResposta(404, ['result' => false, 'messages' => "Recurso não encontrado."], false);
                 break;
@@ -72,6 +79,17 @@ class EscolasResource extends API {
     private function processarAssociacaoAlunos($arDados) {
         $modelEscolas = new EscolasModel();
         $arResult = $modelEscolas->associarVariosAlunos($arDados->codigo_cidade, $arDados->id_escola, $arDados->alunos);
+        $this->populaResposta(200, $arResult);
+    }
+    
+    /**
+     * Método responsável por processar a associaçãod e várias rotas a uma escola
+     * @param type $arDados
+     */
+    
+    private function processarAssociacaoRotas($arDados){
+        $modelEscolas = new EscolasModel();
+        $arResult = $modelEscolas->associarVariasRotas($arDados->codigo_cidade, $arDados->id_escola, $arDados->rotas);
         $this->populaResposta(200, $arResult);
     }
 
@@ -110,7 +128,13 @@ class EscolasResource extends API {
                 } else {
                     $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array alunos com os ids dos alunos que se desejam remover a associação com a escola."], false);
                 }
-
+                break;
+            case 'rotas':
+                if (isset($arDados->rotas)) {
+                    $this->processarDelecaoAssociacaoRotas($arDados);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array rotas com os ids das rotas que se desejam remover a associação com a escola."], false);
+                }
                 break;
             default:
                 $this->populaResposta(404, ['result' => false, 'messages' => "Recurso não encontrado."], false);
@@ -121,6 +145,12 @@ class EscolasResource extends API {
     private function processarDelecaoAssociacaoAlunos($arDados) {
         $modelEscolas = new EscolasModel();
         $arResult = $modelEscolas->excluirVariasAssociacoesAlunos($arDados->codigo_cidade, $arDados->id_escola, $arDados->alunos);
+        $this->populaResposta(200, $arResult);
+    }
+    
+    private function processarDelecaoAssociacaoRotas($arDados){
+        $modelEscolas = new EscolasModel();
+        $arResult = $modelEscolas->excluirVariasAssociacoesRotas($arDados->codigo_cidade, $arDados->id_escola, $arDados->rotas);
         $this->populaResposta(200, $arResult);
     }
 
@@ -171,6 +201,9 @@ class EscolasResource extends API {
                 case 'alunos':
                     $this->getAlunosEscola($codigoCidade, $idEscola);
                     break;
+                case 'rotas':
+                    $this->getRotasEscola($codigoCidade, $idEscola);
+                    break;
                 default:
                     $arResult = ['result' => false, 'messages' => "Recurso não existe!"];
                     break;
@@ -184,6 +217,12 @@ class EscolasResource extends API {
     private function getAlunosEscola($codigoCidade, $idEscola) {
         $dbSeteEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
         $arResult = $dbSeteEscolaTemAluno->getAlunosByEscola($codigoCidade, $idEscola);
+        $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult);
+    }
+    
+    private function getRotasEscola($codigoCidade, $idEscola){
+        $dbSeteRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arResult = $dbSeteRotaPassaPorEscola->getRotasByEscola($codigoCidade, $idEscola);
         $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult);
     }
 

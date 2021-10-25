@@ -147,7 +147,7 @@ class EscolasModel {
             $boValidate = false;
             $arErros['mec_tp_localizacao_diferenciada'] = "O valor do objeto mec_tp_localizacao_diferenciada está inválido. Verifique e tente novamente!";
         }
-        
+
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
@@ -256,6 +256,51 @@ class EscolasModel {
             $arIds['id_aluno'] = $aluno;
             $arResult = $dbSetePGEscolaTemAluno->_delete($arIds);
             $arRetorno[] = ['id_aluno' => $aluno, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
+    }
+
+    public function associarVariasRotas($codigoCidade, $idEscola, $arRotas) {
+        $dbSetePGRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arIdsRotas = [];
+        foreach ($arRotas as $idRota) {
+            if ($idRota['id_rota'] !== "") {
+                $arIdsRotas[] = $idRota['id_rota'];
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsRotas as $rota) {
+            $arResult = $dbSetePGRotaPassaPorEscola->_inserir([
+                'id_escola' => $idEscola,
+                'id_rota' => $rota,
+                'codigo_cidade' => $codigoCidade
+            ]);
+            $arRetorno[] = ['id_rota' => $rota, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
+    }
+    
+    public function excluirVariasAssociacoesRotas($codigoCidade, $idEscola, $arRotas) {
+
+
+        $dbSetePGRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arIdsRotas = [];
+        foreach ($arRotas as $idRota) {
+            if ($idRota->id_rota !== "") {
+                $arIdsRotas[] = $idRota->id_rota;
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsRotas as $rota) {
+            $arIds['codigo_cidade'] = $codigoCidade;
+            $arIds['id_escola'] = $idEscola;
+            $arIds['id_rota'] = $rota;
+            $arResult = $dbSetePGRotaPassaPorEscola->_delete($arIds);
+            $arRetorno[] = ['id_rota' => $rota, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
         }
 
         return $arRetorno;
