@@ -38,11 +38,18 @@ class EscolasResource extends API {
         $codigoCidade = $arParams['codigo_cidade'];
         $idEscola = $arParams['escolas_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idEscola;
+        $arDados->id_escola = $idEscola;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
-            case 'aluno':
-                
+            case 'alunos':
+                if (isset($arDados->alunos)) {
+                    $this->processarAssociacaoAlunos($arDados);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array alunos com os ids dos alunos que se desejam associar a escola."], false);
+                }
+                break;
+            default:
+                $this->populaResposta(404, ['result' => false, 'messages' => "Recurso não encontrado."], false);
                 break;
         }
     }
@@ -59,6 +66,16 @@ class EscolasResource extends API {
     }
 
     /**
+     * Método responsável por associar vários alunos de uma única vez a escola
+     * @param Object $arDados
+     */
+    private function processarAssociacaoAlunos($arDados) {
+        $modelEscolas = new EscolasModel();
+        $arResult = $modelEscolas->associarVariosAlunos($arDados->codigo_cidade, $arDados->id_escola, $arDados->alunos);
+        $this->populaResposta(200, $arResult);
+    }
+
+    /**
      * Delete a resource
      *
      * @param  mixed $id
@@ -67,12 +84,44 @@ class EscolasResource extends API {
     public function delete($id) {
         $modelEscolas = new EscolasModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        if (isset($arParams['rota'])) {
+            $client_data = file_get_contents("php://input");
+            $arData = json_decode($client_data);
+            $this->processarRotasDELETE($arParams, $arData);
+        } else {
+            $codigoCidade = $arParams['codigo_cidade'];
+            $idEscola = $arParams['escolas_id'];
+            $arResult = $modelEscolas->removerRegistroById($codigoCidade, $idEscola);
+            $this->populaResposta(200, $arResult);
+        }
+        exit;
+    }
+
+    private function processarRotasDELETE($arParams, $arDados) {
         $codigoCidade = $arParams['codigo_cidade'];
         $idEscola = $arParams['escolas_id'];
-        $arResult = $modelEscolas->removerRegistroById($codigoCidade, $idEscola);
-        header("Content-type: application/json");
-        echo json_encode($arResult);
-        exit;
+        $rota = $arParams['rota'];
+        $arDados->id_escola = $idEscola;
+        $arDados->codigo_cidade = $codigoCidade;
+        switch ($rota) {
+            case 'alunos':
+                if (isset($arDados->alunos)) {
+                    $this->processarDelecaoAssociacaoAlunos($arDados);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => "Deve ser enviado o array alunos com os ids dos alunos que se desejam remover a associação com a escola."], false);
+                }
+
+                break;
+            default:
+                $this->populaResposta(404, ['result' => false, 'messages' => "Recurso não encontrado."], false);
+                break;
+        }
+    }
+
+    private function processarDelecaoAssociacaoAlunos($arDados) {
+        $modelEscolas = new EscolasModel();
+        $arResult = $modelEscolas->excluirVariasAssociacoesAlunos($arDados->codigo_cidade, $arDados->id_escola, $arDados->alunos);
+        $this->populaResposta(200, $arResult);
     }
 
     /**
@@ -115,8 +164,8 @@ class EscolasResource extends API {
             }
         }
     }
-    
-    private function processarGetEscolaRota($rota, $codigoCidade, $idEscola){
+
+    private function processarGetEscolaRota($rota, $codigoCidade, $idEscola) {
         if ($idEscola != "" && is_numeric($idEscola)) {
             switch ($rota) {
                 case 'alunos':
@@ -131,8 +180,8 @@ class EscolasResource extends API {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_escola deve ser informado!"], false);
         }
     }
-    
-    private function getAlunosEscola($codigoCidade, $idEscola){
+
+    private function getAlunosEscola($codigoCidade, $idEscola) {
         $dbSeteEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
         $arResult = $dbSeteEscolaTemAluno->getAlunosByEscola($codigoCidade, $idEscola);
         $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult);

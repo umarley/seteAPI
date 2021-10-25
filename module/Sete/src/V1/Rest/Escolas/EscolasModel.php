@@ -17,7 +17,7 @@ class EscolasModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row){
+        foreach ($arDados as $key => $row) {
             $arDados[$key]['qtd_alunos'] = $this->_entity->qtdAlunosPorEscola($codigoMunicipio, $row['id_escola']);
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoMunicipio}/{$row['id_escola']}");
         }
@@ -175,8 +175,8 @@ class EscolasModel {
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
-    
-    public function removerRegistroById($codigoCidade, $idEscola){
+
+    public function removerRegistroById($codigoCidade, $idEscola) {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_escola'] = $idEscola;
         $arResult = $this->_entity->_delete($arIds);
@@ -196,6 +196,56 @@ class EscolasModel {
             'pg_atual' => (int) $pagina,
             'registros' => $arData
         ];
+    }
+
+    public function associarVariosAlunos($codigoCidade, $idEscola, $arAlunos) {
+        $dbSetePGEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
+        $arIdsAlunos = [];
+        foreach ($arAlunos as $idAluno) {
+            if ($idAluno['id_aluno'] !== "") {
+                $arIdsAlunos[] = $idAluno['id_aluno'];
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsAlunos as $aluno) {
+            $alunoAssociadoEscola = $dbSetePGEscolaTemAluno->alunoAssociadoEscola($aluno, $codigoCidade);
+            if ($alunoAssociadoEscola) {
+                $arRetorno[] = ['id_aluno' => $aluno, 'result' => false, 'messages' => "Aluno já associado a alguma escola. Verifique e tente novamente!"];
+            } else {
+                $arResult = $dbSetePGEscolaTemAluno->_inserir([
+                    'id_escola' => $idEscola,
+                    'id_aluno' => $aluno,
+                    'codigo_cidade' => $codigoCidade
+                ]);
+                $arRetorno[] = ['id_aluno' => $aluno, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+            }
+        }
+
+        return $arRetorno;
+    }
+
+    public function excluirVariasAssociacoesAlunos($codigoCidade, $idEscola, $arAlunos) {
+
+
+        $dbSetePGEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
+        $arIdsAlunos = [];
+        foreach ($arAlunos as $idAluno) {
+            if ($idAluno->id_aluno !== "") {
+                $arIdsAlunos[] = $idAluno->id_aluno;
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsAlunos as $aluno) {
+            $arIds['codigo_cidade'] = $codigoCidade;
+            $arIds['id_escola'] = $idEscola;
+            $arIds['id_aluno'] = $aluno;
+            $arResult = $dbSetePGEscolaTemAluno->_delete($arIds);
+            $arRetorno[] = ['id_aluno' => $aluno, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
     }
 
 }
