@@ -16,8 +16,6 @@ class AlunosModel {
 
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
-        $dbSeteEscolaAluno = new \Db\SetePG\SeteEscolaTemAluno();
-        $dbSeteRotaAluno = new \Db\SetePG\SeteRotaAtendeAluno();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row){
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");

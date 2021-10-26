@@ -28,7 +28,7 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
     public function getAlunosByEscola($codigoCidade, $idEscola){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf'])
+                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf', 'loc_latitude', 'loc_longitude', 'nivel', 'turno'])
                 ->where("eta.codigo_cidade = {$codigoCidade} AND eta.id_escola = {$idEscola}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $this->getResultSet($prepare->execute());
