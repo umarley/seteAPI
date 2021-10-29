@@ -9,11 +9,11 @@ use PHPUnit\Framework\Constraint\IsEmpty;
 
 use function PHPUnit\Framework\isEmpty;
 
-class SeteVeiculos extends AbstractDatabasePostgres {
+class SeteFornecedores extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_veiculos';
-        $this->primaryKey = 'id_veiculo';
+        $this->table = 'sete_fornecedores';
+        $this->primaryKey = 'id_fornecedor';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -22,7 +22,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_fornecedor = {$arIds['id_fornecedor']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -31,7 +31,7 @@ class SeteVeiculos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id_veiculo', 'placa','modelo','tipo','capacidade','marca','origem','manutencao'])
+                ->columns(['*'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);

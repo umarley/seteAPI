@@ -151,7 +151,7 @@ class VeiculosModel {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é inválida!";
             }
-            if ($dbVeiculo->VeiculoExiste($arPost['placa'], $codigoCidade , $idVeiculo)) {
+            if ($dbVeiculo->veiculoExisteUnico($arPost['placa'], $codigoCidade , $idVeiculo)) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já existe!";
             }
