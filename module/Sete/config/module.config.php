@@ -130,7 +130,7 @@ return [
             'sete.rest.fornecedores' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/fornecedores[/:fornecedores_id]',
+                    'route' => '/fornecedores[/:codigo_cidade[/:fornecedores_id[/:rota]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\Fornecedores\\Controller',
                     ],

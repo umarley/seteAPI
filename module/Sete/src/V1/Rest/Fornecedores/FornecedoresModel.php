@@ -51,7 +51,6 @@ class FornecedoresModel {
         if ($arResult['result']) {
             $arResult['messages']['id'] = $this->_entity->getUltimoIdInserido();
         }
-
         return $arResult;
     }
 
