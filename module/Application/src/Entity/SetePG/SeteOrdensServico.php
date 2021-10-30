@@ -9,11 +9,11 @@ use PHPUnit\Framework\Constraint\IsEmpty;
 
 use function PHPUnit\Framework\isEmpty;
 
-class SeteFornecedores extends AbstractDatabasePostgres {
+class SeteOrdensServico extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_fornecedores';
-        $this->primaryKey = 'id_fornecedor';
+        $this->table = 'sete_veiculos';
+        $this->primaryKey = 'id_veiculo';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -22,7 +22,7 @@ class SeteFornecedores extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_fornecedor = {$arIds['id_fornecedor']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -31,7 +31,7 @@ class SeteFornecedores extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['*'])
+                ->columns(['id_veiculo', 'placa','modelo','tipo','capacidade','marca','origem','manutencao'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -74,7 +74,7 @@ class SeteFornecedores extends AbstractDatabasePostgres {
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_fornecedor)")]);
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_veiculo)")]);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['id'];
@@ -84,7 +84,7 @@ class SeteFornecedores extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_fornecedor' => $arId['id_fornecedor']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_veiculo' => $arId['id_veiculo']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
