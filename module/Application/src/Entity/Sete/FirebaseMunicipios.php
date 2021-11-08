@@ -38,7 +38,7 @@ class FirebaseMunicipios extends AbstractDatabase {
     
     public function marcarProcessado($codigoCidade){
         $this->sql = new Sql($this->AdapterBD);
-        $update = $this->sql->update($this->tableIdentifier);
+        $update = $this->sql->update(new TableIdentifier('firebase_processamento_cidades'));
         $update->set(['dt_processado' => date("Y-m-d H:i:s"), 'is_processado' => 'S']);
         $update->where(['codigo_cidade' => $codigoCidade]);
         $sql = $this->sql->buildSqlString($update);
