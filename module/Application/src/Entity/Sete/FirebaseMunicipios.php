@@ -22,6 +22,7 @@ class FirebaseMunicipios extends AbstractDatabase {
     public function getLista() {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => new TableIdentifier('firebase_processamento_cidades')])
+                ->columns(['codigo_municipio' => 'codigo_cidade'])
                 ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_cidade = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
                 ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf'])
                 ->where("us.is_processado = 'N'")
