@@ -30,10 +30,10 @@ include __DIR__ . '/../vendor/autoload.php';
 
 if (!class_exists(Application::class)) {
     throw new RuntimeException(
-                    "Unable to load application.\n"
-                    . "- Type `composer install` if you are developing locally.\n"
-                    . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
-                    . "- Type `docker-compose run laminas composer install` if you are using Docker.\n"
+    "Unable to load application.\n"
+    . "- Type `composer install` if you are developing locally.\n"
+    . "- Type `vagrant ssh -c 'composer install'` if you are using Vagrant.\n"
+    . "- Type `docker-compose run laminas composer install` if you are using Docker.\n"
     );
 }
 
@@ -59,14 +59,19 @@ mainLoadData();
 function mainLoadData() {
     $dbCoreCargaDados = new \Db\Core\CargaDados();
     if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_MUNICIPIOS)) {
+        echo "Populando lista de municipios...\r\n";
+        populaListaMunicipios();
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_MUNICIPIOS, ['data_carga' => date('Y-m-d H:i:s')]);
-        cargaMunicipios();
+        echo "Limpando base de dados...\r\n";
+        limparBD();
     }
     if ($dbCoreCargaDados->podeExecutarCargaDados($dbCoreCargaDados::CARGA_USERS)) {
         $dbCoreCargaDados->_atualizar($dbCoreCargaDados::CARGA_USERS, ['data_carga' => date('Y-m-d H:i:s')]);
         cargaUsers();
         cargaUsuariosLiberados();
     }
+    //Se houver municipios para processar na tabela firebase_processamento_cidades, o sistema processará 100 municipios por vez
+    cargaMunicipios();
 }
 
 function cargaUsuariosLiberados() {
@@ -106,19 +111,15 @@ function cargaUsers() {
 }
 
 function cargaMunicipios() {
-    echo "Populando lista de municipios...\r\n";
-    populaListaMunicipios();
     $arMunicipios = listarMunicipios();
     processarMunicipios($arMunicipios);
 }
 
 function processarMunicipios($arMunicipios) {
     $modelFirebase = new \Application\Model\FirebaseModel();
-    echo "Limpando base de dados...\r\n";
-    limparBD();
     echo "Iniciando processo...\r\n";
     foreach ($arMunicipios as $row) {
-        echo "Processar municipio {$row['codigo_municipio']} - " . strtoupper($row['nome_cidade']). "...\r\n";
+        echo "Processar municipio {$row['codigo_municipio']} - " . strtoupper($row['nome_cidade']) . "...\r\n";
         $arAlunos = $modelFirebase->getAlunosMunicipio($row['codigo_municipio']);
         echo "Processando dados alunos...\r\n";
         processarAlunos($row['codigo_municipio'], $arAlunos);
@@ -152,6 +153,8 @@ function processarMunicipios($arMunicipios) {
         $arRotasPossuiVeiculo = $modelFirebase->getRotasPossuiVeiculoMunicipio($row['codigo_municipio']);
         echo "Processando dados rota possui veiculo...\r\n";
         processarRotasPossuiVeiculo($row['codigo_municipio'], $arRotasPossuiVeiculo);
+        echo "Marcando cidade {$row['codigo_municipio']} como processada...\r\n";
+        marcarCidadeComoProcessada($row['codigo_municipio']);
     }
 }
 
@@ -511,9 +514,16 @@ function listarMunicipios() {
     return $dbFirbaseMunicipios->getLista();
 }
 
+function marcarCidadeComoProcessada($codigoCidade) {
+    $dbFirbaseMunicipios = new \Db\Sete\FirebaseMunicipios();
+    $dbFirbaseMunicipios->marcarProcessado($codigoCidade);
+}
+
 function populaListaMunicipios() {
     $modelFirebase = new \Application\Model\FirebaseModel();
     $modelFirebase->processarDocumentosMunicipios();
+    $dbCoreCargaDados = new \Db\Core\CargaDados();
+    $dbCoreCargaDados->executarCargaProcessamento();
 }
 
 function formatDateSQL($dataBR) {

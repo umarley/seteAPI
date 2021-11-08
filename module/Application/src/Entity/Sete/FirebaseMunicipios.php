@@ -21,9 +21,11 @@ class FirebaseMunicipios extends AbstractDatabase {
 
     public function getLista() {
         $sql = new Sql($this->AdapterBD);
-        $select = $sql->select(['us' => $this->tableIdentifier])
-                ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
-                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf']);
+        $select = $sql->select(['us' => new TableIdentifier('firebase_processamento_cidades')])
+                ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_cidade = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
+                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf'])
+                ->where("us.is_processado = 'N'")
+                ->limit("100");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $arLista = [];
         $this->getResultSet($prepare->execute());
@@ -31,6 +33,30 @@ class FirebaseMunicipios extends AbstractDatabase {
             $arLista[] = $row;
         }
         return $arLista;
+    }
+    
+    public function marcarProcessado($codigoCidade){
+        $this->sql = new Sql($this->AdapterBD);
+        $update = $this->sql->update($this->tableIdentifier);
+        $update->set(['dt_processado' => date("Y-m-d H:i:s"), 'is_processado' => 'S']);
+        $update->where(['codigo_cidade' => $codigoCidade]);
+        $sql = $this->sql->buildSqlString($update);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $bool = true;
+            $message = 'Registro atualizado com sucesso!';
+        } catch (\PDOException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            echo $ex->getMessage();
+            die();
+            //$this->rollback();
+        } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            //$this->rollback();
+        }
+        return ['result' => $bool, 'messages' => $message];
     }
 
     public function getByCodigoIBGE($codigo) {

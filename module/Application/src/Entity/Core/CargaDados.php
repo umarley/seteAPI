@@ -30,5 +30,12 @@ class CargaDados extends AbstractDatabase {
             return false;
         }
     }
+    
+    public function executarCargaProcessamento(){
+        $sql = "CALL pLoadCidadesProcessar()";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $statement->execute();
+    }
 
 }
