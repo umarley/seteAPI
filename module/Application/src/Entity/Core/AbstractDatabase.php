@@ -200,8 +200,6 @@ class AbstractDatabase extends TableGateway {
         foreach ($config->db->adapters->$configName as $key => $value) {
             $arConfig[$key] = $value;
         }
-        var_dump($arConfig);
-        exit;
         return $arConfig;
     }
 
