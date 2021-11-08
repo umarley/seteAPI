@@ -195,7 +195,7 @@ class AbstractDatabase extends TableGateway {
         /* if (AMBIENTE_EXEC === AMBIENTE_PRODUCAO) {
           $config = new \Laminas\Config\Config(include realpath('config/autoload/global.php'));
           } */
-        $config = new \Laminas\Config\Config(include realpath('config/autoload/local.php'));
+        $config = new \Laminas\Config\Config(include_once realpath('config/autoload/local.php'));
 
         $arConfig = [];
         foreach ($config->db->adapters->$configName as $key => $value) {
