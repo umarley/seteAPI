@@ -511,7 +511,7 @@ function deParaUsers($arUsuario) {
 
 function listarMunicipios() {
     $dbFirbaseMunicipios = new \Db\Sete\FirebaseMunicipios();
-    return $dbFirbaseMunicipios->getLista();
+    return $dbFirbaseMunicipios->getListaProcessar();
 }
 
 function marcarCidadeComoProcessada($codigoCidade) {
