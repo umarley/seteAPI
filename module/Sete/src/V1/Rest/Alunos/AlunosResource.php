@@ -154,8 +154,16 @@ class AlunosResource extends API {
         $dbSeteEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_aluno'] = $idAluno;
-        $arResult = $dbSeteEscolaTemAluno->_delete($arIds);
-        $this->populaResposta(200, $arResult, false);
+        $arEscolaAluno = $dbSeteEscolaTemAluno->getById($arIds);
+        if(isset($arEscolaAluno['id_escola']) && !empty($arEscolaAluno['id_escola'])){
+            $arIds['id_escola'] = $arEscolaAluno['id_escola'];
+            $arResult = $dbSeteEscolaTemAluno->_delete($arIds);
+            $codigoHTTP = 200;
+        }else{
+            $arResult = ['result' => false, 'messages' => 'Não há escola associada ao aluno.'];
+            $codigoHTTP = 404;
+        }       
+        $this->populaResposta($codigoHTTP, $arResult, false);
         exit;
     }
     
