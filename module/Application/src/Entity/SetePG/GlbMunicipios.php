@@ -44,7 +44,7 @@ class GlbMunicipios extends AbstractDatabasePostgres {
     public function getListaByEstado($codigoEstado){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['cid' => $this->tableIdentifier])
-                ->columns(['nm_cidade' => 'nome', 'codigo_uf'])
+                ->columns(['nm_cidade' => 'nome', 'codigo_uf', 'codigo_cidade' => 'codigo_ibge'])
                 ->join(['est' => new TableIdentifier('glb_estado', $this->schema)], "cid.codigo_uf = est.codigo", ['estado' => 'nome'])
                 ->where("cid.codigo_uf = {$codigoEstado}");
         $prepare = $sql->prepareStatementForSqlObject($select);
