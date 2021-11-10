@@ -38,6 +38,8 @@ class VeiculosModel {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_veiculo'] = $idVeiculo;
         $arRow = $this->_entity->getById($arIds);
+        $arRow['modo_str'] = \Db\Enum\ModoVeiculo::getLabel($arRow['modo']);
+        $arRow['origem_str'] = \Db\Enum\Origem::getLabel($arRow['origem']);
         $urlHelper = new \Application\Utils\UrlHelper();
         $arRow['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoCidade}/{$idVeiculo}");
         return $arRow;
@@ -93,7 +95,7 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
-        if (!isset($arPost['modo']) || empty($arPost['modo'])) {
+        if (!isset($arPost['modo']) || $arPost['modo'] == "") {
             $boValidate = false;
             $arErros['modo'] = "O modo do veiculo deve ser informado!";
         }

@@ -30,6 +30,16 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         }
     }
     
+    public function getByIdAluno($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_rotas', 'sete')], "eta.id_rota = rot.id_rota AND eta.codigo_cidade = rot.codigo_cidade", ['*'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_aluno = {$arIds['id_aluno']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row;
+    }
+    
     public function alunoAssociadoRota($idAluno, $codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)

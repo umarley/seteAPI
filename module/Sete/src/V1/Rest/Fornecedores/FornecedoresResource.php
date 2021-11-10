@@ -2,11 +2,14 @@
 namespace Sete\V1\Rest\Fornecedores;
 
 
+
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Sete\V1\Rest\Fornecedores;
 use Sete\V1\API;
+use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Laminas\ApiTools\Rest\AbstractResourceListener;
 
-class FornecedoresResource extends API
+class FornecedoresResource extends AbstractResourceListener
 {
     /**
      * Create a resource
@@ -105,7 +108,6 @@ class FornecedoresResource extends API
                 $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_Fornecedor deve ser informado!"], false);
             } 
         }
-    }
 
     /**
      * Fetch all or a subset of resources
@@ -136,7 +138,6 @@ class FornecedoresResource extends API
         $this->populaResposta(200, $arResultado, false);
         exit;
     }
-    
 
     /**
      * Patch (partial in-place update) a resource
@@ -179,11 +180,13 @@ class FornecedoresResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
+
     public function update($id, $data) {
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);
     }
+      
     private function processarRequestPUT($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
@@ -193,6 +196,7 @@ class FornecedoresResource extends API
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
+      
     private function processarUpdateFornecedor($data) {
         $modelFornecedores = new FornecedoresModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
@@ -206,5 +210,4 @@ class FornecedoresResource extends API
         } else {
             $this->populaResposta(400, $boValidate, false);
         }
-    }
 }
