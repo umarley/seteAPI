@@ -73,7 +73,11 @@ class MotoristasModel {
         }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
+            $arErros['nome'] = "O nome do motorista deve ser informado!";
+        }
+        if (!isset($arPost['sexo']) || empty($arPost['sexo'])) {
+            $boValidate = false;
+            $arErros['sexo'] = "O sexo do motorista deve ser informado!";
         }
         if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
             $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
@@ -96,7 +100,11 @@ class MotoristasModel {
                 $arErros['data_nascimento'] = "A data de nascimento informada é inválida!";
             }
         }
-        if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
+        if (!isset($arPost['cnh']) || empty($arPost['cnh'])) {
+            $boValidate = false;
+            $arErros['cnh'] = "O número da CNH do motorista deve ser informado!";
+        }
+        /*if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
             $boValidate = false;
             $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
         } else {
@@ -104,6 +112,14 @@ class MotoristasModel {
                 $boValidate = false;
                 $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
             }
+        }*/
+        if (!isset($arPost['tem_cnh_a']) && !isset($arPost['tem_cnh_b']) && !isset($arPost['tem_cnh_c']) && !isset($arPost['tem_cnh_d']) && !isset($arPost['tem_cnh_e'])){
+            $boValidate = false;
+            $arErros['tem_cnh'] = "Informe ao menos uma categoria para a CNH.";
+        }
+        if (!isset($arPost['turno_manha']) && !isset($arPost['turno_tarde']) && !isset($arPost['turno_noite'])){
+            $boValidate = false;
+            $arErros['turno'] = "Informe ao menos um turno de trabalho para o motorista.";
         }
         if ($boValidate) {
             return $this->validarParametrosInsertMotorista($arPost);
