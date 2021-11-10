@@ -20,11 +20,11 @@ class FornecedoresModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row){
+        foreach ($arDados as $key => $row) {
             $arDados[$key]['ramo_mecanica'] = ($row['ramo_mecanica'] == 'N' ? "Não" : "Sim");
             $arDados[$key]['ramo_combustivel'] = ($row['ramo_combustivel'] == 'N' ? "Não" : "Sim");
             $arDados[$key]['ramo_seguro'] = ($row['ramo_seguro'] == 'N' ? "Não" : "Sim");
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoMunicipio}/{$row['id_veiculo']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("fornecedores/{$codigoMunicipio}/{$row['id_fornecedor']}");
         }
         return $arDados;
     }
@@ -43,10 +43,11 @@ class FornecedoresModel {
         $arPost['ramo_mecanica'] = isset($arPost['ramo_mecanica']) ? $arPost['ramo_mecanica'] : 'N';
         $arPost['ramo_combustivel'] = isset($arPost['ramo_combustivel']) ? $arPost['ramo_combustivel'] : 'N';
         $arPost['ramo_seguro'] = isset($arPost['ramo_seguro']) ? $arPost['ramo_seguro'] : 'N';
-        $arPost['loc_latitude'] = isset($arPost['loc_latitude']) ? $arPost['loc_latitude'] : '0';
-        $arPost['loc_longitude'] = isset($arPost['loc_longitude']) ? $arPost['loc_longitude'] : '0';
-        $arPost['loc_endereco'] = isset($arPost['loc_endereco']) ? $arPost['loc_endereco'] : '0';
-        $arPost['loc_cep'] = isset($arPost['loc_cep']) ? $arPost['loc_cep'] : '0';
+        $arPost['loc_latitude'] = isset($arPost['loc_latitude']) ? $arPost['loc_latitude'] : null;
+        $arPost['loc_longitude'] = isset($arPost['loc_longitude']) ? $arPost['loc_longitude'] : null;
+        $arPost['loc_endereco'] = isset($arPost['loc_endereco']) ? $arPost['loc_endereco'] : null;
+        $arPost['loc_cep'] = isset($arPost['loc_cep']) ? $arPost['loc_cep'] : null;
+        $arPost['dt_criacao'] = date("Y-m-d H:i:s");
         $arResult = $this->_entity->_inserir($arPost);
         if ($arResult['result']) {
             $arResult['messages']['id'] = $this->_entity->getUltimoIdInserido();
@@ -68,19 +69,35 @@ class FornecedoresModel {
                 $arErros['codigo_cidade'] = "O código da cidade não existe. Verifique e tente novamente!";
             }
         }
-        if ( !isset($arPost['cnpj']) || empty($arPost['cnpj']) ) {
+        if (!isset($arPost['cnpj']) || empty($arPost['cnpj'])) {
             $boValidate = false;
             $arErros['cnpj'] = "O cnpj do Fornecedor deve ser informado!";
+        } else {
+            $cnpjValido = \Application\Utils\Utils::validarCnpj($arPost['cnpj']);
+            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cnpj']);
+            if (!$cnpjValido && !$cpfValido) {
+                $boValidate = false;
+                $arErros['cnpj'] = "O CNPJ ou CPF informado é inválido!";
+            } else {
+                $dbSeteFornecedores = new \Db\SetePG\SeteFornecedores();
+                $arIds['codigo_cidade'] = $arPost['codigo_cidade'];
+                $arIds['cnpj'] = $arPost['cnpj'];
+                $fornecedorJaExisteNaCidade = $dbSeteFornecedores->fornecedorExisteParaCidade($arIds);
+                if ($fornecedorJaExisteNaCidade) {
+                    $boValidate = false;
+                    $arErros['cnpj'] = "O CNPJ ou CPF informado já está cadastrado no sistema!";
+                }
+            }
         }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
             $arErros['nome'] = "O nome do fornecedor deve ser informado!";
         }
-        if (!isset($arPost['telefone']) || empty($arPost['telefone'])) {
+        if (!isset($arPost['ramo_mecanica']) && !isset($arPost['ramo_combustivel']) && !isset($arPost['ramo_seguro'])) {
             $boValidate = false;
-            $arErros['telefone'] = "O telefone do Fornecedor deve ser informado!";
+            $arErros['servicos'] = "Ao menos um serviço deve ser marcado!";
         }
-        
+
         if ($boValidate) {
             return $this->validarParametrosInsertFornecedores($arPost);
         } else {
@@ -105,7 +122,7 @@ class FornecedoresModel {
             $boValidate = false;
             $arErros['ramo_seguro'] = "O o valor do objeto ramo_seguro deve ser S ou N";
         }
-        
+
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
@@ -113,25 +130,24 @@ class FornecedoresModel {
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
+        if (!isset($arPost['cnpj']) || empty($arPost['cnpj'])) {
+            $boValidate = false;
+            $arErros['cnpj'] = "O cnpj do Fornecedor deve ser informado!";
+        } else {
+            $cnpjValido = \Application\Utils\Utils::validarCnpj($arPost['cnpj']);
+            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cnpj']);
+            if (!$cnpjValido && !$cpfValido) {
+                $boValidate = false;
+                $arErros['cnpj'] = "O CNPJ ou CPF informado é inválido!";
+            }
+        }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
             $arErros['nome'] = "O nome do fornecedor deve ser informado!";
         }
-        if (!isset($arPost['loc_latitude']) || empty($arPost['loc_latitude'])) {
+        if (!isset($arPost['ramo_mecanica']) && !isset($arPost['ramo_combustivel']) && !isset($arPost['ramo_seguro'])) {
             $boValidate = false;
-            $arErros['loc_latitude'] = "O loc_latitude do fornecedor deve ser informado!";
-        }
-        if (!isset($arPost['loc_longitude']) || empty($arPost['loc_longitude'])) {
-            $boValidate = false;
-            $arErros['loc_longitude'] = "O loc_longitude do fornecedor deve ser informado!";
-        }
-        if (!isset($arPost['loc_endereco']) || empty($arPost['loc_endereco'])) {
-            $boValidate = false;
-            $arErros['loc_endereco'] = "O loc_endereco do fornecedor deve ser informado!";
-        }
-        if (!isset($arPost['loc_cep']) || empty($arPost['loc_cep'])) {
-            $boValidate = false;
-            $arErros['loc_cep'] = "O loc_cep do fornecedor deve ser informado!";
+            $arErros['servicos'] = "Ao menos um serviço deve ser marcado!";
         }
 
         if ($boValidate) {
@@ -145,6 +161,7 @@ class FornecedoresModel {
         $arPost = (Array) $arPost;
         unset($arPost['codigo_cidade']);
         unset($arPost['id_fornecedor']);
+        $arPost['dt_alteracao'] = date("Y-m-d H:i:s");
         $arId['codigo_cidade'] = $codigoCidade;
         $arId['id_fornecedor'] = $idFornecedor;
         $arResult = $this->_entity->_atualizar($arId, $arPost);

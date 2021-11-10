@@ -27,6 +27,20 @@ class SeteFornecedores extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function fornecedorExisteParaCidade($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['id_fornecedor'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cnpj = '{$arIds['cnpj']}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->count();
+        if($row > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
