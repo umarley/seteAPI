@@ -104,6 +104,10 @@ class MotoristasModel {
             $boValidate = false;
             $arErros['cnh'] = "O número da CNH do motorista deve ser informado!";
         }
+        if (!isset($arPost['vinculo']) || empty($arPost['vinculo'])) {
+            $boValidate = false;
+            $arErros['cnh'] = "O vínculo do motorista com a administração pública deve ser informado!";
+        }
         /*if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
             $boValidate = false;
             $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
@@ -167,6 +171,10 @@ class MotoristasModel {
         if (isset($arPost['sexo']) && !in_array($arPost['sexo'], \Db\Enum\Sexo::SEXOS)) {
             $boValidate = false;
             $arErros['sexo'] = "O valor do objeto sexo está inválido. Verifique e tente novamente!";
+        }
+        if (isset($arPost['vinculo']) && !in_array($arPost['vinculo'], \Db\Enum\VinculoServidor::VINCULOS)) {
+            $boValidate = false;
+            $arErros['sexo'] = "O valor do objeto vinculo está inválido. Verifique e tente novamente!";
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }
