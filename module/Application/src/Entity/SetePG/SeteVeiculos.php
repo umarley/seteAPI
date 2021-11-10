@@ -5,6 +5,7 @@ namespace Db\SetePG;
 use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
+use Laminas\Db\Sql\TableIdentifier;
 use PHPUnit\Framework\Constraint\IsEmpty;
 
 use function PHPUnit\Framework\isEmpty;
@@ -20,8 +21,9 @@ class SeteVeiculos extends AbstractDatabasePostgres {
 
     public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
+        $select = $sql->select(['v' => $this->tableIdentifier])
                 ->columns(['*'])
+                ->join(['marca' => new TableIdentifier('glb_marca_veiculos', 'sete')], "marca.id_marca = v.marca", ['marca_str' => 'nm_marca'], "LEFT")
                 ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
@@ -48,6 +50,20 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function veiculoExistePUT($placa, $codigoCidade, $idVeiculo) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}' AND id_veiculo <> {$idVeiculo}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {

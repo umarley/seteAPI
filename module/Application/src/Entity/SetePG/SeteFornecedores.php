@@ -27,6 +27,20 @@ class SeteFornecedores extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function fornecedorExisteParaCidade($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['id_fornecedor'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cnpj = '{$arIds['cnpj']}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->count();
+        if($row > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
@@ -42,34 +56,6 @@ class SeteFornecedores extends AbstractDatabasePostgres {
         return $arLista;
     }
 
-
-    public function veiculoExiste($placa, $codigoCidade) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        if ($row['qtd'] > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public function veiculoExisteUnico($placa, $codigoCidade, $idVeiculo) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}' AND id_veiculo != '{$idVeiculo}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        if ($row['qtd'] > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
@@ -107,7 +93,7 @@ class SeteFornecedores extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where(["codigo_cidade" => $arIds['codigo_cidade'], 'id_veiculo' => $arIds['id_veiculo']]);
+        $delete->where(["codigo_cidade" => $arIds['codigo_cidade'], 'id_fornecedor' => $arIds['id_fornecedor']]);
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

@@ -74,6 +74,22 @@ class SeteAlunos extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function alunoExistePUT($cpf, $idAluno = null) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("cpf = '{$cpf}' AND id_aluno <> {$idAluno}");
+        $sqlBuild = $sql->buildSqlString($select);
+        $statement = $this->AdapterBD->createStatement($sqlBuild);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);

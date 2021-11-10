@@ -6,11 +6,11 @@ use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
-class SeteEscolaTemAluno extends AbstractDatabasePostgres {
+class SeteRotaPassaPorEscola extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_escola_tem_alunos';
-        $this->primaryKey = 'id_escola';
+        $this->table = 'sete_rota_passa_por_escolas';
+        $this->primaryKey = 'id_rota';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -18,17 +18,17 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
     public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-                ->join(['esc' => new \Laminas\Db\Sql\TableIdentifier('sete_escolas', 'sete')], "eta.id_escola = esc.id_escola AND eta.codigo_cidade = esc.codigo_cidade", ['*'])
-                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_aluno = {$arIds['id_aluno']}");
+                ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_rotas', 'sete')], "eta.id_rota = rot.id_rota AND eta.codigo_cidade = rot.codigo_cidade", ['*'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
     }
     
-    public function getAlunosByEscola($codigoCidade, $idEscola){
+    public function getRotasByEscola($codigoCidade, $idEscola){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf', 'loc_latitude', 'loc_longitude', 'nivel', 'turno'])
+                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_rotas', 'sete')], "eta.id_rota = al.id_rota AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_rota', 'nome', 'km', 'turno_matutino', 'turno_vespertino', 'turno_noturno'])
                 ->where("eta.codigo_cidade = {$codigoCidade} AND eta.id_escola = {$idEscola}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $this->getResultSet($prepare->execute());
@@ -37,21 +37,6 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
             $arLista[] = $row;
         }
         return $arLista;
-    }
-    
-    public function getNomeEscolaAssociadaAluno($codigoCidade, $idAluno){
-        $sql = "SELECT coalesce(r.nome, 'Não Informada') as nome FROM sete.sete_escola_tem_alunos raa 
-                    inner join sete.sete_escolas r on raa.id_escola  = r.id_escola  and raa.codigo_cidade  = r.codigo_cidade 
-                    WHERE raa.codigo_cidade = '{$codigoCidade}' AND raa.id_aluno = {$idAluno}";
-        $statement = $this->AdapterBD->createStatement($sql);
-        $statement->prepare();
-        $execute = $statement->execute();
-        if($execute->count() > 0){
-            $row = $execute->current();
-            return $row['nome'];
-        }else{
-            return 'Não informada';
-        }
     }
 
     public function getLista($municipio) {
@@ -68,11 +53,11 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
         return $arLista;
     }
     
-    public function alunoAssociadoEscola($idAluno, $codigoCidade){
+    public function rotaAssociadoEscola($idRota, $codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = '{$codigoCidade}' AND id_aluno = {$idAluno}");
+                ->where("codigo_cidade = '{$codigoCidade}' AND id_rota = {$idRota}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -85,7 +70,7 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']} AND id_escola = {$arIds['id_escola']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_rota = {$arIds['id_rota']} AND id_escola = {$arIds['id_escola']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
