@@ -24,6 +24,30 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function getByCodEntidadeMec($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['*'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND mec_co_entidade = {$arIds['mec_co_entidade']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row;
+    }
+    
+    public function escolaExisteByCodigoMEC($codigoCidade, $codigoEntidadeMec) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("mec_co_entidade = '{$codigoEntidadeMec}' AND codigo_cidade = '{$codigoCidade}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);

@@ -16,6 +16,7 @@ return [
             \Sete\V1\Rest\Motoristas\MotoristasResource::class => \Sete\V1\Rest\Motoristas\MotoristasResourceFactory::class,
             \Sete\V1\Rest\OrdensServicos\OrdensServicosResource::class => \Sete\V1\Rest\OrdensServicos\OrdensServicosResourceFactory::class,
             \Sete\V1\Rest\Fornecedores\FornecedoresResource::class => \Sete\V1\Rest\Fornecedores\FornecedoresResourceFactory::class,
+            \Sete\V1\Rest\Censo\CensoResource::class => \Sete\V1\Rest\Censo\CensoResourceFactory::class,
         ],
     ],
     'router' => [
@@ -146,6 +147,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.censo' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/censo[/:codigo_cidade[/:censo_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Censo\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -164,6 +174,7 @@ return [
             11 => 'sete.rest.motoristas',
             12 => 'sete.rest.ordens-servicos',
             13 => 'sete.rest.fornecedores',
+            14 => 'sete.rest.censo',
         ],
     ],
     'api-tools-rest' => [
@@ -478,6 +489,28 @@ return [
             'collection_class' => \Sete\V1\Rest\Fornecedores\FornecedoresCollection::class,
             'service_name' => 'Fornecedores',
         ],
+        'Sete\\V1\\Rest\\Censo\\Controller' => [
+            'listener' => \Sete\V1\Rest\Censo\CensoResource::class,
+            'route_name' => 'sete.rest.censo',
+            'route_identifier_name' => 'censo_id',
+            'collection_name' => 'censo',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Censo\CensoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Censo\CensoCollection::class,
+            'service_name' => 'Censo',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -495,6 +528,7 @@ return [
             'Sete\\V1\\Rest\\Motoristas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\OrdensServicos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Fornecedores\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Censo\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -568,6 +602,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Censo\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -624,6 +663,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Fornecedores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Censo\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -797,6 +840,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.fornecedores',
                 'route_identifier_name' => 'fornecedores_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Censo\CensoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.censo',
+                'route_identifier_name' => 'censo_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Censo\CensoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.censo',
+                'route_identifier_name' => 'censo_id',
                 'is_collection' => true,
             ],
         ],
