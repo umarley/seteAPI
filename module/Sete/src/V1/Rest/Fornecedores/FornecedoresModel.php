@@ -21,9 +21,9 @@ class FornecedoresModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row) {
-            $arDados[$key]['ramo_mecanica'] = ($row['ramo_mecanica'] == 'N' ? "Não" : "Sim");
+            /*$arDados[$key]['ramo_mecanica'] = ($row['ramo_mecanica'] == 'N' ? "Não" : "Sim");
             $arDados[$key]['ramo_combustivel'] = ($row['ramo_combustivel'] == 'N' ? "Não" : "Sim");
-            $arDados[$key]['ramo_seguro'] = ($row['ramo_seguro'] == 'N' ? "Não" : "Sim");
+            $arDados[$key]['ramo_seguro'] = ($row['ramo_seguro'] == 'N' ? "Não" : "Sim");*/
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("fornecedores/{$codigoMunicipio}/{$row['id_fornecedor']}");
         }
         return $arDados;
