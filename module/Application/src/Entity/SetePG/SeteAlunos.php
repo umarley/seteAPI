@@ -24,6 +24,20 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function alunoExisteById($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['*'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_aluno = {$arIds['id_aluno']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->count();
+        if($row > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public function getLista($municipio) {
         $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno,
@@ -146,6 +160,9 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $update->set($dados);
         $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_aluno' => $arId['id_aluno']]);
         $sql = $this->sql->buildSqlString($update);
+        
+        echo $sql . "<br />";
+        
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
             $bool = true;

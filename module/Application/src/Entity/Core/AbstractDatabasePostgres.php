@@ -81,7 +81,7 @@ class AbstractDatabasePostgres extends TableGateway {
         try {
             $result = $statement->execute();
             $bool = true;
-            $message = ['id' => $result->getGeneratedValue(), 'sql' => $sql];
+            $message = ['id' => $result->getGeneratedValue()];
         } catch (\PDOException $ex) {
             
         } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {

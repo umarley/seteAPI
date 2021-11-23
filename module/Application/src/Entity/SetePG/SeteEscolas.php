@@ -24,7 +24,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
-    
+
     public function getByCodEntidadeMec($arIds) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
@@ -34,7 +34,16 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
-    
+
+    public function getIdEscolaByCodigoMecAndCodigoCidade($codigoEntidadeMec, $codigoCidade) {
+        $sql = "SELECT id_escola FROM sete.sete_escolas e WHERE e.codigo_cidade = '{$codigoCidade}'
+                    and e.mec_co_entidade = '{$codigoEntidadeMec}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['id_escola'];
+    }
+
     public function escolaExisteByCodigoMEC($codigoCidade, $codigoEntidadeMec) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
@@ -72,7 +81,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row['qtd'];
     }
-    
+
     public function qtdAlunosPorEscola($municipio, $idEscola = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(new \Laminas\Db\Sql\TableIdentifier('sete_escola_tem_alunos', 'sete'))
