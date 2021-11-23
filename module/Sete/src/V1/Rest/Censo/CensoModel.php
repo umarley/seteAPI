@@ -175,7 +175,7 @@ class CensoModel {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo ensino_pre_escola da escola está inválido!";
             }
-            if (!isset($rowAluno['cor']) || empty($rowAluno['cor'])) {
+            if (!isset($rowAluno['cor']) || $rowAluno['cor'] == "") {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor do aluno está ausente!";
             } else if (!in_array($rowAluno['cor'], \Db\Enum\CorRaca::COR_RACA)) {
@@ -231,7 +231,7 @@ class CensoModel {
         return ['result' => $boValido, 'messages' => $arErros];
     }
 
-    public function processarImportacaoEscola($arEscolas, $usuarioAutenticado) {
+    public function processarImportacaoEscola($arEscolas, $usuarioAutenticado, $codigoCidade) {
         $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
         $arOperacaoResult = [];
         $arMessages = [];
@@ -248,6 +248,7 @@ class CensoModel {
                 $rowEscola['dt_alteracao'] = date("Y-m-d H:i:s");
                 $arOperacaoResult[$key] = $dbSeteEscolas->_atualizar($arIds, $rowEscola);
             } else {
+                $rowEscola['codigo_cidade']  = $codigoCidade;
                 $rowEscola['mec_in_regular'] = isset($rowEscola['mec_in_regular']) ? $rowEscola['mec_in_regular'] : 'N';
                 $rowEscola['mec_in_eja'] = isset($rowEscola['mec_in_eja']) ? $arPost['mec_in_eja'] : 'N';
                 $rowEscola['mec_in_profissionalizante'] = isset($rowEscola['mec_in_profissionalizante']) ? $rowEscola['mec_in_profissionalizante'] : 'N';

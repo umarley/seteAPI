@@ -39,7 +39,7 @@ class CensoResource extends API
         $modelCenso = new \Sete\V1\Rest\Censo\CensoModel();
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $usuarioAutenticado = $dbCoreAccessToken->getEmailUsuarioSETEByAccessToken($this->getAcessToken());
-        $arResult = $modelCenso->processarImportacaoEscola($arData->escolas, $usuarioAutenticado);
+        $arResult = $modelCenso->processarImportacaoEscola($arData->escolas, $usuarioAutenticado, $codigoCidade);
         if($arResult['result']){
             $arResultAlunos = $modelCenso->processarImportacaoAluno($arData->alunos, $usuarioAutenticado, $codigoCidade);
             $codigoHTTP = ($arResultAlunos['result'] ? 201 : 500);
