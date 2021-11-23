@@ -177,13 +177,13 @@ class CensoModel {
             }
             
             
-            if ($rowAluno['cor'] == "") {
+            /*if ($rowAluno['cor'] == "") {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor do aluno está ausente!";
             } else if ($rowAluno['cor'] != ""  && !in_array($rowAluno['cor'], \Db\Enum\CorRaca::COR_RACA)) {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor da escola está inválido!";
-            }
+            }*/
             if (!isset($rowAluno['turno']) || empty($rowAluno['turno'])) {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo turno do aluno está ausente!";
