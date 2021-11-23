@@ -175,11 +175,15 @@ class CensoModel {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo ensino_pre_escola da escola está inválido!";
             }
+            
+            var_dump(!isset($rowAluno['cor']));
+            
+            var_dump($rowAluno['cor']);
+            
+            exit;
             if (!isset($rowAluno['cor']) || $rowAluno['cor'] == "") {
                 $boValido = false;
-                var_dump($rowAluno['cor']);
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor do aluno está ausente!";
-                exit;
             } else if (!in_array($rowAluno['cor'], \Db\Enum\CorRaca::COR_RACA)) {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor da escola está inválido!";
