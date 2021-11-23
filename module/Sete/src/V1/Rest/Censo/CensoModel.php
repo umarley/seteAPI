@@ -274,6 +274,7 @@ class CensoModel {
                 $arMessages[] = $rowOP['messages'];
             }
         }
+        var_dump($arOperacaoResult);
         return ['result' => $boOperacao, 'messages' => $arMessages];
     }
 
@@ -312,23 +313,29 @@ class CensoModel {
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
                 $arOperacaoResult[$key] = $this->_entityAlunos->_atualizar($arId, $row['alunoRow']);
-                $this->_entityEscolaTemAlunos->_inserir([
+                $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
                     'id_aluno' => $row['alunoBD']['id_aluno'],
                     'id_escola' => $idEscola,
                     'codigo_cidade' => $codigoCidade
                     ]);
+                echo "Atualização <br />";
+                    var_dump($arOPESTA);
                 //echo "Atualizar " . $row['alunoBD']['nome'] . "<br />";
             } else {
                 $row['alunoRow']['dt_criacao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['criado_por'] = $usuarioAutenticado;
                 $arOperacaoResult[$key] = $this->_entityAlunos->_inserir($row['alunoRow']);
+                $idNovoAluno = $this->_entityAlunos->getUltimoIdInserido();
+                var_dump($arOperacaoResult[$key]);
                 if($arOperacaoResult[$key]['result']){
                     $arOperacaoResult[$key]['messages']['id'] = $this->_entityAlunos->getUltimoIdInserido();
-                    $this->_entityEscolaTemAlunos->_inserir([
-                    'id_aluno' => $arOperacaoResult[$key]['messages']['id'],
+                    $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
+                    'id_aluno' => $idNovoAluno,
                     'id_escola' => $idEscola,
                     'codigo_cidade' => $codigoCidade
                     ]);
+                    echo "Inserção <br />";
+                    var_dump($arOPESTA);
                 }
                 
                 //echo "Inserir " . $row['alunoBD']['nome'] . "<br />";
