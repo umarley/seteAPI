@@ -326,6 +326,8 @@ class CensoModel {
                 $row['alunoRow']['criado_por'] = $usuarioAutenticado;
                 $arOperacaoResult[$key] = $this->_entityAlunos->_inserir($row['alunoRow']);
                 $idNovoAluno = $this->_entityAlunos->getUltimoIdInserido();
+                echo "ID Aluno <br /> " ;
+                var_dump($idNovoAluno);
                 var_dump($arOperacaoResult[$key]);
                 if($arOperacaoResult[$key]['result']){
                     $arOperacaoResult[$key]['messages']['id'] = $this->_entityAlunos->getUltimoIdInserido();
