@@ -305,7 +305,7 @@ class CensoModel {
             
 
             
-           if (sizeof($row['alunoBD']) > 0) {
+           if (sizeof($row['alunoBD']) > 2) {
                 $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade']; 
                 $arIdsDeletarRelacaoEscolaAluno['id_aluno'] = $row['alunoBD']['id_aluno'];
                 $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
