@@ -355,7 +355,7 @@ class CensoModel {
                 
                 //echo "Inserir " . $row['alunoBD']['nome'] . "<br />";
             }
-        }
+      //  }
         foreach ($arOperacaoResult as $rowOP) {
             if (!$rowOP['result']) {
                 $boOperacao = false;
