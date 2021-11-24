@@ -313,6 +313,10 @@ class CensoModel {
                 $row['alunoRow']['alterado_por'] = $usuarioAutenticado;
                 echo "<pre />";
                 var_dump($row['alunoBD']);
+                
+                echo "<pre />";
+                var_dump(count($row['alunoBD']));
+                
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
                 $idsAlunosJaExiste = $this->_entityAlunos->alunoExisteById($arId);
