@@ -311,6 +311,7 @@ class CensoModel {
                 $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
                 $row['alunoRow']['dt_alteracao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['alterado_por'] = $usuarioAutenticado;
+                echo "<pre />";
                 var_dump($row['alunoBD']);
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
