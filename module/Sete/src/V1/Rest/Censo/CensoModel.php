@@ -175,8 +175,8 @@ class CensoModel {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo ensino_pre_escola da escola está inválido!";
             }
-            
-            
+
+
             if (!isset($rowAluno['cor']) || $rowAluno['cor'] === "") {
                 $boValido = false;
                 $arErros[$key][] = "Registro na Posição {$key} com campo cor do aluno está ausente!";
@@ -250,7 +250,7 @@ class CensoModel {
                 $rowEscola['dt_alteracao'] = date("Y-m-d H:i:s");
                 $arOperacaoResult[$key] = $dbSeteEscolas->_atualizar($arIds, $rowEscola);
             } else {
-                $rowEscola['codigo_cidade']  = $codigoCidade;
+                $rowEscola['codigo_cidade'] = $codigoCidade;
                 $rowEscola['mec_in_regular'] = isset($rowEscola['mec_in_regular']) ? $rowEscola['mec_in_regular'] : 'N';
                 $rowEscola['mec_in_eja'] = isset($rowEscola['mec_in_eja']) ? $arPost['mec_in_eja'] : 'N';
                 $rowEscola['mec_in_profissionalizante'] = isset($rowEscola['mec_in_profissionalizante']) ? $rowEscola['mec_in_profissionalizante'] : 'N';
@@ -291,63 +291,63 @@ class CensoModel {
         }
 
         foreach ($arDadosAlunos as $key => $row) {
-            
-            $row['alunoRow']['da_porteira'] = isset($row['alunoRow']['da_porteira']) ? $row['alunoRow']['da_porteira'] : 'N';
-            $row['alunoRow']['da_mataburro'] = isset($row['alunoRow']['da_mataburro']) ? $row['alunoRow']['da_mataburro'] : 'N';
-            $row['alunoRow']['da_colchete'] = isset($row['alunoRow']['da_colchete']) ? $row['alunoRow']['da_colchete'] : 'N';
-            $row['alunoRow']['da_atoleiro'] = isset($row['alunoRow']['da_atoleiro']) ? $row['alunoRow']['da_atoleiro'] : 'N';
-            $row['alunoRow']['da_ponterustica'] = isset($row['alunoRow']['da_ponterustica']) ? $row['alunoRow']['da_ponterustica'] : 'N';
+
             $row['alunoRow']['codigo_cidade'] = $codigoCidade;
-            
+
             $codigoMecEscola = $row['alunoRow']['id_escola'];
             unset($row['alunoRow']['id_escola']);
             $idEscola = $this->_entityEscolas->getIdEscolaByCodigoMecAndCodigoCidade($codigoMecEscola, $codigoCidade);
-            
 
-            
-           if (sizeof($row['alunoBD']) > 2) {
-                $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade']; 
+
+
+            if (sizeof($row['alunoBD']) > 2) {
+                $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade'];
                 $arIdsDeletarRelacaoEscolaAluno['id_aluno'] = $row['alunoBD']['id_aluno'];
                 $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
                 $row['alunoRow']['dt_alteracao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['alterado_por'] = $usuarioAutenticado;
-                
+
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
-                /*$idsAlunosJaExiste = $this->_entityAlunos->alunoExisteById($arId);
-                //se os ids já existir na base de dados, o sistema exclui o registro e insere um novo na nova cidade
-                if($idsAlunosJaExiste){
-                    $this->_entityAlunos->_delete($arId);
-                    $this->_entityAlunos->_inserir($row['alunoRow']);
-                    $idAluno = $this->_entityAlunos->getUltimoIdInserido();
-                }else{*/
-                    $idAluno = $row['alunoBD']['id_aluno'];
-                    $arOperacaoResult[$key] = $this->_entityAlunos->_atualizar($arId, $row['alunoRow']);
+                /* $idsAlunosJaExiste = $this->_entityAlunos->alunoExisteById($arId);
+                  //se os ids já existir na base de dados, o sistema exclui o registro e insere um novo na nova cidade
+                  if($idsAlunosJaExiste){
+                  $this->_entityAlunos->_delete($arId);
+                  $this->_entityAlunos->_inserir($row['alunoRow']);
+                  $idAluno = $this->_entityAlunos->getUltimoIdInserido();
+                  }else{ */
+                $idAluno = $row['alunoBD']['id_aluno'];
+                $arOperacaoResult[$key] = $this->_entityAlunos->_atualizar($arId, $row['alunoRow']);
                 //}
                 $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
                     'id_aluno' => $idAluno,
                     'id_escola' => $idEscola,
                     'codigo_cidade' => $codigoCidade
-                    ]);
+                ]);
                 //echo "Atualização <br />";
-                   // var_dump($arOPESTA);
+                // var_dump($arOPESTA);
                 //echo "Atualizar " . $row['alunoBD']['nome'] . "<br />";
             } else {
+                $row['alunoRow']['da_porteira'] = isset($row['alunoRow']['da_porteira']) ? $row['alunoRow']['da_porteira'] : 'N';
+                $row['alunoRow']['da_mataburro'] = isset($row['alunoRow']['da_mataburro']) ? $row['alunoRow']['da_mataburro'] : 'N';
+                $row['alunoRow']['da_colchete'] = isset($row['alunoRow']['da_colchete']) ? $row['alunoRow']['da_colchete'] : 'N';
+                $row['alunoRow']['da_atoleiro'] = isset($row['alunoRow']['da_atoleiro']) ? $row['alunoRow']['da_atoleiro'] : 'N';
+                $row['alunoRow']['da_ponterustica'] = isset($row['alunoRow']['da_ponterustica']) ? $row['alunoRow']['da_ponterustica'] : 'N';
                 $row['alunoRow']['dt_criacao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['criado_por'] = $usuarioAutenticado;
                 $arOperacaoResult[$key] = $this->_entityAlunos->_inserir($row['alunoRow']);
                 $idNovoAluno = $this->_entityAlunos->getUltimoIdInserido();
-                if($arOperacaoResult[$key]['result']){
+                if ($arOperacaoResult[$key]['result']) {
                     $arOperacaoResult[$key]['messages']['id'] = $this->_entityAlunos->getUltimoIdInserido();
                     $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
-                    'id_aluno' => $idNovoAluno,
-                    'id_escola' => $idEscola,
-                    'codigo_cidade' => $codigoCidade
+                        'id_aluno' => $idNovoAluno,
+                        'id_escola' => $idEscola,
+                        'codigo_cidade' => $codigoCidade
                     ]);
-                   // echo "Inserção <br />";
-                   // var_dump($arOPESTA);
+                    // echo "Inserção <br />";
+                    // var_dump($arOPESTA);
                 }
-                
+
                 //echo "Inserir " . $row['alunoBD']['nome'] . "<br />";
             }
         }
@@ -372,7 +372,7 @@ class CensoModel {
 
     private function checarAlunoSemCPF($arAluno) {
         $chaveComparacao = str_replace(" ", "-", trim($arAluno['nome'])) . "-" . $this->formataDataNascimentoSQL($arAluno['data_nascimento']);
-        $alunoExiste = $this->_entityAlunos->alunoExistePorChaveComposta($chaveComparacao);        
+        $alunoExiste = $this->_entityAlunos->alunoExistePorChaveComposta($chaveComparacao);
         if ($alunoExiste) {
             $arDadosAlunoBD = $this->_entityAlunos->getAlunoPorChave($chaveComparacao);
         } else {
