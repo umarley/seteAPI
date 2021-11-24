@@ -311,24 +311,19 @@ class CensoModel {
                 $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
                 $row['alunoRow']['dt_alteracao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['alterado_por'] = $usuarioAutenticado;
-                echo "<pre />";
-                var_dump($row['alunoBD']);
-                
-                echo "<pre />";
-                var_dump(sizeof($row['alunoBD']));
                 
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
-                $idsAlunosJaExiste = $this->_entityAlunos->alunoExisteById($arId);
+                /*$idsAlunosJaExiste = $this->_entityAlunos->alunoExisteById($arId);
                 //se os ids já existir na base de dados, o sistema exclui o registro e insere um novo na nova cidade
                 if($idsAlunosJaExiste){
                     $this->_entityAlunos->_delete($arId);
                     $this->_entityAlunos->_inserir($row['alunoRow']);
                     $idAluno = $this->_entityAlunos->getUltimoIdInserido();
-                }else{
+                }else{*/
                     $idAluno = $row['alunoBD']['id_aluno'];
                     $arOperacaoResult[$key] = $this->_entityAlunos->_atualizar($arId, $row['alunoRow']);
-                }
+                //}
                 $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
                     'id_aluno' => $idAluno,
                     'id_escola' => $idEscola,
