@@ -305,7 +305,7 @@ class CensoModel {
             
 
             
-           /*if (!isset($row['alunoBD']['codigo_cidade'])) {
+           if (sizeof($row['alunoBD']) > 0) {
                 $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade']; 
                 $arIdsDeletarRelacaoEscolaAluno['id_aluno'] = $row['alunoBD']['id_aluno'];
                 $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
@@ -315,7 +315,7 @@ class CensoModel {
                 var_dump($row['alunoBD']);
                 
                 echo "<pre />";
-                var_dump(count($row['alunoBD']));
+                var_dump(sizeof($row['alunoBD']));
                 
                 $arId['codigo_cidade'] = $row['alunoBD']['codigo_cidade'];
                 $arId['id_aluno'] = $row['alunoBD']['id_aluno'];
@@ -337,7 +337,7 @@ class CensoModel {
                 //echo "Atualização <br />";
                    // var_dump($arOPESTA);
                 //echo "Atualizar " . $row['alunoBD']['nome'] . "<br />";
-            } else {*/
+            } else {
                 $row['alunoRow']['dt_criacao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['criado_por'] = $usuarioAutenticado;
                 $arOperacaoResult[$key] = $this->_entityAlunos->_inserir($row['alunoRow']);
@@ -355,7 +355,7 @@ class CensoModel {
                 
                 //echo "Inserir " . $row['alunoBD']['nome'] . "<br />";
             }
-      //  }
+        }
         foreach ($arOperacaoResult as $rowOP) {
             if (!$rowOP['result']) {
                 $boOperacao = false;
