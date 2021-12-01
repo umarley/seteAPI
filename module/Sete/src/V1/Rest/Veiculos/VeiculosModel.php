@@ -95,7 +95,7 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
-        if (!isset($arPost['modo']) || $arPost['modo'] == "") {
+        if (!isset($arPost['modo'])) {
             $boValidate = false;
             $arErros['modo'] = "O modo do veiculo deve ser informado!";
         }
