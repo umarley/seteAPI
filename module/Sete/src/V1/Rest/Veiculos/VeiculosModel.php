@@ -136,6 +136,12 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['tipo'] = "O valor do objeto tipo está inválido. Verifique e tente novamente!";
         }
+        
+        if (isset($arPost['tipo_combustivel']) && !in_array($arPost['tipo_combustivel'], \Db\Enum\TipoCombustivel::TIPO_COMBUSTIVEL)) {
+            $boValidate = false;
+            $arErros['modo'] = "O valor do objeto tipo_combustivel está inválido. Verifique e tente novamente!";
+        }
+
 
         
         return ['result' => $boValidate, 'messages' => $arErros];
