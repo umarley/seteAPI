@@ -81,10 +81,10 @@ class VeiculosModel {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já está cadastrada. Verifique e tente novamente!";
             }
-            if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
+            /*if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é invalida. Verifique e tente novamente!";
-            }
+            }*/
         }
         if (!isset($arPost['marca']) || empty($arPost['marca'])) {
             $boValidate = false;
