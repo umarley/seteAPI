@@ -18,17 +18,17 @@ class MonitoresModel {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row) {
-            if (!empty($row['data_validade_cnh'])) {
-                $arRow['data_validade_cnh'] = date("d/m/Y", strtotime($arRow['data_validade_cnh']));
+            if (!empty($row['data_nascimento'])) {
+                $row['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
             }
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("monitores/{$codigoMunicipio}/{$row['cpf']}");
         }
         return $arDados;
     }
 
-    public function getById($codigoCidade, $cpfMotorista) {
+    public function getById($codigoCidade, $cpfMonitor) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['cpf_motorista'] = $cpfMotorista;
+        $arIds['cpf_monitor'] = $cpfMonitor;
         $arRow = $this->_entity->getById($arIds);
         if (!empty($arRow)) {
             $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
@@ -38,11 +38,14 @@ class MonitoresModel {
         return $arRow;
     }
 
-    public function prepareInsert($arPost) {
+    public function prepareInsert($arPost, $accessToken) {
+        $dbAccessToken = new \Db\Core\AccessToken();
         $arPost = (Array) $arPost;
         $arPost['turno_manha'] = isset($arPost['turno_manha']) ? $arPost['turno_manha'] : 'N';
         $arPost['turno_tarde'] = isset($arPost['turno_tarde']) ? $arPost['turno_tarde'] : 'N';
         $arPost['turno_noite'] = isset($arPost['turno_noite']) ? $arPost['turno_noite'] : 'N';
+        $arPost['dt_criacao']  = date("Y-m-d H:i:s");
+        $arPost['criado_por']  = $dbAccessToken->getEmailUsuarioSETEByAccessToken($accessToken);
         $arResult = $this->_entity->_inserir($arPost);
         if ($arResult['result']) {
             unset($arResult['messages']['id']);
@@ -76,15 +79,18 @@ class MonitoresModel {
         }
         if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
             $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbMotorista = new \Db\SetePG\SeteMotoristas();
+            $dbMonitor = new \Db\SetePG\SeteMonitores();
             if (!$cpfValido) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado é inválido!";
             }
-            if ($dbMotorista->motoristaExiste($arPost['cpf'])) {
+            if ($dbMonitor->monitorExiste($arPost['cpf'])) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado já existe!";
             }
+        } else {
+            $boValidate = false;
+            $arErros['cpf'] = "O cpf é obrigatório!";
         }
         if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
             $boValidate = false;
@@ -97,18 +103,18 @@ class MonitoresModel {
         }
         if (!isset($arPost['vinculo']) || empty($arPost['vinculo'])) {
             $boValidate = false;
-            $arErros['cnh'] = "O vínculo do monitor com a administração pública deve ser informado!";
+            $arErros['vinculo'] = "O vínculo do monitor com a administração pública deve ser informado!";
         }
-        /*if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
-            $boValidate = false;
-            $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
-        } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
-                $boValidate = false;
-                $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
-            }
-        }*/
-        if (!isset($arPost['turno_manha']) && !isset($arPost['turno_tarde']) && !isset($arPost['turno_noite'])){
+        /* if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
+          $boValidate = false;
+          $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
+          } else {
+          if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
+          $boValidate = false;
+          $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
+          }
+          } */
+        if (!isset($arPost['turno_manha']) && !isset($arPost['turno_tarde']) && !isset($arPost['turno_noite'])) {
             $boValidate = false;
             $arErros['turno'] = "Informe ao menos um turno de trabalho para o motorista.";
         }

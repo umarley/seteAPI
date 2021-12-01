@@ -19,7 +19,7 @@ class SeteMonitores extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cpf = '{$arIds['cpf_motorista']}'");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cpf = '{$arIds['cpf_monitor']}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -28,7 +28,7 @@ class SeteMonitores extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'cnh', 'data_validade_cnh', 'turno_manha', 'turno_tarde', 'turno_noite'])
+                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'data_nascimento', 'turno_manha', 'turno_tarde', 'turno_noite'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -49,14 +49,14 @@ class SeteMonitores extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function motoristaExiste($cpf, $idMotorista = null) {
+    public function monitorExiste($cpf, $idMonitor = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
         $sqlBuild = $sql->buildSqlString($select);
-        if($idMotorista != ""){
-           $sqlBuild .= " AND id_motorista <> {$idMotorista}";
+        if($idMonitor != ""){
+           $sqlBuild .= " AND id_motorista <> {$idMonitor}";
         }
         $statement = $this->AdapterBD->createStatement($sqlBuild);
         $statement->prepare();
