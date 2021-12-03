@@ -216,6 +216,7 @@ class VeiculosResource extends API
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
+    
     private function processarUpdateVeiculo($data) {
         $modelVeiculos = new VeiculosModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
