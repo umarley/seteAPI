@@ -155,10 +155,10 @@ class VeiculosModel {
         if (isset($arPost['placa']) && !empty($arPost['placa'])) {
             $placaValida = \Application\Utils\Utils::validarPlaca($arPost['placa']);
             $dbVeiculo = new \Db\SetePG\SeteVeiculos();
-            if (!$placaValida) {
+            /*if (!$placaValida) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é inválida!";
-            }
+            }*/
             if ($dbVeiculo->veiculoExisteUnico($arPost['placa'], $codigoCidade , $idVeiculo)) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já existe!";

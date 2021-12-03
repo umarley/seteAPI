@@ -221,7 +221,7 @@ class VeiculosResource extends API
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idVeiculo = $arParams['veiculos_id'];
-        $boValidate = $modelVeiculos->validarUpdatePUT($data, $idVeiculo);
+        $boValidate = $modelVeiculos->validarUpdate($data, $idVeiculo);
         if (empty($codigoCidade) || $idVeiculo == "") {
             $this->populaResposta(400, ['result' => false, 'messages' => "O ID veiculo e código da cidade devem ser informados!"], false);
         } else if ($boValidate['result']) {
