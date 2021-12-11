@@ -18,6 +18,7 @@ return [
             \Sete\V1\Rest\Fornecedores\FornecedoresResource::class => \Sete\V1\Rest\Fornecedores\FornecedoresResourceFactory::class,
             \Sete\V1\Rest\Censo\CensoResource::class => \Sete\V1\Rest\Censo\CensoResourceFactory::class,
             \Sete\V1\Rest\Monitores\MonitoresResource::class => \Sete\V1\Rest\Monitores\MonitoresResourceFactory::class,
+            \Sete\V1\Rest\Shapes\ShapesResource::class => \Sete\V1\Rest\Shapes\ShapesResourceFactory::class,
         ],
     ],
     'router' => [
@@ -166,6 +167,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.shapes' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/shapes[/:shapes_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Shapes\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -186,6 +196,7 @@ return [
             13 => 'sete.rest.fornecedores',
             14 => 'sete.rest.censo',
             15 => 'sete.rest.monitores',
+            16 => 'sete.rest.shapes',
         ],
     ],
     'api-tools-rest' => [
@@ -547,6 +558,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Monitores\MonitoresCollection::class,
             'service_name' => 'Monitores',
         ],
+        'Sete\\V1\\Rest\\Shapes\\Controller' => [
+            'listener' => \Sete\V1\Rest\Shapes\ShapesResource::class,
+            'route_name' => 'sete.rest.shapes',
+            'route_identifier_name' => 'shapes_id',
+            'collection_name' => 'shapes',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Shapes\ShapesEntity::class,
+            'collection_class' => \Sete\V1\Rest\Shapes\ShapesCollection::class,
+            'service_name' => 'Shapes',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -566,6 +600,7 @@ return [
             'Sete\\V1\\Rest\\Fornecedores\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Censo\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Monitores\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Shapes\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -649,6 +684,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Shapes\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -713,6 +753,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Monitores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Shapes\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -910,6 +954,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.monitores',
                 'route_identifier_name' => 'monitores_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Shapes\ShapesEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.shapes',
+                'route_identifier_name' => 'shapes_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Shapes\ShapesCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.shapes',
+                'route_identifier_name' => 'shapes_id',
                 'is_collection' => true,
             ],
         ],
