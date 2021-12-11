@@ -250,8 +250,11 @@ class CensoModel {
                 $rowEscola['dt_alteracao'] = date("Y-m-d H:i:s");
                 var_dump($arIds);
                 var_dump($rowEscola);
-                exit;
+                
                 $arOperacaoResult[$key] = $dbSeteEscolas->_atualizar($arIds, $rowEscola);
+                echo "linha 255 CensoModel.php";
+                var_dump($arOperacaoResult[$key]);
+                exit;
             } else {
                 $rowEscola['codigo_cidade'] = $codigoCidade;
                 $rowEscola['mec_in_regular'] = isset($rowEscola['mec_in_regular']) ? $rowEscola['mec_in_regular'] : 'N';
