@@ -265,6 +265,8 @@ class CensoModel {
                 $rowEscola['criado_por'] = $usuarioAutenticado;
                 $rowEscola['dt_criacao'] = date("Y-m-d H:i:s");
                 $arOperacaoResult[$key] = $dbSeteEscolas->_inserir($rowEscola);
+                
+                var_dump($arOperacaoResult[$key]);
             }
         }
 
