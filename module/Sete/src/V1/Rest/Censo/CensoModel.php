@@ -312,7 +312,7 @@ class CensoModel {
                   }else{ */
                 $row['alunoRow']['id_escola'] = $idEscola;
                 $idAluno = $row['alunoBD']['id_aluno'];
-                
+                var_dump($idEscola);
                 var_dump($arId);
                 var_dump($row['alunoRow']);
                 exit;
