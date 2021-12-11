@@ -161,7 +161,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_aluno' => $arId['id_aluno']]);
         $sql = $this->sql->buildSqlString($update);
         
-        echo $sql . "<br />";
+        //echo $sql . "<br />";
         
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

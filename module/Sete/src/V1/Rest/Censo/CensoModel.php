@@ -252,7 +252,7 @@ class CensoModel {
             } else {
                 $rowEscola['codigo_cidade'] = $codigoCidade;
                 $rowEscola['mec_in_regular'] = isset($rowEscola['mec_in_regular']) ? $rowEscola['mec_in_regular'] : 'N';
-                $rowEscola['mec_in_eja'] = isset($rowEscola['mec_in_eja']) ? $arPost['mec_in_eja'] : 'N';
+                $rowEscola['mec_in_eja'] = isset($rowEscola['mec_in_eja']) ? $rowEscola['mec_in_eja'] : 'N';
                 $rowEscola['mec_in_profissionalizante'] = isset($rowEscola['mec_in_profissionalizante']) ? $rowEscola['mec_in_profissionalizante'] : 'N';
                 $rowEscola['mec_in_especial_exclusiva'] = isset($rowEscola['mec_in_especial_exclusiva']) ? $rowEscola['mec_in_especial_exclusiva'] : 'N';
                 $rowEscola['horario_matutino'] = isset($rowEscola['horario_matutino']) ? $rowEscola['horario_matutino'] : 'N';
@@ -291,15 +291,9 @@ class CensoModel {
         }
 
         foreach ($arDadosAlunos as $key => $row) {
-
             $row['alunoRow']['codigo_cidade'] = $codigoCidade;
-
             $codigoMecEscola = $row['alunoRow']['id_escola'];
-            unset($row['alunoRow']['id_escola']);
             $idEscola = $this->_entityEscolas->getIdEscolaByCodigoMecAndCodigoCidade($codigoMecEscola, $codigoCidade);
-
-
-
             if (sizeof($row['alunoBD']) > 2) {
                 $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade'];
                 $arIdsDeletarRelacaoEscolaAluno['id_aluno'] = $row['alunoBD']['id_aluno'];
@@ -316,14 +310,16 @@ class CensoModel {
                   $this->_entityAlunos->_inserir($row['alunoRow']);
                   $idAluno = $this->_entityAlunos->getUltimoIdInserido();
                   }else{ */
+                $row['alunoRow']['id_escola'] = $idEscola;
                 $idAluno = $row['alunoBD']['id_aluno'];
                 $arOperacaoResult[$key] = $this->_entityAlunos->_atualizar($arId, $row['alunoRow']);
                 //}
-                $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
+                $arDadosEscolaTemAluno = [
                     'id_aluno' => $idAluno,
                     'id_escola' => $idEscola,
                     'codigo_cidade' => $codigoCidade
-                ]);
+                ];
+                $arOPESTA = $this->_entityEscolaTemAlunos->_inserir($arDadosEscolaTemAluno);
                 //echo "Atualização <br />";
                 // var_dump($arOPESTA);
                 //echo "Atualizar " . $row['alunoBD']['nome'] . "<br />";
@@ -339,11 +335,12 @@ class CensoModel {
                 $idNovoAluno = $this->_entityAlunos->getUltimoIdInserido();
                 if ($arOperacaoResult[$key]['result']) {
                     $arOperacaoResult[$key]['messages']['id'] = $this->_entityAlunos->getUltimoIdInserido();
-                    $arOPESTA = $this->_entityEscolaTemAlunos->_inserir([
+                    $arDadosEscolaTemAluno = [
                         'id_aluno' => $idNovoAluno,
                         'id_escola' => $idEscola,
                         'codigo_cidade' => $codigoCidade
-                    ]);
+                    ];
+                    $arOPESTA = $this->_entityEscolaTemAlunos->_inserir($arDadosEscolaTemAluno);
                     // echo "Inserção <br />";
                     // var_dump($arOPESTA);
                 }

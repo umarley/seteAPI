@@ -22,6 +22,9 @@ class CensoResource extends API
     
     private function processarRequisicaoPOST($codigoCidade, $arData){
         $modelCenso = new \Sete\V1\Rest\Censo\CensoModel();
+        if(!isset($arData->escolas) || !isset($arData->alunos)){
+            $this->populaResposta(400, ['result' => false, 'messages' => "Objeto escolas ou alunos ausentes!"], false);
+        }
         $escolasValida = $modelCenso->validarEscolas($codigoCidade, $arData->escolas);
         if($escolasValida['result']){
             $alunosValido = $modelCenso->validarAlunos($arData->alunos);
