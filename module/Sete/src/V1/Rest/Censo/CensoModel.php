@@ -248,6 +248,9 @@ class CensoModel {
                 $arIds['id_escola'] = $arEscolaBD['id_escola'];
                 $rowEscola['alterado_por'] = $usuarioAutenticado;
                 $rowEscola['dt_alteracao'] = date("Y-m-d H:i:s");
+                var_dump($arIds);
+                var_dump($rowEscola);
+                exit;
                 $arOperacaoResult[$key] = $dbSeteEscolas->_atualizar($arIds, $rowEscola);
             } else {
                 $rowEscola['codigo_cidade'] = $codigoCidade;
