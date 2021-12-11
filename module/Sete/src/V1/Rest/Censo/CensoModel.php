@@ -238,10 +238,8 @@ class CensoModel {
         $arOperacaoResult = [];
         $arMessages = [];
         $boOperacao = true;
-        var_dump($arEscolas);
-        exit;
         foreach ($arEscolas as $key => $rowEscola) {
-            $arIds['codigo_cidade'] = $rowEscola['mec_co_municipio'];
+            $arIds['codigo_cidade'] = $codigoCidade;
             $arIds['mec_co_entidade'] = $rowEscola['mec_co_entidade'];
             $escolaExisteNoBD = $dbSeteEscolas->escolaExisteByCodigoMEC($arIds['codigo_cidade'], $arIds['mec_co_entidade']);
             unset($rowEscola['id_escola']);
