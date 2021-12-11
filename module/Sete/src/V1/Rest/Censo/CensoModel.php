@@ -264,6 +264,9 @@ class CensoModel {
                 $rowEscola['ensino_pre_escola'] = isset($rowEscola['ensino_pre_escola']) ? $rowEscola['ensino_pre_escola'] : 'N';
                 $rowEscola['criado_por'] = $usuarioAutenticado;
                 $rowEscola['dt_criacao'] = date("Y-m-d H:i:s");
+                
+                var_dump($rowEscola);
+                exit;
                 $arOperacaoResult[$key] = $dbSeteEscolas->_inserir($rowEscola);
             }
         }
