@@ -297,7 +297,7 @@ class CensoModel {
             if (sizeof($row['alunoBD']) > 2) {
                 $arIdsDeletarRelacaoEscolaAluno['codigo_cidade'] = $row['alunoRow']['codigo_cidade'];
                 $arIdsDeletarRelacaoEscolaAluno['id_aluno'] = $row['alunoBD']['id_aluno'];
-                $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
+               // $this->_entityEscolaTemAlunos->_deleteAssociacaoAluno($arIdsDeletarRelacaoEscolaAluno);
                 $row['alunoRow']['dt_alteracao'] = date("Y-m-d H:i:s");
                 $row['alunoRow']['alterado_por'] = $usuarioAutenticado;
 
