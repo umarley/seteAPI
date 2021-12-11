@@ -49,7 +49,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("mec_co_entidade = '{$codigoEntidadeMec}' AND codigo_cidade = '{$codigoCidade}'");
-                echo $sql;
+                echo $sql->buildSqlString($select);
                 exit;
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
