@@ -265,8 +265,6 @@ class CensoModel {
                 $rowEscola['criado_por'] = $usuarioAutenticado;
                 $rowEscola['dt_criacao'] = date("Y-m-d H:i:s");
                 $arOperacaoResult[$key] = $dbSeteEscolas->_inserir($rowEscola);
-                
-                var_dump($arOperacaoResult[$key]);
             }
         }
 
@@ -321,6 +319,8 @@ class CensoModel {
                     'id_escola' => $idEscola,
                     'codigo_cidade' => $codigoCidade
                 ];
+                var_dump($arDadosEscolaTemAluno);
+                exit;
                 $arOPESTA = $this->_entityEscolaTemAlunos->_inserir($arDadosEscolaTemAluno);
                 //echo "Atualização <br />";
                 // var_dump($arOPESTA);
