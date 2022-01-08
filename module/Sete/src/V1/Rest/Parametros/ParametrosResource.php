@@ -1,17 +1,11 @@
 <?php
-namespace Sete\V1\Rest\Municipios;
+namespace Sete\V1\Rest\Parametros;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
-use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Sete\V1\API;
 
-class MunicipiosResource extends \Sete\V1\API
+class ParametrosResource extends API
 {
-    
-    public function __construct() {
-        parent::__construct();
-        $this->_model = new MunicipiosModel();
-    }
-    
     /**
      * Create a resource
      *
@@ -20,8 +14,22 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function create($data)
     {
-        $this->usuarioPodeGravar();
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $parametroId  = $arParams['parametros_id'];
+        if((!isset($codigoCidade) || empty($codigoCidade)) && (!isset($parametroId) || empty($parametroId))){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro codigo_cidade e/ou codigo_parametro obrigatório!'], false);
+        }else if(!isset($data->valor) || empty($data->valor)){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro valor obrigatório!'], false);
+        }else {
+            $this->processarRequisicaoPOST($codigoCidade, $parametroId, $data->valor);
+        }
+    }
+    
+    private function processarRequisicaoPOST($codigoCidade, $codigoParametro, $valorParametro){
+        $modelParametro = new ParametrosModel();
+        $arResult = $modelParametro->gravarValorParametro($codigoCidade, $codigoParametro, $valorParametro);
+        $this->populaResposta(201, $arResult, false);
     }
 
     /**
@@ -32,7 +40,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function delete($id)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -55,7 +62,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetch($id)
     {
-        return $this->_model->getById($id);
+        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
     /**
@@ -66,20 +73,23 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetchAll($params = [])
     {
-        $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'mapa';
-        switch ($tipo){
-            case 'mapa':
-                $this->populaResposta(200, $this->_model->getAll());
-                break;
-            case 'lista':
-                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
-                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
-                $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
-                break;
-            case 'excel':
-                $this->populaResposta(200, $this->_model->processarExcel(), false);
-                break;
+        $arParams = $this->event->getRouteMatch()->getParams();
+        if(!isset($arParams['codigo_cidade'])){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro codigo_cidade obrigatório!'], false);
+        }else{
+            $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($arParams['codigo_cidade']);
+            if($usuarioPodeAcessarMunicipio){
+                $this->processarRequisicaoGETALL($arParams['codigo_cidade']);
+            }else{
+                $this->populaResposta(403, ['result' => false, 'messages' => "Usuário não tem permissão pra acessar o municipio selecionado."]);
+            }
         }
+    }
+    
+    private function processarRequisicaoGETALL($codigoCidade){
+        $modelParametros = new ParametrosModel();
+        $arResult = $modelParametros->getAll($codigoCidade);
+        $this->populaResposta(200, $arResult);
     }
 
     /**
@@ -125,7 +135,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function update($id, $data)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }

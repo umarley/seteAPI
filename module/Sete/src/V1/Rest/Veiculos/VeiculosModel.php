@@ -81,10 +81,10 @@ class VeiculosModel {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já está cadastrada. Verifique e tente novamente!";
             }
-            if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
+            /*if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é invalida. Verifique e tente novamente!";
-            }
+            }*/
         }
         if (!isset($arPost['marca']) || empty($arPost['marca'])) {
             $boValidate = false;
@@ -95,7 +95,7 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
-        if (!isset($arPost['modo']) || $arPost['modo'] == "") {
+        if (!isset($arPost['modo'])) {
             $boValidate = false;
             $arErros['modo'] = "O modo do veiculo deve ser informado!";
         }
@@ -136,6 +136,12 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['tipo'] = "O valor do objeto tipo está inválido. Verifique e tente novamente!";
         }
+        
+        if (isset($arPost['tipo_combustivel']) && !in_array($arPost['tipo_combustivel'], \Db\Enum\TipoCombustivel::TIPO_COMBUSTIVEL)) {
+            $boValidate = false;
+            $arErros['modo'] = "O valor do objeto tipo_combustivel está inválido. Verifique e tente novamente!";
+        }
+
 
         
         return ['result' => $boValidate, 'messages' => $arErros];
@@ -149,10 +155,10 @@ class VeiculosModel {
         if (isset($arPost['placa']) && !empty($arPost['placa'])) {
             $placaValida = \Application\Utils\Utils::validarPlaca($arPost['placa']);
             $dbVeiculo = new \Db\SetePG\SeteVeiculos();
-            if (!$placaValida) {
+            /*if (!$placaValida) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é inválida!";
-            }
+            }*/
             if ($dbVeiculo->veiculoExisteUnico($arPost['placa'], $codigoCidade , $idVeiculo)) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já existe!";

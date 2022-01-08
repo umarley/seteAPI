@@ -16,6 +16,7 @@ class VeiculosResource extends API
      */
     public function create($data)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -49,6 +50,7 @@ class VeiculosResource extends API
      * @return ApiProblem|mixed
      */
     public function delete($id) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idVeiculo= $arParams['veiculos_id'];
@@ -117,7 +119,7 @@ class VeiculosResource extends API
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         if (!isset($codigoCidade) || empty($codigoCidade)) {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro codigo_cidade deve ser informado!"], false);
-        } else if(in_array($codigoCidade, ['marcas', 'tipo'])){
+        } else if(in_array($codigoCidade, ['marcas', 'tipo', 'modelos'])){
             $this->processarVariacaoRotaVeiculo($codigoCidade);
         } else if (!$dbGlbMunicipios->municipioExiste($codigoCidade)) {
             $this->populaResposta(404, ['result' => false, 'messages' => "O municipio informado não existe!"], false);
@@ -136,6 +138,9 @@ class VeiculosResource extends API
             case 'tipo':
                 $this->getTipoVeiculos();
                 break;
+            case 'modelos':
+                $this->getModelosVeiculos();
+                break;
         }
     }
     
@@ -147,6 +152,12 @@ class VeiculosResource extends API
     private function getMarcasVeiculos(){
         $dbSetePGGlbMarcaVeiculos = new \Db\SetePG\GlbMarcasVeiculos();
         $arMarcas = $dbSetePGGlbMarcaVeiculos->getLista();
+        $this->populaResposta(200, $arMarcas);
+    }
+    
+    private function getModelosVeiculos(){
+        $dbSetePGGlbModelosVeiculos = new \Db\SetePG\GlbModelosVeiculos();
+        $arMarcas = $dbSetePGGlbModelosVeiculos->getLista();
         $this->populaResposta(200, $arMarcas);
     }
     
@@ -202,6 +213,7 @@ class VeiculosResource extends API
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);
@@ -215,12 +227,13 @@ class VeiculosResource extends API
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
+    
     private function processarUpdateVeiculo($data) {
         $modelVeiculos = new VeiculosModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idVeiculo = $arParams['veiculos_id'];
-        $boValidate = $modelVeiculos->validarUpdatePUT($data, $idVeiculo);
+        $boValidate = $modelVeiculos->validarUpdate($data, $idVeiculo);
         if (empty($codigoCidade) || $idVeiculo == "") {
             $this->populaResposta(400, ['result' => false, 'messages' => "O ID veiculo e código da cidade devem ser informados!"], false);
         } else if ($boValidate['result']) {

@@ -100,5 +100,28 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
         }
         return ['result' => $boResultado, 'messages' => $message];
     }
+    
+    /**
+     * Método para excluir associação de escola através aluno
+     */
+    public function _deleteAssociacaoAluno($arIds) {
+        $this->sql = new Sql($this->AdapterBD);
+        $delete = $this->sql->delete($this->tableIdentifier);
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']}");
+        $sql = $this->sql->buildSqlString($delete);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $boResultado = true;
+            $message = "Registro excluido com sucesso!";
+        } catch (\PDOException $zAdapterEx) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zAdapterEx->getMessage();
+        } catch (\Laminas\Db\Adapter\Exception\InvalidQueryException $zendDbExc) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
+        }
+        return ['result' => $boResultado, 'messages' => $message];
+    }
+    
 
 }

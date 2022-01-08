@@ -1,17 +1,11 @@
 <?php
-namespace Sete\V1\Rest\Municipios;
+namespace Sete\V1\Rest\Shapes;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
-class MunicipiosResource extends \Sete\V1\API
+class ShapesResource extends AbstractResourceListener
 {
-    
-    public function __construct() {
-        parent::__construct();
-        $this->_model = new MunicipiosModel();
-    }
-    
     /**
      * Create a resource
      *
@@ -20,8 +14,13 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function create($data)
     {
-        $this->usuarioPodeGravar();
-        return new ApiProblem(405, 'The POST method has not been defined');
+       
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
+        $arId['codigo_cidade'] = $data->codigo_cidade;
+        $arId['id_rota'] = $data->id_rota;
+        $shape = (array) $data->shape;
+        $arOP = $dbSeteRotas->_atualizar($arId, ['shape' => json_encode($shape)]);
+        return $arOP;      
     }
 
     /**
@@ -32,7 +31,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function delete($id)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -55,7 +53,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetch($id)
     {
-        return $this->_model->getById($id);
+        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
     /**
@@ -66,20 +64,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetchAll($params = [])
     {
-        $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'mapa';
-        switch ($tipo){
-            case 'mapa':
-                $this->populaResposta(200, $this->_model->getAll());
-                break;
-            case 'lista':
-                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
-                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
-                $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
-                break;
-            case 'excel':
-                $this->populaResposta(200, $this->_model->processarExcel(), false);
-                break;
-        }
+        return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
     /**
@@ -125,7 +110,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function update($id, $data)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }

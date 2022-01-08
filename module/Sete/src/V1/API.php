@@ -2,6 +2,7 @@
 
 namespace Sete\V1;
 
+use Db\Enum\NivelAluno;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
@@ -42,6 +43,11 @@ class API extends AbstractResourceListener {
         return $this->accessToken;        
     }
     
+    protected function getBody(){
+        $data = file_get_contents("php://input");
+        return json_decode($data);
+    }
+    
     protected function usuarioPodeAcessarCidade($codigoCidade){
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);
@@ -49,6 +55,14 @@ class API extends AbstractResourceListener {
             return true;
         }else{
             return false;
+        }
+    }
+
+    protected function usuarioPodeGravar(){
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $nivelPermissao = $dbCoreAccessToken->getNivelByAccessToken($this->accessToken);
+        if(!in_array($nivelPermissao,["admin","editor"])){
+            $this->populaResposta(401,["result" => false, "messages"=>"Usuário não autorizado a realizar gravações no sistema!"],false);
         }
     }
     

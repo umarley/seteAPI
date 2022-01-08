@@ -16,6 +16,10 @@ return [
             \Sete\V1\Rest\Motoristas\MotoristasResource::class => \Sete\V1\Rest\Motoristas\MotoristasResourceFactory::class,
             \Sete\V1\Rest\OrdensServicos\OrdensServicosResource::class => \Sete\V1\Rest\OrdensServicos\OrdensServicosResourceFactory::class,
             \Sete\V1\Rest\Fornecedores\FornecedoresResource::class => \Sete\V1\Rest\Fornecedores\FornecedoresResourceFactory::class,
+            \Sete\V1\Rest\Censo\CensoResource::class => \Sete\V1\Rest\Censo\CensoResourceFactory::class,
+            \Sete\V1\Rest\Monitores\MonitoresResource::class => \Sete\V1\Rest\Monitores\MonitoresResourceFactory::class,
+            \Sete\V1\Rest\Shapes\ShapesResource::class => \Sete\V1\Rest\Shapes\ShapesResourceFactory::class,
+            \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -146,6 +150,42 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.censo' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/censo[/:codigo_cidade[/:censo_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Censo\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.monitores' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/monitores[/:codigo_cidade[/:monitores_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Monitores\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.shapes' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/shapes[/:shapes_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Shapes\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.parametros' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/parametros[/:codigo_cidade[/:parametros_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Parametros\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -164,6 +204,10 @@ return [
             11 => 'sete.rest.motoristas',
             12 => 'sete.rest.ordens-servicos',
             13 => 'sete.rest.fornecedores',
+            14 => 'sete.rest.censo',
+            15 => 'sete.rest.monitores',
+            16 => 'sete.rest.shapes',
+            17 => 'sete.rest.parametros',
         ],
     ],
     'api-tools-rest' => [
@@ -400,6 +444,7 @@ return [
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -478,6 +523,98 @@ return [
             'collection_class' => \Sete\V1\Rest\Fornecedores\FornecedoresCollection::class,
             'service_name' => 'Fornecedores',
         ],
+        'Sete\\V1\\Rest\\Censo\\Controller' => [
+            'listener' => \Sete\V1\Rest\Censo\CensoResource::class,
+            'route_name' => 'sete.rest.censo',
+            'route_identifier_name' => 'censo_id',
+            'collection_name' => 'censo',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Censo\CensoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Censo\CensoCollection::class,
+            'service_name' => 'Censo',
+        ],
+        'Sete\\V1\\Rest\\Monitores\\Controller' => [
+            'listener' => \Sete\V1\Rest\Monitores\MonitoresResource::class,
+            'route_name' => 'sete.rest.monitores',
+            'route_identifier_name' => 'monitores_id',
+            'collection_name' => 'monitores',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PUT',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Monitores\MonitoresEntity::class,
+            'collection_class' => \Sete\V1\Rest\Monitores\MonitoresCollection::class,
+            'service_name' => 'Monitores',
+        ],
+        'Sete\\V1\\Rest\\Shapes\\Controller' => [
+            'listener' => \Sete\V1\Rest\Shapes\ShapesResource::class,
+            'route_name' => 'sete.rest.shapes',
+            'route_identifier_name' => 'shapes_id',
+            'collection_name' => 'shapes',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Shapes\ShapesEntity::class,
+            'collection_class' => \Sete\V1\Rest\Shapes\ShapesCollection::class,
+            'service_name' => 'Shapes',
+        ],
+        'Sete\\V1\\Rest\\Parametros\\Controller' => [
+            'listener' => \Sete\V1\Rest\Parametros\ParametrosResource::class,
+            'route_name' => 'sete.rest.parametros',
+            'route_identifier_name' => 'parametros_id',
+            'collection_name' => 'parametros',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Parametros\ParametrosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Parametros\ParametrosCollection::class,
+            'service_name' => 'Parametros',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -495,6 +632,10 @@ return [
             'Sete\\V1\\Rest\\Motoristas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\OrdensServicos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Fornecedores\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Censo\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Monitores\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Shapes\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -568,6 +709,26 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Censo\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Monitores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Shapes\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Parametros\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -624,6 +785,22 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Fornecedores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Censo\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Monitores\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Shapes\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Parametros\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -797,6 +974,54 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.fornecedores',
                 'route_identifier_name' => 'fornecedores_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Censo\CensoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.censo',
+                'route_identifier_name' => 'censo_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Censo\CensoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.censo',
+                'route_identifier_name' => 'censo_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Monitores\MonitoresEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.monitores',
+                'route_identifier_name' => 'monitores_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Monitores\MonitoresCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.monitores',
+                'route_identifier_name' => 'monitores_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Shapes\ShapesEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.shapes',
+                'route_identifier_name' => 'shapes_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Shapes\ShapesCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.shapes',
+                'route_identifier_name' => 'shapes_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Parametros\ParametrosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.parametros',
+                'route_identifier_name' => 'parametros_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Parametros\ParametrosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.parametros',
+                'route_identifier_name' => 'parametros_id',
                 'is_collection' => true,
             ],
         ],

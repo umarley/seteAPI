@@ -49,14 +49,14 @@ class SeteMotoristas extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function motoristaExiste($cpf, $idAluno = null) {
+    public function motoristaExiste($cpf, $idMotorista = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
         $sqlBuild = $sql->buildSqlString($select);
-        if($idAluno != ""){
-           $sqlBuild .= " AND id_aluno <> {$idAluno}";
+        if($idMotorista != ""){
+           $sqlBuild .= " AND id_motorista <> {$idMotorista}";
         }
         $statement = $this->AdapterBD->createStatement($sqlBuild);
         $statement->prepare();

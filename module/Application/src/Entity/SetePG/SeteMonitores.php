@@ -6,11 +6,11 @@ use Db\Core\AbstractDatabasePostgres;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
-class SeteRotas extends AbstractDatabasePostgres {
+class SeteMonitores extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_rotas';
-        $this->primaryKey = 'id_rota';
+        $this->table = 'sete_monitores';
+        $this->primaryKey = 'cpf';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -19,17 +19,7 @@ class SeteRotas extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_rota = {$arIds['id_rota']}");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row;
-    }
-    
-    public function getShapeById($arIds) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['shape'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_rota = {$arIds['id_rota']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cpf = '{$arIds['cpf_monitor']}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -38,7 +28,7 @@ class SeteRotas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_rota', 'nome', 'km', 'turno_matutino', 'turno_vespertino', 'turno_noturno', 'shape'])
+                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'data_nascimento', 'turno_manha', 'turno_tarde', 'turno_noite'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -59,13 +49,18 @@ class SeteRotas extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function rotaExiste($idRota, $codigoCidade) {
+    public function monitorExiste($cpf, $idMonitor = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("id_rota = '{$idRota}' AND codigo_cidade = '{$codigoCidade}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
+                ->where("cpf = '{$cpf}'");
+        $sqlBuild = $sql->buildSqlString($select);
+        if($idMonitor != ""){
+           $sqlBuild .= " AND id_motorista <> {$idMonitor}";
+        }
+        $statement = $this->AdapterBD->createStatement($sqlBuild);
+        $statement->prepare();
+        $row = $statement->execute()->current();
         if ($row['qtd'] > 0) {
             return true;
         } else {
@@ -73,20 +68,11 @@ class SeteRotas extends AbstractDatabasePostgres {
         }
     }
 
-    public function getUltimoIdInserido() {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_rota)")]);
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id'];
-    }
-
     public function _atualizar($arId, $dados) {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_rota' => $arId['id_rota']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'cpf' => $arId['cpf']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -109,7 +95,7 @@ class SeteRotas extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND cpf = '{$arIds['cpf']}'");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

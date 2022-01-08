@@ -1,59 +1,51 @@
 <?php
 
-namespace Sete\V1\Rest\Motoristas;
+namespace Sete\V1\Rest\Monitores;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-class MotoristasModel {
+class MonitoresModel {
 
     protected $_entity;
 
     public function __construct() {
-        $this->_entity = new \Db\SetePG\SeteMotoristas();
+        $this->_entity = new \Db\SetePG\SeteMonitores();
     }
 
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
         foreach ($arDados as $key => $row) {
-            if (!empty($row['data_validade_cnh'])) {
-                $arRow['data_validade_cnh'] = date("d/m/Y", strtotime($arRow['data_validade_cnh']));
-            }
             if (!empty($row['data_nascimento'])) {
-                $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
+                $row['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
             }
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("monitores/{$codigoMunicipio}/{$row['cpf']}");
         }
         return $arDados;
     }
 
-    public function getById($codigoCidade, $cpfMotorista) {
+    public function getById($codigoCidade, $cpfMonitor) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['cpf_motorista'] = $cpfMotorista;
+        $arIds['cpf_monitor'] = $cpfMonitor;
         $arRow = $this->_entity->getById($arIds);
-        if (!empty($arRow['data_nascimento'])) {
+        if (!empty($arRow)) {
             $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
-        }
-        if (!empty($arRow['data_validade_cnh'])) {
-            $arRow['data_validade_cnh'] = date("d/m/Y", strtotime($arRow['data_validade_cnh']));
         }
         //$urlHelper = new \Application\Utils\UrlHelper();
         //$arRow['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoCidade}/{$cpfMotorista}/escola");
         return $arRow;
     }
 
-    public function prepareInsert($arPost) {
+    public function prepareInsert($arPost, $accessToken) {
+        $dbAccessToken = new \Db\Core\AccessToken();
         $arPost = (Array) $arPost;
         $arPost['turno_manha'] = isset($arPost['turno_manha']) ? $arPost['turno_manha'] : 'N';
         $arPost['turno_tarde'] = isset($arPost['turno_tarde']) ? $arPost['turno_tarde'] : 'N';
         $arPost['turno_noite'] = isset($arPost['turno_noite']) ? $arPost['turno_noite'] : 'N';
-        $arPost['tem_cnh_a'] = isset($arPost['tem_cnh_a']) ? $arPost['tem_cnh_a'] : 'N';
-        $arPost['tem_cnh_b'] = isset($arPost['tem_cnh_b']) ? $arPost['tem_cnh_b'] : 'N';
-        $arPost['tem_cnh_c'] = isset($arPost['tem_cnh_c']) ? $arPost['tem_cnh_c'] : 'N';
-        $arPost['tem_cnh_d'] = isset($arPost['tem_cnh_d']) ? $arPost['tem_cnh_d'] : 'N';
-        $arPost['tem_cnh_e'] = isset($arPost['tem_cnh_e']) ? $arPost['tem_cnh_e'] : 'N';
+        $arPost['dt_criacao'] = date("Y-m-d H:i:s");
+        $arPost['criado_por'] = $dbAccessToken->getEmailUsuarioSETEByAccessToken($accessToken);
         $arResult = $this->_entity->_inserir($arPost);
         if ($arResult['result']) {
             unset($arResult['messages']['id']);
@@ -79,23 +71,26 @@ class MotoristasModel {
         }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do motorista deve ser informado!";
+            $arErros['nome'] = "O nome do monitor deve ser informado!";
         }
         if (!isset($arPost['sexo']) || empty($arPost['sexo'])) {
             $boValidate = false;
-            $arErros['sexo'] = "O sexo do motorista deve ser informado!";
+            $arErros['sexo'] = "O sexo do monitor deve ser informado!";
         }
         if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
             $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbMotorista = new \Db\SetePG\SeteMotoristas();
+            $dbMonitor = new \Db\SetePG\SeteMonitores();
             if (!$cpfValido) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado é inválido!";
             }
-            if ($dbMotorista->motoristaExiste($arPost['cpf'])) {
+            if ($dbMonitor->monitorExiste($arPost['cpf'])) {
                 $boValidate = false;
                 $arErros['cpf'] = "O cpf informado já existe!";
             }
+        } else {
+            $boValidate = false;
+            $arErros['cpf'] = "O cpf é obrigatório!";
         }
         if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
             $boValidate = false;
@@ -106,14 +101,10 @@ class MotoristasModel {
                 $arErros['data_nascimento'] = "A data de nascimento informada é inválida!";
             }
         }
-        if (!isset($arPost['cnh']) || empty($arPost['cnh'])) {
+        if (!isset($arPost['vinculo']) || empty($arPost['vinculo'])) {
             $boValidate = false;
-            $arErros['cnh'] = "O número da CNH do motorista deve ser informado!";
+            $arErros['vinculo'] = "O vínculo do monitor com a administração pública deve ser informado!";
         }
-        /* if (!isset($arPost['vinculo']) || empty($arPost['vinculo'])) {
-          $boValidate = false;
-          $arErros['cnh'] = "O vínculo do motorista com a administração pública deve ser informado!";
-          } */
         /* if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
           $boValidate = false;
           $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
@@ -123,22 +114,18 @@ class MotoristasModel {
           $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
           }
           } */
-        if (!isset($arPost['tem_cnh_a']) && !isset($arPost['tem_cnh_b']) && !isset($arPost['tem_cnh_c']) && !isset($arPost['tem_cnh_d']) && !isset($arPost['tem_cnh_e'])) {
-            $boValidate = false;
-            $arErros['tem_cnh'] = "Informe ao menos uma categoria para a CNH.";
-        }
         if (!isset($arPost['turno_manha']) && !isset($arPost['turno_tarde']) && !isset($arPost['turno_noite'])) {
             $boValidate = false;
-            $arErros['turno'] = "Informe ao menos um turno de trabalho para o motorista.";
+            $arErros['turno'] = "Informe ao menos um turno de trabalho para o monitor.";
         }
         if ($boValidate) {
-            return $this->validarParametrosInsertMotorista($arPost);
+            return $this->validarParametrosInsertMonitor($arPost);
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    private function validarParametrosInsertMotorista($arPost) {
+    private function validarParametrosInsertMonitor($arPost) {
         $boValidate = true;
         $arErros = [];
         $arValoresBooleanos = ['S', 'N'];
@@ -154,33 +141,13 @@ class MotoristasModel {
             $boValidate = false;
             $arErros['turno_noite'] = "O valor do objeto da_colchete deve ser S ou N";
         }
-        if (isset($arPost['tem_cnh_a']) && !in_array($arPost['tem_cnh_a'], $arValoresBooleanos)) {
-            $boValidate = false;
-            $arErros['tem_cnh_a'] = "O o valor do objeto tem_cnh_a deve ser S ou N";
-        }
-        if (isset($arPost['tem_cnh_b']) && !in_array($arPost['tem_cnh_b'], $arValoresBooleanos)) {
-            $boValidate = false;
-            $arErros['tem_cnh_b'] = "O o valor do objeto tem_cnh_b deve ser S ou N";
-        }
-        if (isset($arPost['tem_cnh_c']) && !in_array($arPost['tem_cnh_c'], $arValoresBooleanos)) {
-            $boValidate = false;
-            $arErros['tem_cnh_c'] = "O o valor do objeto tem_cnh_c deve ser S ou N";
-        }
-        if (isset($arPost['tem_cnh_d']) && !in_array($arPost['tem_cnh_d'], $arValoresBooleanos)) {
-            $boValidate = false;
-            $arErros['tem_cnh_d'] = "O o valor do objeto tem_cnh_d deve ser S ou N";
-        }
-        if (isset($arPost['tem_cnh_e']) && !in_array($arPost['tem_cnh_e'], $arValoresBooleanos)) {
-            $boValidate = false;
-            $arErros['tem_cnh_e'] = "O o valor do objeto tem_cnh_e deve ser S ou N";
-        }
         if (isset($arPost['sexo']) && !in_array($arPost['sexo'], \Db\Enum\Sexo::SEXOS)) {
             $boValidate = false;
             $arErros['sexo'] = "O valor do objeto sexo está inválido. Verifique e tente novamente!";
         }
         if (isset($arPost['vinculo']) && !in_array($arPost['vinculo'], \Db\Enum\VinculoServidor::VINCULOS)) {
             $boValidate = false;
-            $arErros['sexo'] = "O valor do objeto vinculo está inválido. Verifique e tente novamente!";
+            $arErros['vinculo'] = "O valor do objeto vinculo está inválido. Verifique e tente novamente!";
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }
@@ -191,44 +158,45 @@ class MotoristasModel {
         $arErros = [];
         if (isset($arPost['nome']) && empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do motorista deve ser informado!";
+            $arErros['nome'] = "O nome do monitor deve ser informado!";
         }
         if (isset($arPost['data_nascimento']) && empty($arPost['data_nascimento'])) {
             $boValidate = false;
-            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informada!";
         } else if (!empty($arPost['data_nascimento']) && !\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
             $boValidate = false;
-            $arErros['data_nascimento'] = "A data de nascimento informada é inválida!";
+            $arErros['data_nascimento'] = "A data informada é inválida!";
         }
-        /*if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
-            $boValidate = false;
-            $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
-        } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
-                $boValidate = false;
-                $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
-            }
-        }*/
+        /* if (!isset($arPost['data_validade_cnh']) || empty($arPost['data_validade_cnh'])) {
+          $boValidate = false;
+          $arErros['data_validade_cnh'] = "O campo data de validade da CNH deve ser informado!";
+          } else {
+          if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_validade_cnh'])) {
+          $boValidate = false;
+          $arErros['data_validade_cnh'] = "A data de validade da CNH informada é inválida!";
+          }
+          } */
         if ($boValidate) {
-            return $this->validarParametrosInsertMotorista($arPost);
+            return $this->validarParametrosInsertMonitor($arPost);
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    public function prepareUpdate($codigoCidade, $cpfMotorista, $arPost) {
+    public function prepareUpdate($codigoCidade, $cpfMonitor, $arPost) {
         $arPost = (Array) $arPost;
+        //Destrói as variaveis codigo cidade e cpf para não atualizar no banco de dados
         unset($arPost['codigo_cidade']);
         unset($arPost['cpf']);
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['cpf'] = $cpfMotorista;
+        $arId['cpf'] = $cpfMonitor;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
 
-    public function removerRegistroById($codigoCidade, $cpfMotorista) {
+    public function removerRegistroById($codigoCidade, $cpfMonitor) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['cpf'] = $cpfMotorista;
+        $arIds['cpf'] = $cpfMonitor;
         $arResult = $this->_entity->_delete($arIds);
         return $arResult;
     }

@@ -1,11 +1,11 @@
 <?php
 
-namespace Sete\V1\Rest\Rotas;
+namespace Sete\V1\Rest\Monitores;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Sete\V1\API;
 
-class RotasResource extends API {
+class MonitoresResource extends API {
 
     /**
      * Create a resource
@@ -14,7 +14,6 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function create($data) {
-        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -28,7 +27,7 @@ class RotasResource extends API {
                 $this->processarRotasPOST($arParams, $arData);
             } else {
                 $arData->codigo_cidade = $codigoCidade;
-                $this->processarInsertRota($arData);
+                $this->processarInsertMonitor($arData);
             }
         } else {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
@@ -37,33 +36,30 @@ class RotasResource extends API {
 
     private function processarRotasPOST($arParams, $arDados) {
         $codigoCidade = $arParams['codigo_cidade'];
-        $idRota = $arParams['rotas_id'];
+        $idMonitor = $arParams['monitores_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idRota;
+        $arDados->cpf_monitor = $idMonitor;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
-            case 'veiculos':
-                $this->associarVeiculoRota($arDados);
-                break;
-            default:
-                $this->populaResposta(404, ['result' => false, 'messages' => "O recurso não existe!"], false);
+            case 'rota':
+                $this->associarRotaMonitor($arDados);
                 break;
         }
     }
 
-    private function associarVeiculoRota($arDados) {
-        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
-        $dbSeteRotaPossuiVeiculos = new \Db\SetePG\SeteRotaPossuiVeiculo();
+    private function associarRotaMonitor($arDados) {
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
+        $dbSeteRotaAtendidaPorMonitor = new \Db\SetePG\SeteRotaAtendidaPorMonitor();
         if ($arDados->id_rota !== "") {
-            if (!$dbSeteVeiculos->veiculoExiste($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"]);
-            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Aluno já associado a uma escola!"], false);
+            if (!$dbSeteRotas->rotaExiste($arDados->id_rota, $arDados->codigo_cidade)) {
+                $this->populaResposta(404, ['result' => false, 'messages' => "Rota informada não existe!"], false);
+            } else if ($dbSeteRotaAtendidaPorMonitor->monitorAssociadoRota($arDados->cpf_monitor, $arDados->codigo_cidade, $arDados->id_rota)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "Monitor já associado a esta rota. Verifique e tente novamente!"], false);
             } else {
-                $this->populaResposta(201, $dbSeteRotaPossuiVeiculos->_inserir([
+                $this->populaResposta(201, $dbSeteRotaAtendidaPorMonitor->_inserir([
                             'codigo_cidade' => $arDados->codigo_cidade,
                             'id_rota' => $arDados->id_rota,
-                            'id_veiculo' => $arDados->id_veiculo
+                            'cpf_monitor' => $arDados->cpf_monitor
                         ]), false);
             }
         } else {
@@ -71,11 +67,11 @@ class RotasResource extends API {
         }
     }
 
-    private function processarInsertRota($arData) {
-        $modelRotas = new RotasModel();
-        $boValidate = $modelRotas->validarInsert($arData);
+    private function processarInsertMonitor($arData) {
+        $modelMonitores = new MonitoresModel();
+        $boValidate = $modelMonitores->validarInsert($arData);
         if ($boValidate['result']) {
-            $arResult = $modelRotas->prepareInsert($arData);
+            $arResult = $modelMonitores->prepareInsert($arData, $this->getAcessToken());
             $this->populaResposta(200, $arResult, false);
         } else {
             $this->populaResposta(400, $boValidate, false);
@@ -89,22 +85,21 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
-        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
-        $idRota = $arParams['rotas_id'];
-        $this->processarRequestDELETE($codigoCidade, $idRota);
+        $cpfMonitor = $arParams['monitores_id'];
+        $this->processarRequestDELETE($codigoCidade, $cpfMonitor);
     }
 
-    private function processarRequestDELETE($codigoCidade, $idRota) {
+    private function processarRequestDELETE($codigoCidade, $cpfMonitor) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
             $arParams = $this->event->getRouteMatch()->getParams();
             if (isset($arParams['rota'])) {
                 $this->processarRotasDELETE($arParams);
             } else {
-                $modelRotas = new RotasModel();
-                $arResult = $modelRotas->removerRegistroById($codigoCidade, $idRota);
+                $modelMonitores = new MonitoresModel();
+                $arResult = $modelMonitores->removerRegistroById($codigoCidade, $cpfMonitor);
                 $this->populaResposta(200, $arResult, false);
             }
         } else {
@@ -114,22 +109,28 @@ class RotasResource extends API {
 
     private function processarRotasDELETE($arParams) {
         $codigoCidade = $arParams['codigo_cidade'];
-        $idRota = $arParams['rotas_id'];
+        $cpfMonitor = $arParams['monitores_id'];
+        $data = $this->getBody();
+        if (!isset($data->id_rota) || empty($data->id_rota)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Informe o ID da rota que será removida para continuar!'], false);
+        }
+        $idRota = $data->id_rota;
         $rota = $arParams['rota'];
         switch ($rota) {
-            case 'veiculos':
-                $this->removerVeiculoRota($codigoCidade, $idRota);
+            case 'rota':
+                $this->removerRotaMonitor($codigoCidade, $cpfMonitor, $idRota);
                 break;
         }
     }
 
-    private function removerVeiculoRota($codigoCidade, $idRota) {
-        $dbSeteRotaPossuiVeiculo = new \Db\SetePG\SeteRotaPossuiVeiculo();
+    private function removerRotaMonitor($codigoCidade, $cpfMonitor, $idRota) {
+
+        $dbSeteRotaAtendidaPorMonitor = new \Db\SetePG\SeteRotaAtendidaPorMonitor();
         $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['cpf_monitor'] = $cpfMonitor;
         $arIds['id_rota'] = $idRota;
-        $arResult = $dbSeteRotaPossuiVeiculo->_delete($arIds);
+        $arResult = $dbSeteRotaAtendidaPorMonitor->_delete($arIds);
         $this->populaResposta(200, $arResult, false);
-        exit;
     }
 
     /**
@@ -149,7 +150,7 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function fetch($id) {
-        $modelRotas = new RotasModel();
+        $modelMonitores = new MonitoresModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         $codigoCidade = $arParams['codigo_cidade'];
@@ -160,27 +161,24 @@ class RotasResource extends API {
         } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
-            $idRota = $arParams['rotas_id'];
-            $rota = $arParams['rota'];
-            if (isset($rota)) {
-                $this->processarGetRota($rota, $codigoCidade, $idRota);
-            } else if ($idRota != "" && is_numeric($idRota)) {
-                $arRota = $modelRotas->getById($codigoCidade, $idRota);
-                $this->populaResposta(count($arRota) > 1 ? 200 : 404, $arRota, false);
+            $cpfMonitor = $arParams['monitores_id'];
+            if (isset($arParams['rota'])) {
+                $rota = $arParams['rota'];
+                $this->processarGetMonitorRota($rota, $codigoCidade, $cpfMonitor);
+            } else if ($cpfMonitor != "" && is_numeric($cpfMonitor)) {
+                $arMonitor = $modelMonitores->getById($codigoCidade, $cpfMonitor);
+                $this->populaResposta(count($arMonitor) > 1 ? 200 : 404, $arMonitor, false);
             } else {
-                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro cpf_monitor deve ser informado!"], false);
             }
         }
     }
 
-    private function processarGetRota($rota, $codigoCidade, $idRota) {
-        if ($idRota != "" && is_numeric($idRota)) {
+    private function processarGetMonitorRota($rota, $codigoCidade, $cpfMonitor) {
+        if ($cpfMonitor != "") {
             switch ($rota) {
-                case 'veiculos':
-                    $this->getVeiculosRota($codigoCidade, $idRota);
-                    break;
-                case 'shape':
-                    $this->getShapeRota($codigoCidade, $idRota);
+                case 'rota':
+                    $this->getRotasMonitor($codigoCidade, $cpfMonitor);
                     break;
                 default:
                     $arResult = ['result' => false, 'messages' => "Recurso não existe!"];
@@ -188,24 +186,16 @@ class RotasResource extends API {
             }
             $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult, false);
         } else {
-            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro cpf_monitor deve ser informado!"], false);
         }
     }
 
-    private function getVeiculosRota($codigoCidade, $idRota) {
-        $dbRotaPossuiVeiculo = new \Db\SetePG\SeteRotaPossuiVeiculo();
-        $arIds['id_rota'] = $idRota;
+    private function getRotasMonitor($codigoCidade, $cpfMonitor) {
+        $dbRotaAtendidaPorMonitor = new \Db\SetePG\SeteRotaAtendidaPorMonitor();
+        $arIds['cpf_monitor'] = $cpfMonitor;
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arResposta = $dbRotaPossuiVeiculo->getById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
-    }
-
-    private function getShapeRota($codigoCidade, $idRota) {
-        $dbSetePGRota = new \Db\SetePG\SeteRotas();
-        $arIds['id_rota'] = $idRota;
-        $arIds['codigo_cidade'] = $codigoCidade;
-        $arResposta = $dbSetePGRota->getShapeById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $arResposta = $dbRotaAtendidaPorMonitor->getByCPFMonitor($arIds);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, true);
     }
 
     /**
@@ -225,21 +215,16 @@ class RotasResource extends API {
         } else if (!$this->usuarioPodeAcessarCidade($codigoCidade)) {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
-            $this->obterTodasRotasCidade($codigoCidade);
+            $this->obterTodosMonitoresCidade($codigoCidade);
         }
     }
 
-    private function obterTodasRotasCidade($codigoCidade) {
-        $modelRotas = new RotasModel();
-        $arRotas = $modelRotas->getAll($codigoCidade);
-        $arResultado['data'] = $arRotas;
-        $arResultado['total'] = count($arRotas);
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
-        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
-        header("Content-type: application/json");
-        echo json_encode($arResultado);
-        exit;
+    private function obterTodosMonitoresCidade($codigoCidade) {
+        $modelMonitores = new MonitoresModel();
+        $arMonitores = $modelMonitores->getAll($codigoCidade);
+        $arResultado['data'] = $arMonitores;
+        $arResultado['total'] = count($arMonitores);
+        $this->populaResposta(200, $arResultado, false);
     }
 
     /**
@@ -281,7 +266,6 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
-        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);
@@ -290,51 +274,26 @@ class RotasResource extends API {
     private function processarRequestPUT($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
-            $arParams = $this->event->getRouteMatch()->getParams();
-            if (isset($arParams['rota'])) {
-                $this->processarRotasPUT($arParams, $arData);
-            } else {
-                $arData->codigo_cidade = $codigoCidade;
-                $this->processarUpdateRota($arParams['rotas_id'], $arData);
-            }
+            $arData->codigo_cidade = $codigoCidade;
+            $this->processarUpdateMonitor($arData);
         } else {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
-    
-    private function processarUpdateRota($idRota, $arData) {
-        $modelRotas = new RotasModel();
-        $boValidate = $modelRotas->validarUpdate($arData, $idRota);
-        if ($boValidate['result']) {
-            $arResult = $modelRotas->prepareUpdate($idRota, $arData);
-            $this->populaResposta(200, $arResult, false);
+
+    private function processarUpdateMonitor($data) {
+        $modelMonitor = new MonitoresModel();
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $cpfMonitor = $arParams['monitores_id'];
+        $boValidate = $modelMonitor->validarUpdate($data, $cpfMonitor);
+        if (empty($codigoCidade) || $cpfMonitor == "") {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O CPF do monitor e código da cidade devem ser informados!"], false);
+        } else if ($boValidate['result']) {
+            $this->populaResposta(200, $modelMonitor->prepareUpdate($codigoCidade, $cpfMonitor, $data), false);
         } else {
             $this->populaResposta(400, $boValidate, false);
         }
-    }
-
-    private function processarRotasPUT($arParams, $arDados) {
-        $codigoCidade = $arParams['codigo_cidade'];
-        $idRota = $arParams['rotas_id'];
-        $rota = $arParams['rota'];
-        $arDados->id_aluno = $idRota;
-        $arDados->codigo_cidade = $codigoCidade;
-        switch ($rota) {
-            case 'shape':
-                $this->atualizarShapeRota($codigoCidade, $idRota, $arDados);
-                break;
-            default:
-                $this->populaResposta(404, ['result' => false, 'messages' => "O recurso não existe!"], false);
-                break;
-        }
-    }
-
-    public function atualizarShapeRota($codigoCidade, $idRota, $shape) {
-        $dbSetePGRotas = new \Db\SetePG\SeteRotas();
-        $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_rota'] = $idRota;
-        $arResposta = $dbSetePGRotas->_atualizar($arId, ['shape' => json_encode($shape)]);
-        $this->populaResposta(200, $arResposta, false);
     }
 
 }

@@ -1,17 +1,12 @@
 <?php
-namespace Sete\V1\Rest\Municipios;
+namespace Sete\V1\Rest\Censo;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Sete\V1\API;
 
-class MunicipiosResource extends \Sete\V1\API
+class CensoResource extends API
 {
-    
-    public function __construct() {
-        parent::__construct();
-        $this->_model = new MunicipiosModel();
-    }
-    
     /**
      * Create a resource
      *
@@ -20,8 +15,41 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function create($data)
     {
-        $this->usuarioPodeGravar();
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $this->processarRequisicaoPOST($codigoCidade, $data);
+    }
+    
+    private function processarRequisicaoPOST($codigoCidade, $arData){
+        $modelCenso = new \Sete\V1\Rest\Censo\CensoModel();
+        if(!isset($arData->escolas) || !isset($arData->alunos)){
+            $this->populaResposta(400, ['result' => false, 'messages' => "Objeto escolas ou alunos ausentes!"], false);
+        }
+        $escolasValida = $modelCenso->validarEscolas($codigoCidade, $arData->escolas);
+        if($escolasValida['result']){
+            $alunosValido = $modelCenso->validarAlunos($arData->alunos);
+            if($alunosValido['result']){
+                $this->processarImportacaoCenso($codigoCidade, $arData);
+            }else{
+                $this->populaResposta(400, $alunosValido, false);
+            }
+        }else{
+            $this->populaResposta(400, $escolasValida, false);
+        }
+    }
+    
+    private function processarImportacaoCenso($codigoCidade, $arData){
+        $modelCenso = new \Sete\V1\Rest\Censo\CensoModel();
+        $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $usuarioAutenticado = $dbCoreAccessToken->getEmailUsuarioSETEByAccessToken($this->getAcessToken());
+        $arResult = $modelCenso->processarImportacaoEscola($arData->escolas, $usuarioAutenticado, $codigoCidade);
+        if($arResult['result']){
+            $arResultAlunos = $modelCenso->processarImportacaoAluno($arData->alunos, $usuarioAutenticado, $codigoCidade);
+            $codigoHTTP = ($arResultAlunos['result'] ? 201 : 500);
+            $this->populaResposta($codigoHTTP, $arResultAlunos, false);
+        }else{
+            $this->populaResposta(400, $arResult, false);
+        }
     }
 
     /**
@@ -32,7 +60,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function delete($id)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -55,7 +82,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetch($id)
     {
-        return $this->_model->getById($id);
+        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
     }
 
     /**
@@ -66,20 +93,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function fetchAll($params = [])
     {
-        $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : 'mapa';
-        switch ($tipo){
-            case 'mapa':
-                $this->populaResposta(200, $this->_model->getAll());
-                break;
-            case 'lista':
-                $pagina = (isset($_GET['pagina']) ? $_GET['pagina'] : 1);
-                $busca = (isset($_GET['busca']) ? $_GET['busca'] : "");
-                $this->populaResposta(200, $this->_model->getListaPaginada($pagina, $busca), false);
-                break;
-            case 'excel':
-                $this->populaResposta(200, $this->_model->processarExcel(), false);
-                break;
-        }
+        return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
     /**
@@ -125,7 +139,6 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function update($id, $data)
     {
-        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }
