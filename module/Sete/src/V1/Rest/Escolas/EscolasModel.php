@@ -17,7 +17,7 @@ class EscolasModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row){
+        foreach ($arDados as $key => $row) {
             $arDados[$key]['qtd_alunos'] = $this->_entity->qtdAlunosPorEscola($codigoMunicipio, $row['id_escola']);
             $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("escolas/{$codigoMunicipio}/{$row['id_escola']}");
         }
@@ -71,6 +71,14 @@ class EscolasModel {
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
             $arErros['nome'] = "O nome da escola deve ser informado!";
+        }
+        if (!isset($arPost['mec_co_municipio']) || empty($arPost['mec_co_municipio'])) {
+            $boValidate = false;
+            $arErros['mec_co_municipio'] = "O mec_co_municipio da escola deve ser informado!";
+        }
+        if (!isset($arPost['mec_tp_localizacao_diferenciada']) || empty($arPost['mec_tp_localizacao_diferenciada'])) {
+            $boValidate = false;
+            $arErros['mec_tp_localizacao_diferenciada'] = "O mec_tp_localizacao_diferenciada da escola deve ser informado!";
         }
         if ($boValidate) {
             return $this->validarParametrosInsertEscola($arPost);
@@ -135,6 +143,11 @@ class EscolasModel {
             $boValidate = false;
             $arErros['mec_tp_localizacao'] = "O valor do objeto mec_tp_localizacao está inválido. Verifique e tente novamente!";
         }
+        if (isset($arPost['mec_tp_localizacao_diferenciada']) && !in_array($arPost['mec_tp_localizacao_diferenciada'], \Db\Enum\MecTpLocalizacaoDiferenciada::LOCALIZACAO_DIFERENCIADA)) {
+            $boValidate = false;
+            $arErros['mec_tp_localizacao_diferenciada'] = "O valor do objeto mec_tp_localizacao_diferenciada está inválido. Verifique e tente novamente!";
+        }
+
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
@@ -175,8 +188,8 @@ class EscolasModel {
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
-    
-    public function removerRegistroById($codigoCidade, $idEscola){
+
+    public function removerRegistroById($codigoCidade, $idEscola) {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_escola'] = $idEscola;
         $arResult = $this->_entity->_delete($arIds);
@@ -196,6 +209,101 @@ class EscolasModel {
             'pg_atual' => (int) $pagina,
             'registros' => $arData
         ];
+    }
+
+    public function associarVariosAlunos($codigoCidade, $idEscola, $arAlunos) {
+        $dbSetePGEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
+        $arIdsAlunos = [];
+        foreach ($arAlunos as $idAluno) {
+            if ($idAluno['id_aluno'] !== "") {
+                $arIdsAlunos[] = $idAluno['id_aluno'];
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsAlunos as $aluno) {
+            $alunoAssociadoEscola = $dbSetePGEscolaTemAluno->alunoAssociadoEscola($aluno, $codigoCidade);
+            if ($alunoAssociadoEscola) {
+                $arRetorno[] = ['id_aluno' => $aluno, 'result' => false, 'messages' => "Aluno já associado a alguma escola. Verifique e tente novamente!"];
+            } else {
+                $arResult = $dbSetePGEscolaTemAluno->_inserir([
+                    'id_escola' => $idEscola,
+                    'id_aluno' => $aluno,
+                    'codigo_cidade' => $codigoCidade
+                ]);
+                $arRetorno[] = ['id_aluno' => $aluno, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+            }
+        }
+
+        return $arRetorno;
+    }
+
+    public function excluirVariasAssociacoesAlunos($codigoCidade, $idEscola, $arAlunos) {
+
+
+        $dbSetePGEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
+        $arIdsAlunos = [];
+        foreach ($arAlunos as $idAluno) {
+            if ($idAluno->id_aluno !== "") {
+                $arIdsAlunos[] = $idAluno->id_aluno;
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsAlunos as $aluno) {
+            $arIds['codigo_cidade'] = $codigoCidade;
+            $arIds['id_escola'] = $idEscola;
+            $arIds['id_aluno'] = $aluno;
+            $arResult = $dbSetePGEscolaTemAluno->_delete($arIds);
+            $arRetorno[] = ['id_aluno' => $aluno, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
+    }
+
+    public function associarVariasRotas($codigoCidade, $idEscola, $arRotas) {
+        $dbSetePGRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arIdsRotas = [];
+        foreach ($arRotas as $idRota) {
+            if ($idRota['id_rota'] !== "") {
+                $arIdsRotas[] = $idRota['id_rota'];
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsRotas as $rota) {
+            $arResult = $dbSetePGRotaPassaPorEscola->_inserir([
+                'id_escola' => $idEscola,
+                'id_rota' => $rota,
+                'codigo_cidade' => $codigoCidade
+            ]);
+            $arRetorno[] = ['id_rota' => $rota, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
+    }
+    
+    public function excluirVariasAssociacoesRotas($codigoCidade, $idEscola, $arRotas) {
+
+
+        $dbSetePGRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arIdsRotas = [];
+        foreach ($arRotas as $idRota) {
+            if ($idRota->id_rota !== "") {
+                $arIdsRotas[] = $idRota->id_rota;
+            }
+        }
+        $arRetorno = [];
+
+        foreach ($arIdsRotas as $rota) {
+            $arIds['codigo_cidade'] = $codigoCidade;
+            $arIds['id_escola'] = $idEscola;
+            $arIds['id_rota'] = $rota;
+            $arResult = $dbSetePGRotaPassaPorEscola->_delete($arIds);
+            $arRetorno[] = ['id_rota' => $rota, 'result' => $arResult['result'], 'messages' => $arResult['messages']];
+        }
+
+        return $arRetorno;
     }
 
 }

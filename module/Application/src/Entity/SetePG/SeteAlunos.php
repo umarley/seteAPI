@@ -24,6 +24,20 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function alunoExisteById($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['*'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_aluno = {$arIds['id_aluno']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->count();
+        if($row > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public function getLista($municipio) {
         $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno,
@@ -62,9 +76,65 @@ class SeteAlunos extends AbstractDatabasePostgres {
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
         $sqlBuild = $sql->buildSqlString($select);
-        if($idAluno != ""){
-           $sqlBuild .= " AND id_aluno <> {$idAluno}";
+        if ($idAluno != "") {
+            $sqlBuild .= " AND id_aluno <> {$idAluno}";
         }
+        $statement = $this->AdapterBD->createStatement($sqlBuild);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Método utilizado na importação do censo
+     */
+    public function alunoExistePorChaveComposta($chave) {
+        $sql = "select count(*) as qtd
+                from sete.sete_alunos a
+                where  replace(ltrim(rtrim(nome)) , ' ', '-') || '-' || data_nascimento = '{$chave}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        if($row['qtd'] > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    /**
+     * Método utilizado na importação do censo
+     */
+    public function getAlunoPorChave($chave){
+        $sql = "select *
+                from sete.sete_alunos a
+                where  replace(ltrim(rtrim(nome)) , ' ', '-') || '-' || data_nascimento = '{$chave}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
+    }
+
+    public function getByCPF($cpf) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['*'])
+                ->where("cpf = '{$cpf}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row;
+    }
+
+    public function alunoExistePUT($cpf, $idAluno = null) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("cpf = '{$cpf}' AND id_aluno <> {$idAluno}");
+        $sqlBuild = $sql->buildSqlString($select);
         $statement = $this->AdapterBD->createStatement($sqlBuild);
         $statement->prepare();
         $row = $statement->execute()->current();
@@ -90,6 +160,9 @@ class SeteAlunos extends AbstractDatabasePostgres {
         $update->set($dados);
         $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_aluno' => $arId['id_aluno']]);
         $sql = $this->sql->buildSqlString($update);
+        
+        //echo $sql . "<br />";
+        
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
             $bool = true;

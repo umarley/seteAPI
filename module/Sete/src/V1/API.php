@@ -43,6 +43,11 @@ class API extends AbstractResourceListener {
         return $this->accessToken;        
     }
     
+    protected function getBody(){
+        $data = file_get_contents("php://input");
+        return json_decode($data);
+    }
+    
     protected function usuarioPodeAcessarCidade($codigoCidade){
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);

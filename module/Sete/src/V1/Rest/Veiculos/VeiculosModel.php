@@ -38,6 +38,8 @@ class VeiculosModel {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_veiculo'] = $idVeiculo;
         $arRow = $this->_entity->getById($arIds);
+        $arRow['modo_str'] = \Db\Enum\ModoVeiculo::getLabel($arRow['modo']);
+        $arRow['origem_str'] = \Db\Enum\Origem::getLabel($arRow['origem']);
         $urlHelper = new \Application\Utils\UrlHelper();
         $arRow['_links']['_self'] = $urlHelper->baseUrl("veiculos/{$codigoCidade}/{$idVeiculo}");
         return $arRow;
@@ -79,10 +81,10 @@ class VeiculosModel {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já está cadastrada. Verifique e tente novamente!";
             }
-            if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
+            /*if(!\Application\Utils\Utils::validarPlaca($arPost['placa'])){
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é invalida. Verifique e tente novamente!";
-            }
+            }*/
         }
         if (!isset($arPost['marca']) || empty($arPost['marca'])) {
             $boValidate = false;
@@ -93,7 +95,7 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
-        if (!isset($arPost['modo']) || empty($arPost['modo'])) {
+        if (!isset($arPost['modo'])) {
             $boValidate = false;
             $arErros['modo'] = "O modo do veiculo deve ser informado!";
         }
@@ -134,6 +136,12 @@ class VeiculosModel {
             $boValidate = false;
             $arErros['tipo'] = "O valor do objeto tipo está inválido. Verifique e tente novamente!";
         }
+        
+        if (isset($arPost['tipo_combustivel']) && !in_array($arPost['tipo_combustivel'], \Db\Enum\TipoCombustivel::TIPO_COMBUSTIVEL)) {
+            $boValidate = false;
+            $arErros['modo'] = "O valor do objeto tipo_combustivel está inválido. Verifique e tente novamente!";
+        }
+
 
         
         return ['result' => $boValidate, 'messages' => $arErros];
@@ -147,11 +155,11 @@ class VeiculosModel {
         if (isset($arPost['placa']) && !empty($arPost['placa'])) {
             $placaValida = \Application\Utils\Utils::validarPlaca($arPost['placa']);
             $dbVeiculo = new \Db\SetePG\SeteVeiculos();
-            if (!$placaValida) {
+            /*if (!$placaValida) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada é inválida!";
-            }
-            if ($dbVeiculo->VeiculoExiste($arPost['placa'], $codigoCidade , $idVeiculo)) {
+            }*/
+            if ($dbVeiculo->veiculoExisteUnico($arPost['placa'], $codigoCidade , $idVeiculo)) {
                 $boValidate = false;
                 $arErros['placa'] = "A placa informada já existe!";
             }

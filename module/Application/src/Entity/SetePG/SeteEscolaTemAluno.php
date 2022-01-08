@@ -28,7 +28,7 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
     public function getAlunosByEscola($codigoCidade, $idEscola){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf'])
+                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = al.id_aluno AND eta.codigo_cidade = al.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf', 'loc_latitude', 'loc_longitude', 'nivel', 'turno'])
                 ->where("eta.codigo_cidade = {$codigoCidade} AND eta.id_escola = {$idEscola}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $this->getResultSet($prepare->execute());
@@ -85,6 +85,28 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']} AND id_escola = {$arIds['id_escola']}");
+        $sql = $this->sql->buildSqlString($delete);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $boResultado = true;
+            $message = "Registro excluido com sucesso!";
+        } catch (\PDOException $zAdapterEx) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zAdapterEx->getMessage();
+        } catch (\Laminas\Db\Adapter\Exception\InvalidQueryException $zendDbExc) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
+        }
+        return ['result' => $boResultado, 'messages' => $message];
+    }
+    
+    /**
+     * Método para excluir associação de escola através aluno
+     */
+    public function _deleteAssociacaoAluno($arIds) {
+        $this->sql = new Sql($this->AdapterBD);
+        $delete = $this->sql->delete($this->tableIdentifier);
         $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
@@ -100,5 +122,6 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
         }
         return ['result' => $boResultado, 'messages' => $message];
     }
+    
 
 }

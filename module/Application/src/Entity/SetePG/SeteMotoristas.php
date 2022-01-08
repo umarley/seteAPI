@@ -28,7 +28,7 @@ class SeteMotoristas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'turno_manha', 'turno_tarde','turno_noite'])
+                ->columns(['codigo_cidade', 'cpf', 'nome', 'telefone', 'cnh', 'data_validade_cnh', 'turno_manha', 'turno_tarde', 'turno_noite'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -49,14 +49,14 @@ class SeteMotoristas extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function motoristaExiste($cpf, $idAluno = null) {
+    public function motoristaExiste($cpf, $idMotorista = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
         $sqlBuild = $sql->buildSqlString($select);
-        if($idAluno != ""){
-           $sqlBuild .= " AND id_aluno <> {$idAluno}";
+        if($idMotorista != ""){
+           $sqlBuild .= " AND id_motorista <> {$idMotorista}";
         }
         $statement = $this->AdapterBD->createStatement($sqlBuild);
         $statement->prepare();

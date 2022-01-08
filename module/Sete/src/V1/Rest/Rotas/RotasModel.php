@@ -17,9 +17,11 @@ class RotasModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        /*foreach ($arDados as $key => $row){
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("alunos/{$codigoMunicipio}/{$row['id_aluno']}");
-        }*/
+        foreach ($arDados as $key => $row){
+            $arDados[$key]['gps'] = (!empty($row['shape']) ? 'Sim' : 'Não');
+            unset($arDados[$key]['shape']);
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("rotas/{$codigoMunicipio}/{$row['id_rota']}");
+        }
         return $arDados;
     }
 
@@ -27,6 +29,7 @@ class RotasModel {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_rota'] = $idRota;
         $arRow = $this->_entity->getById($arIds);
+        unset($arRow['shape']);
         $urlHelper = new \Application\Utils\UrlHelper();
         $arRow['_links']['_self'] = $urlHelper->baseUrl("rotas/{$codigoCidade}/{$idRota}/veiculos");
         return $arRow;
@@ -123,52 +126,42 @@ class RotasModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUpdate($arPost, $idAluno) {
+    public function validarUpdate($arPost, $idRota) {
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
+        if (!isset($arPost['codigo_cidade']) || empty($arPost['codigo_cidade'])) {
+            $boValidate = false;
+            $arErros['codigo_cidade'] = "O código da cidade deve ser informado!";
+        } else {
+            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+            if (!$dbMunicipio->municipioExiste($arPost['codigo_cidade'])) {
+                $boValidate = false;
+                $arErros['codigo_cidade'] = "O código da cidade não existe. Verifique e tente novamente!";
+            }
+        }
         if (!isset($arPost['nome']) || empty($arPost['nome'])) {
             $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
+            $arErros['nome'] = "O nome da rota deve ser informado!";
         }
-        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
-            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbAluno = new \Db\SetePG\SeteAlunos();
-            if (!$cpfValido) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado é inválido!";
-            }
-            if ($dbAluno->alunoExiste($arPost['cpf'], $idAluno)) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado já existe!";
-            }
-        }
-        if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
+        if (!isset($arPost['km']) || empty($arPost['km'])) {
             $boValidate = false;
-            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
-        } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
-                $boValidate = false;
-                $arErros['data_nascimento'] = "A data informada é inválida!";
-            }
+            $arErros['km'] = "Informe a distância da rota para continuar!";
         }
-        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+        if (!isset($arPost['tempo']) || empty($arPost['tempo'])) {
             $boValidate = false;
-            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
-        }
-        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
-            $boValidate = false;
-            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+            $arErros['tempo'] = "Informe a duração em minutos da rota para continuar!";
         }
         if ($boValidate) {
-            return $this->validarParametrosInsertAluno($arPost);
+            return $this->validarParametrosInsertRota($arPost);
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    public function prepareUpdate($codigoCidade, $idAluno, $arPost) {
+    public function prepareUpdate($idRota, $arPost) {
         $arPost = (Array) $arPost;
+        $codigoCidade = $arPost['codigo_cidade'];
         unset($arPost['codigo_cidade']);
         unset($arPost['id_aluno']);
         $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
@@ -177,7 +170,7 @@ class RotasModel {
         $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
         $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_aluno'] = $idAluno;
+        $arId['id_rota'] = $idRota;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }
