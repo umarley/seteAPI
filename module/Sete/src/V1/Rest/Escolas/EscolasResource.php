@@ -14,6 +14,7 @@ class EscolasResource extends API {
      * @return ApiProblem|mixed
      */
     public function create($data) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -100,6 +101,7 @@ class EscolasResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
+        $this->usuarioPodeGravar();
         $modelEscolas = new EscolasModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         if (isset($arParams['rota'])) {
@@ -292,6 +294,7 @@ class EscolasResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
+        $this->usuarioPodeGravar();
         $modelEscolas = new EscolasModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
