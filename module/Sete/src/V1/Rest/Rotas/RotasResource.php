@@ -39,7 +39,7 @@ class RotasResource extends API {
         $codigoCidade = $arParams['codigo_cidade'];
         $idRota = $arParams['rotas_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idRota;
+        $arDados->id_rota = $idRota;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
             case 'veiculos':
@@ -53,25 +53,48 @@ class RotasResource extends API {
                 break;
         }
     }
-    
+
     private function associarAlunosRota($arDados) {
-        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
-        $dbSeteRotaPossuiVeiculos = new \Db\SetePG\SeteRotaPossuiVeiculo();
+        $arResultado = [];
         if ($arDados->id_rota !== "") {
-            if (!$dbSeteVeiculos->veiculoExiste($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"]);
-            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Aluno já associado a uma escola!"], false);
+            if (isset($arDados->alunos)) {
+                foreach ($arDados->alunos as $rowAluno) {
+                    if (!empty($rowAluno['id_aluno'])) {
+                        $arResultado[] = $this->processarAssociacaoRotaAluno($arDados, $rowAluno['id_aluno']);
+                    }
+                }
+                $this->populaResposta(200, $arResultado);
             } else {
-                $this->populaResposta(201, $dbSeteRotaPossuiVeiculos->_inserir([
-                            'codigo_cidade' => $arDados->codigo_cidade,
-                            'id_rota' => $arDados->id_rota,
-                            'id_veiculo' => $arDados->id_veiculo
-                        ]), false);
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro alunos deve ser informado!"], false);
             }
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
         }
+    }
+
+    private function processarAssociacaoRotaAluno($arDados, $idAluno) {
+        $dbSeteAluno = new \Db\SetePG\SeteAlunos();
+        $dbSeteRotasAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+        $arIds['codigo_cidade'] = $arDados->codigo_cidade;
+        $arIds['id_aluno'] = $idAluno;
+        $alunoExiste = $dbSeteAluno->alunoExisteById($arIds);
+        $arResultados = [];
+        if (!$alunoExiste) {
+            $arResultados[] = ['result' => false, 'messages' => "O id {$idAluno} informando não foi encontrado. Verifique e tente novamente!"];
+        } else {
+            $vinculoExisteParaAluno = $dbSeteRotasAtendeAluno->alunoAssociadoRota($idAluno, $arDados->codigo_cidade);
+            if ($vinculoExisteParaAluno) {
+                $arResultados[] = ['result' => false, 'messages' => "Aluno {$idAluno} já associado a uma rota. Não é permitido o aluno ter mais de uma rota!"];
+            } else {
+                $dbSeteRotasAtendeAluno->_inserir([
+                    'id_rota' => $arDados->id_rota,
+                    'id_aluno' => $idAluno,
+                    'codigo_cidade' => $arDados->codigo_cidade
+                ]);
+                $arResultados[] = ['result' => true, 'messages' => "Aluno {$idAluno} vinculado com sucesso!"];
+            }
+        }
+        return $arResultados;
     }
 
     private function associarVeiculoRota($arDados) {
@@ -123,6 +146,8 @@ class RotasResource extends API {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
             $arParams = $this->event->getRouteMatch()->getParams();
+            $data = file_get_contents("php://input");
+            $arParams['arData'] = json_decode($data);
             if (isset($arParams['rota'])) {
                 $this->processarRotasDELETE($arParams);
             } else {
@@ -144,18 +169,23 @@ class RotasResource extends API {
                 $this->removerVeiculoRota($codigoCidade, $idRota);
                 break;
             case 'alunos':
-                $this->removerAlunosRota($codigoCidade, $idRota);
+                $arResult = $this->removerAlunosRota($arParams);
+                $this->populaResposta(200, $arResult);
                 break;
         }
     }
-    
-    private function removerAlunosRota($codigoCidade, $idRota) {
-        $dbSeteRotaPossuiVeiculo = new \Db\SetePG\SeteRotaPossuiVeiculo();
-        $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_rota'] = $idRota;
-        $arResult = $dbSeteRotaPossuiVeiculo->_delete($arIds);
-        $this->populaResposta(200, $arResult, false);
-        exit;
+
+    private function removerAlunosRota($arParams) {
+        $arResult = [];
+        foreach ($arParams['arData']->alunos as $rowAluno) {
+            $dbSeteRotaAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+            $arIds['codigo_cidade'] = $arParams['codigo_cidade'];
+            $arIds['id_rota'] = $arParams['rotas_id'];
+            $arIds['id_aluno'] = $rowAluno->id_aluno;
+            $arResult[] = $dbSeteRotaAtendeAluno->_deleteByAlunoAndRota($arIds);
+            
+        }
+        return $arResult;
     }
 
     private function removerVeiculoRota($codigoCidade, $idRota) {
@@ -229,13 +259,13 @@ class RotasResource extends API {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
         }
     }
-    
+
     private function getAlunosRota($codigoCidade, $idRota) {
-        $dbRotaPossuiVeiculo = new \Db\SetePG\SeteRotaPossuiVeiculo();
+        $dbRotaAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arResposta = $dbRotaPossuiVeiculo->getById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $arResposta = $dbRotaAtendeAluno->getAlunosById($arIds);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
     }
 
     private function getVeiculosRota($codigoCidade, $idRota) {
@@ -347,7 +377,7 @@ class RotasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
-    
+
     private function processarUpdateRota($idRota, $arData) {
         $modelRotas = new RotasModel();
         $boValidate = $modelRotas->validarUpdate($arData, $idRota);

@@ -22,7 +22,11 @@ class SeteRotaPossuiVeiculo extends AbstractDatabasePostgres {
                 ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
-        return $row;
+        if(!$row){
+            return [];
+        }else{
+            return $row;
+        }
     }
     
     public function getAlunosByEscola($codigoCidade, $idEscola){

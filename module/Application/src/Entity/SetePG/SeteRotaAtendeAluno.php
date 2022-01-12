@@ -14,6 +14,20 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
+    
+    public function getAlunosById($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['alu' => new \Laminas\Db\Sql\TableIdentifier('sete_alunos', 'sete')], "eta.id_aluno = alu.id_aluno AND eta.codigo_cidade = alu.codigo_cidade", ['codigo_cidade', 'id_aluno', 'nome', 'cpf', 'loc_latitude', 'loc_longitude', 'nivel', 'turno'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $arAlunos = [];
+        $this->getResultSet($prepare->execute());
+        foreach ($this->resultSet as $row){
+            $arAlunos[] = $row;
+        }
+        return $arAlunos;
+    }
 
     public function getNomeRotaAssociadoAluno($codigoCidade, $idAluno){
         $sql = "SELECT coalesce(r.nome, 'Não Informada') as nome FROM sete.sete_rota_atende_aluno raa 
@@ -58,6 +72,25 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
         $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']}");
+        $sql = $this->sql->buildSqlString($delete);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $boResultado = true;
+            $message = "Registro excluido com sucesso!";
+        } catch (\PDOException $zAdapterEx) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zAdapterEx->getMessage();
+        } catch (\Laminas\Db\Adapter\Exception\InvalidQueryException $zendDbExc) {
+            $boResultado = false;
+            $message = "Falha ao excluir o registro. Contacte o administrador do sistema para maiores informações. <br />" . $zendDbExc->getMessage();
+        }
+        return ['result' => $boResultado, 'messages' => $message];
+    }
+    
+    public function _deleteByAlunoAndRota($arIds) {
+        $this->sql = new Sql($this->AdapterBD);
+        $delete = $this->sql->delete($this->tableIdentifier);
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_aluno = {$arIds['id_aluno']} AND id_rota = {$arIds['id_rota']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
