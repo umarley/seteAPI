@@ -14,6 +14,7 @@ class MotoristasResource extends API
      * @return ApiProblem|mixed
      */
     public function create($data) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -66,6 +67,7 @@ class MotoristasResource extends API
      */
     public function delete($id)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $cpfMotorista = $arParams['motoristas_id'];
@@ -224,6 +226,7 @@ class MotoristasResource extends API
      */
     public function update($id, $data)
     {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);

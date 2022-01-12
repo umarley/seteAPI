@@ -20,6 +20,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function create($data)
     {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The POST method has not been defined');
     }
 
@@ -31,6 +32,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function delete($id)
     {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -123,6 +125,7 @@ class MunicipiosResource extends \Sete\V1\API
      */
     public function update($id, $data)
     {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 }

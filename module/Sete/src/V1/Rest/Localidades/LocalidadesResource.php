@@ -14,6 +14,7 @@ class LocalidadesResource extends API {
      * @return ApiProblem|mixed
      */
     public function create($data) {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The POST method has not been defined');
     }
 
@@ -24,6 +25,7 @@ class LocalidadesResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
     }
 
@@ -128,6 +130,7 @@ class LocalidadesResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
+        $this->usuarioPodeGravar();
         return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
     }
 
