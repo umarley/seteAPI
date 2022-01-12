@@ -9,24 +9,24 @@ use Laminas\Db\Sql\Sql;
 class SeteParametros extends AbstractDatabasePostgres {
 
     const PARAMETROS = [
-        ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor' => 20, 'descricao_parametro' => 'Percentual dos encargos sociais sob o salários dos motoristas.'],
-        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_RODO', 'valor' => 13.5, 'descricao_parametro' => 'Coeficiente de custo de manutenção (RODOVIÁRIO)'],
-        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_AQUA', 'valor' => 13.5, 'descricao_parametro' => 'Coeficiente de custo de manutenção (AQUAVIÁRIO)'],
-        ['codigo_parametro' => 'VIDA_UTIL_RODO', 'valor' => 10, 'descricao_parametro' => 'Vida útil do veículo rodoviário em anos'],
-        ['codigo_parametro' => 'VIDA_UTIL_AQUA', 'valor' => 10, 'descricao_parametro' => 'Vida útil da embarcação rodoviário em anos'],
-        ['codigo_parametro' => 'PERC_RESIDUAL_RODO', 'valor' => 15, 'descricao_parametro' => 'Percentual do valor residual do veículo rodoviário de acordo com o que resta da vida útil.'],
-        ['codigo_parametro' => 'PERC_RESIDUAL_AQUA', 'valor' => 15, 'descricao_parametro' => 'Percentual do valor residual do veículo aquaviario de acordo com o que resta da vida útil.'],
-        ['codigo_parametro' => 'PERC_TRC', 'valor' => 9.25, 'descricao_parametro' => 'Taxa de remuneração do capital'],
-        ['codigo_parametro' => 'CFT_CONSUMO_OLEO_LUBRIFICANTE', 'valor' => 005, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE ÓLEOS E LUBRIFICANTES (l/km)'],
-        ['codigo_parametro' => 'NUM_RECAPAGEM', 'valor' => 3, 'descricao_parametro' => 'Número de recapagens que são feitas nos pneus do veículos'],
-        ['codigo_parametro' => 'CFT_CONSUMO_PECAS', 'valor' => 0.0058, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE PEÇAS E ACESSÓRIOS'],
-        ['codigo_parametro' => 'PERC_SEGURO_AQUA', 'valor' => 4.2, 'descricao_parametro' => 'TAXA DE SEGURO DAS EMBARCAÇÕES (4.2%)'],
-        ['codigo_parametro' => 'PERC_MANUTENCAO_EMBARCACAO', 'valor' => null, 'descricao_parametro' => ' TAXA ANUAL DE MANUTENÇÃO E REPARO DA EMBARCAÇÃO-TIPO'],
-        ['codigo_parametro' => 'DENSIDADE_COMBUSTIVEL', 'valor' => 0.85, 'descricao_parametro' => 'DENSIDADE DE COMBUSTÍVEL (kg/litro)'],
-        ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (kg/hp)'],
-        ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (kg/litro)'],
-        ['codigo_parametro' => 'PRECO_MEDIO_LUBRIFICANTE', 'valor' => null, 'descricao_parametro' => 'Preço médio do lubrificante (R$ / litro);'],
-        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => null, 'descricao_parametro' => 'Preço médio do litro do combustível (diesel, gasolina, óleo e gás natural)']
+        ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor_padrao' => 20, 'valor' => 20, 'descricao_parametro' => 'PERCENTUAL DOS ENCARGOS SOCIAIS SOB O SALÁRIOS DOS MOTORISTAS.'],
+        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_RODO', 'valor_padrao' => 13.5, 'valor' => 13.5, 'descricao_parametro' => 'COEFICIENTE DE CUSTO DE MANUTENÇÃO (RODOVIÁRIO)'],
+        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_AQUA', 'valor_padrao' => 13.5, 'valor' => 13.5, 'descricao_parametro' => 'COEFICIENTE DE CUSTO DE MANUTENÇÃO (AQUAVIÁRIO)'],
+        ['codigo_parametro' => 'VIDA_UTIL_RODO', 'valor_padrao' => 10, 'valor' => 10, 'descricao_parametro' => 'VIDA ÚTIL DO VEÍCULO RODOVIÁRIO EM ANOS'],
+        ['codigo_parametro' => 'VIDA_UTIL_AQUA', 'valor_padrao' => 10, 'valor' => 10, 'descricao_parametro' => 'VIDA ÚTIL DA EMBARCAÇÃO RODOVIÁRIO EM ANOS'],
+        ['codigo_parametro' => 'PERC_RESIDUAL_RODO', 'valor_padrao' => 15, 'valor' => 15, 'descricao_parametro' => 'PERCENTUAL DO VALOR RESIDUAL DO VEÍCULO RODOVIÁRIO DE ACORDO COM O QUE RESTA DA VIDA ÚTIL.'],
+        ['codigo_parametro' => 'PERC_RESIDUAL_AQUA', 'valor_padrao' => 15, 'valor' => 15, 'descricao_parametro' => 'PERCENTUAL DO VALOR RESIDUAL DO VEÍCULO AQUAVIARIO DE ACORDO COM O QUE RESTA DA VIDA ÚTIL.'],
+        ['codigo_parametro' => 'PERC_TRC', 'valor_padrao' => 9.25, 'valor' => 9.25, 'descricao_parametro' => 'TAXA DE REMUNERAÇÃO DO CAPITAL'],
+        ['codigo_parametro' => 'CFT_CONSUMO_OLEO_LUBRIFICANTE', 'valor_padrao' => 005, 'valor' => 005, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE ÓLEOS E LUBRIFICANTES (L/KM)'],
+        ['codigo_parametro' => 'NUM_RECAPAGEM', 'valor_padrao' => 3, 'valor' => 3, 'descricao_parametro' => 'NÚMERO DE RECAPAGENS QUE SÃO FEITAS NOS PNEUS DO VEÍCULOS'],
+        ['codigo_parametro' => 'CFT_CONSUMO_PECAS', 'valor_padrao' => 0.0058, 'valor' => 0.0058, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE PEÇAS E ACESSÓRIOS'],
+        ['codigo_parametro' => 'PERC_SEGURO_AQUA', 'valor_padrao' => 4.2, 'valor' => 4.2, 'descricao_parametro' => 'TAXA DE SEGURO DAS EMBARCAÇÕES (4.2%)'],
+        ['codigo_parametro' => 'PERC_MANUTENCAO_EMBARCACAO', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => ' TAXA ANUAL DE MANUTENÇÃO E REPARO DA EMBARCAÇÃO-TIPO'],
+        ['codigo_parametro' => 'DENSIDADE_COMBUSTIVEL', 'valor_padrao' => 0.85, 'valor' => 0.85, 'descricao_parametro' => 'DENSIDADE DE COMBUSTÍVEL (KG/LITRO)'],
+        ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (KG/HP)'],
+        ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (KG/LITRO)'],
+        ['codigo_parametro' => 'PRECO_MEDIO_LUBRIFICANTE', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LUBRIFICANTE (R$ / LITRO);'],
+        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO COMBUSTÍVEL (DIESEL, GASOLINA, ÓLEO E GÁS NATURAL)']
     ];
 
     public function __construct() {
