@@ -42,12 +42,24 @@ class UserModel {
         return $this->_entityPG->getLista($codigoMunicipio);
     }
 
-    public function processarInsert($arPost, $accessToken) {
+    public function processarInsertNovoUsuario($arPost) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
         $arData = (array) $arPost;
+        $arData['is_liberado'] = 'N';
+        //$arData['cod_cidade'] = $arData['codigo_cidade'];
+        $arData['cidade'] = $arCidade['nm_cidade'];
+        $arData['cod_estado'] = $arCidade['codigo_uf'];
+        $arData['estado'] = $arCidade['estado'];
         $arData['dt_criacao'] = date("Y-m-d H:i:s");
-        $arData['criado_por'] = $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken);
-        return $this->_entity->_inserir($arData);
+        $arData['nivel_permissao'] = $arData['tipo_permissao'];
+        unset($arData['tipo_permissao']);
+        $arResult = $this->_entityPG->_inserir($arData);
+        if ($arResult['result']) {
+            $arResult['messages']['id'] = $this->_entityPG->getUltimoIdInserido();
+        }
+        return $arResult;
     }
 
     public function processarUpdate($idUsuario, $arPost, $accessToken) {
@@ -135,7 +147,7 @@ class UserModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
     
-    public function processarInsertUsuarioSETE($arPost, $accessToken){
+    public function processarInsert($arPost, $accessToken){
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
