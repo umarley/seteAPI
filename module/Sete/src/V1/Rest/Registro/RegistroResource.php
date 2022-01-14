@@ -2,13 +2,14 @@
 
 namespace Sete\V1\Rest\Registro;
 
+use Sete\V1\API;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 
 class RegistroResource extends AbstractResourceListener {
-
-    private $_model;
     
+    protected $_model;
+
     /**
      * Create a resource
      *
@@ -31,7 +32,7 @@ class RegistroResource extends AbstractResourceListener {
             $this->populaResposta(400, $boValidate, false);
         } else {
             $data->codigo_cidade = $codigoCidade;
-            $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+            $arResult = $this->_model->processarInsertNovoUsuario($data);
             $this->populaResposta(201, $arResult, false);
         }
     }

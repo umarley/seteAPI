@@ -21,15 +21,6 @@ class UserResource extends API {
         $userType = $this->event->getRouteMatch()->getParam('user_type');
         $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
         switch ($userType) {
-            case 'api':
-                $validate = $this->_model->validarUsuario($data);
-                if (!$validate['result']) {
-                    $this->populaResposta(400, $validate, false);
-                } else {
-                    $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
-                    $this->populaResposta(201, $arResult, false);
-                }
-                break;
             case 'sete':
                 $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
                 if ($usuarioPodeAcessarMunicipio) {
@@ -50,7 +41,7 @@ class UserResource extends API {
                             $this->populaResposta(400, $boValidate, false);
                         } else {
                             $data->codigo_cidade = $codigoCidade;
-                            $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+                            $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
                             $this->populaResposta(201, $arResult, false);
                         }
                     }
