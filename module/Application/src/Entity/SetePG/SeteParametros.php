@@ -21,7 +21,7 @@ class SeteParametros extends AbstractDatabasePostgres {
         ['codigo_parametro' => 'NUM_RECAPAGEM', 'valor_padrao' => 3, 'valor' => 3, 'descricao_parametro' => 'NÚMERO DE RECAPAGENS QUE SÃO FEITAS NOS PNEUS DO VEÍCULOS'],
         ['codigo_parametro' => 'CFT_CONSUMO_PECAS', 'valor_padrao' => 0.0058, 'valor' => 0.0058, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE PEÇAS E ACESSÓRIOS'],
         ['codigo_parametro' => 'PERC_SEGURO_AQUA', 'valor_padrao' => 4.2, 'valor' => 4.2, 'descricao_parametro' => 'TAXA DE SEGURO DAS EMBARCAÇÕES (4.2%)'],
-        ['codigo_parametro' => 'PERC_MANUTENCAO_EMBARCACAO', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => ' TAXA ANUAL DE MANUTENÇÃO E REPARO DA EMBARCAÇÃO-TIPO'],
+        ['codigo_parametro' => 'PERC_MANUTENCAO_EMBARCACAO', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'TAXA ANUAL DE MANUTENÇÃO E REPARO DA EMBARCAÇÃO-TIPO'],
         ['codigo_parametro' => 'DENSIDADE_COMBUSTIVEL', 'valor_padrao' => 0.85, 'valor' => 0.85, 'descricao_parametro' => 'DENSIDADE DE COMBUSTÍVEL (KG/LITRO)'],
         ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (KG/HP)'],
         ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (KG/LITRO)'],
@@ -47,7 +47,7 @@ class SeteParametros extends AbstractDatabasePostgres {
     }
     
     public function getLista($codigoCidade){
-        $sql = "select codigo_parametro, valor, descricao_parametro from sete.sete_parametros 
+        $sql = "select codigo_parametro, valor_padrao,  valor, descricao_parametro, descricao_detalhada from sete.sete_parametros 
                 where codigo_cidade = {$codigoCidade}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
