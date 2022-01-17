@@ -26,7 +26,9 @@ class SeteParametros extends AbstractDatabasePostgres {
         ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (KG/HP)'],
         ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (KG/LITRO)'],
         ['codigo_parametro' => 'PRECO_MEDIO_LUBRIFICANTE', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LUBRIFICANTE (R$ / LITRO);'],
-        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO COMBUSTÍVEL (DIESEL, GASOLINA, ÓLEO E GÁS NATURAL)']
+        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO COMBUSTÍVEL (DIESEL, GASOLINA, ÓLEO E GÁS NATURAL)'],
+        ['codigo_parametro' => 'PRECO_MEDIO_PNEUS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DOS PN PNEUS'],
+        ['codigo_parametro' => 'PRECO_MEDIO_RECAPAGEM', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO SERVIÇO DE RECAPAGEM']
     ];
 
     public function __construct() {
