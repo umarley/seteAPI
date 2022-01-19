@@ -175,9 +175,9 @@ class RotasModel {
         return $arResult;
     }
 
-    public function removerRegistroById($codigoCidade, $idAluno) {
+    public function removerRegistroById($codigoCidade, $idRota) {
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
+        $arIds['id_rota'] = $idRota;
         $arResult = $this->_entity->_delete($arIds);
         return $arResult;
     }
