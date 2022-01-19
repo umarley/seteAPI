@@ -169,8 +169,13 @@ class RotasResource extends API {
                 $this->removerVeiculoRota($codigoCidade, $idRota);
                 break;
             case 'alunos':
-                $arResult = $this->removerAlunosRota($arParams);
-                $this->populaResposta(200, $arResult);
+                if (isset($arParams['arData']->alunos)) {
+                    $arResult = $this->removerAlunosRota($arParams);
+                    $this->populaResposta(200, $arResult);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => 'O objeto contendo os ID\'s dos alunos deve ser informado!'], false);
+                }
+
                 break;
         }
     }
@@ -183,7 +188,6 @@ class RotasResource extends API {
             $arIds['id_rota'] = $arParams['rotas_id'];
             $arIds['id_aluno'] = $rowAluno->id_aluno;
             $arResult[] = $dbSeteRotaAtendeAluno->_deleteByAlunoAndRota($arIds);
-            
         }
         return $arResult;
     }
