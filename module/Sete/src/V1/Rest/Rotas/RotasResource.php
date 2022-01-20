@@ -48,9 +48,32 @@ class RotasResource extends API {
             case 'alunos':
                 $this->associarAlunosRota($arDados);
                 break;
+            case 'motoristas':
+                $this->associarMotoristaRota($arDados);
+                break;
             default:
                 $this->populaResposta(404, ['result' => false, 'messages' => "O recurso não existe!"], false);
                 break;
+        }
+    }
+    
+    private function associarMotoristaRota($arDados) {
+        $dbSeteMotorista = new \Db\SetePG\SeteMotoristas();
+        $dbSeteRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        if ($arDados->id_rota !== "") {
+            if (!$dbSeteMotorista->motoristaExiste($arDados->cpf_motorista)) {
+                $this->populaResposta(404, ['result' => false, 'messages' => "Motorista informado não existe!"]);
+            } else if ($dbSeteRotaDirigidaPorMotorista->rotaAssociadaMotorista($arDados->cpf_motorista, $arDados->id_rota, $arDados->codigo_cidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "Motorista já associado a esta rota!"], false);
+            } else {
+                $this->populaResposta(201, $dbSeteRotaDirigidaPorMotorista->_inserir([
+                            'codigo_cidade' => $arDados->codigo_cidade,
+                            'id_rota' => $arDados->id_rota,
+                            'cpf_motorista' => $arDados->cpf_motorista
+                        ]), false);
+            }
+        } else {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
         }
     }
 
@@ -104,7 +127,7 @@ class RotasResource extends API {
             if (!$dbSeteVeiculos->veiculoExiste($arDados->id_veiculo, $arDados->codigo_cidade)) {
                 $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"]);
             } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Aluno já associado a uma escola!"], false);
+                $this->populaResposta(400, ['result' => false, 'messages' => "Veículo já associado a uma rota!"], false);
             } else {
                 $this->populaResposta(201, $dbSeteRotaPossuiVeiculos->_inserir([
                             'codigo_cidade' => $arDados->codigo_cidade,
@@ -168,6 +191,9 @@ class RotasResource extends API {
             case 'veiculos':
                 $this->removerVeiculoRota($codigoCidade, $idRota);
                 break;
+            case 'motoristas':
+                $this->removerMotoristaRota($codigoCidade, $idRota, $arParams['arData']->cpf_motorista);
+                break;
             case 'alunos':
                 if (isset($arParams['arData']->alunos)) {
                     $arResult = $this->removerAlunosRota($arParams);
@@ -197,6 +223,16 @@ class RotasResource extends API {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_rota'] = $idRota;
         $arResult = $dbSeteRotaPossuiVeiculo->_delete($arIds);
+        $this->populaResposta(200, $arResult, false);
+        exit;
+    }
+    
+    private function removerMotoristaRota($codigoCidade, $idRota, $cpfMotorista) {
+        $dbSeteRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_rota'] = $idRota;
+        $arIds['cpf_motorista'] = $cpfMotorista;
+        $arResult = $dbSeteRotaDirigidaPorMotorista->_delete($arIds);
         $this->populaResposta(200, $arResult, false);
         exit;
     }
@@ -251,6 +287,12 @@ class RotasResource extends API {
                 case 'alunos':
                     $this->getAlunosRota($codigoCidade, $idRota);
                     break;
+                case 'motoristas':
+                    $this->getMotoristasRota($codigoCidade, $idRota);
+                    break;
+                case 'monitores':
+                    $this->getMonitoresRota($codigoCidade, $idRota);
+                    break;
                 case 'shape':
                     $this->getShapeRota($codigoCidade, $idRota);
                     break;
@@ -262,6 +304,29 @@ class RotasResource extends API {
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
         }
+    }
+    
+    private function getMonitoresRota($codigoCidade, $idRota) {
+        $dbRotaAtendidaPorMonitor = new \Db\SetePG\SeteRotaAtendidaPorMonitor();
+        $arIds['id_rota'] = $idRota;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaAtendidaPorMonitor->getLista($arIds);
+        foreach ($arResposta as $key => $row){
+            $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
+        }
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+    }
+    
+    private function getMotoristasRota($codigoCidade, $idRota) {
+        $dbRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        $arIds['id_rota'] = $idRota;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaDirigidaPorMotorista->getLista($arIds);
+        foreach ($arResposta as $key => $row){
+            $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
+            $arResposta[$key]['data_validade_cnh'] = date("d/m/Y", strtotime($row['data_validade_cnh']));
+        }
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
     }
 
     private function getAlunosRota($codigoCidade, $idRota) {

@@ -20,6 +20,7 @@ return [
             \Sete\V1\Rest\Monitores\MonitoresResource::class => \Sete\V1\Rest\Monitores\MonitoresResourceFactory::class,
             \Sete\V1\Rest\Shapes\ShapesResource::class => \Sete\V1\Rest\Shapes\ShapesResourceFactory::class,
             \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
+            \Sete\V1\Rest\Custo\CustoResource::class => \Sete\V1\Rest\Custo\CustoResourceFactory::class,
         ],
     ],
     'router' => [
@@ -186,6 +187,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.custo' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/custo[/:codigo_cidade[/:id_rota[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Custo\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -208,6 +218,7 @@ return [
             15 => 'sete.rest.monitores',
             16 => 'sete.rest.shapes',
             17 => 'sete.rest.parametros',
+            18 => 'sete.rest.custo',
         ],
     ],
     'api-tools-rest' => [
@@ -615,6 +626,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Parametros\ParametrosCollection::class,
             'service_name' => 'Parametros',
         ],
+        'Sete\\V1\\Rest\\Custo\\Controller' => [
+            'listener' => \Sete\V1\Rest\Custo\CustoResource::class,
+            'route_name' => 'sete.rest.custo',
+            'route_identifier_name' => 'id_rota',
+            'collection_name' => 'custo',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Custo\CustoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Custo\CustoCollection::class,
+            'service_name' => 'custo',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -636,6 +670,7 @@ return [
             'Sete\\V1\\Rest\\Monitores\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Shapes\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Custo\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -729,6 +764,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Custo\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -801,6 +841,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Parametros\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Custo\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1022,6 +1066,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.parametros',
                 'route_identifier_name' => 'parametros_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Custo\CustoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.custo',
+                'route_identifier_name' => 'id_rota',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Custo\CustoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.custo',
+                'route_identifier_name' => 'id_rota',
                 'is_collection' => true,
             ],
         ],
