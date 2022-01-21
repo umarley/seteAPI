@@ -8,12 +8,13 @@ use Laminas\Db\Sql\Sql;
 use PHPUnit\Framework\Constraint\IsEmpty;
 
 use function PHPUnit\Framework\isEmpty;
+use function PHPUnit\Framework\isNull;
 
-class SeteOrdensServico extends AbstractDatabasePostgres {
+class SeteOrdensServicos extends AbstractDatabasePostgres {
 
     public function __construct() {
-        $this->table = 'sete_veiculos';
-        $this->primaryKey = 'id_veiculo';
+        $this->table = 'sete_ordem_servico';
+        $this->primaryKey = 'id_ordem';
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
@@ -22,7 +23,7 @@ class SeteOrdensServico extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['*'])
-                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_veiculo = {$arIds['id_veiculo']}");
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id_ordem= {$arIds['id_ordem']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row;
@@ -31,7 +32,7 @@ class SeteOrdensServico extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id_veiculo', 'placa','modelo','tipo','capacidade','marca','origem','manutencao'])
+                ->columns(['id_ordem','id_veiculo', 'id_fornecedor','data','tipo_servico','comentario'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -43,19 +44,46 @@ class SeteOrdensServico extends AbstractDatabasePostgres {
     }
 
 
-    public function veiculoExiste($placa, $codigoCidade) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("placa = '{$placa}' AND codigo_cidade = '{$codigoCidade}'");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        if ($row['qtd'] > 0) {
+    public function veiculoExisteById($idVeiculo, $codigoCidade) {
+        $sql = "select count(*)
+                as qntd
+                from sete.sete_veiculos a
+                where  id_veiculo = '{$idVeiculo}' AND codigo_cidade = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        if ($row['qntd'] != 0) {
             return true;
         } else {
             return false;
         }
     }
+
+    public function fornecedorExisteById($idFornecedor, $codigoCidade) {
+        $sql = "select count(*)
+                as qntd
+                from sete.sete_fornecedores a
+                where  id_fornecedor = '{$idFornecedor}' AND codigo_cidade = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        if ($row['qntd'] != 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getUltimoIdInserido() {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_ordem)")]);
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['id'];
+    }
+
+    
 
     public function veiculoExisteUnico($placa, $codigoCidade, $idVeiculo) {
         $sql = new Sql($this->AdapterBD);
@@ -71,14 +99,6 @@ class SeteOrdensServico extends AbstractDatabasePostgres {
         }
     }
 
-    public function getUltimoIdInserido() {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['id' => new \Laminas\Db\Sql\Expression("max(id_veiculo)")]);
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['id'];
-    }
 
     public function _atualizar($arId, $dados) {
         $this->sql = new Sql($this->AdapterBD);
