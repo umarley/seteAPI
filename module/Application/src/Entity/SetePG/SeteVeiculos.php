@@ -59,6 +59,20 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         }
     }
     
+    public function veiculoExisteById($idVeiculo, $codigoCidade) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("id_veiculo = '{$idVeiculo}' AND codigo_cidade = '{$codigoCidade}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     public function veiculoExistePUT($placa, $codigoCidade, $idVeiculo) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)

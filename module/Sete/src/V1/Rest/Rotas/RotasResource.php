@@ -124,8 +124,8 @@ class RotasResource extends API {
         $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
         $dbSeteRotaPossuiVeiculos = new \Db\SetePG\SeteRotaPossuiVeiculo();
         if ($arDados->id_rota !== "") {
-            if (!$dbSeteVeiculos->veiculoExiste($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"]);
+            if (!$dbSeteVeiculos->veiculoExisteById($arDados->id_veiculo, $arDados->codigo_cidade)) {
+                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"], false);
             } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
                 $this->populaResposta(400, ['result' => false, 'messages' => "Veículo já associado a uma rota!"], false);
             } else {
