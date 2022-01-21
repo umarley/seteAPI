@@ -2,9 +2,9 @@
 namespace Sete\V1\Rest\Custo;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
-use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Sete\V1\API;
 
-class CustoResource extends AbstractResourceListener
+class CustoResource extends API
 {
     /**
      * Create a resource
@@ -47,7 +47,26 @@ class CustoResource extends AbstractResourceListener
      */
     public function fetch($id)
     {
-        return new ApiProblem(405, 'The GET method has not been defined for individual resources');
+        $arParams     = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idRota       = $arParams['id_rota'];
+        $this->_model = new \Sete\V1\Rest\Custo\CustoModel();
+        $boValidateRotaAndCidade = $this->_model->checarRotaAndCidadeExistem($codigoCidade, $idRota);
+        if($boValidateRotaAndCidade['result']){
+            $this->processarValidacaoParametrosCusto($codigoCidade, $idRota);
+        }else{
+            $this->populaResposta($boValidateRotaAndCidade['http_code'], ['result' => $boValidateRotaAndCidade['result'], 'messages' => $boValidateRotaAndCidade['messages']], false);
+        }
+        exit;
+    }
+    
+    private function processarValidacaoParametrosCusto($codigoCidade, $idRota){
+        $this->_model = new \Sete\V1\Rest\Custo\CustoModel();
+        $boValidate = $this->_model->validarParametrosCusto($codigoCidade, $idRota);
+        
+        
+        
+        
     }
 
     /**

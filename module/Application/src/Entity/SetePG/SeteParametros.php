@@ -7,6 +7,27 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
 class SeteParametros extends AbstractDatabasePostgres {
+    
+    const PERC_ENCARGO_SOCIAIS = 'PERC_ENCARGO_SOCIAIS';
+    const PERC_CFT_CUSTO_MANUTENCAO_RODO = 'PERC_CFT_CUSTO_MANUTENCAO_RODO';
+    const PERC_CFT_CUSTO_MANUTENCAO_AQUA = 'PERC_CFT_CUSTO_MANUTENCAO_AQUA';
+    const VIDA_UTIL_RODO = 'VIDA_UTIL_RODO';
+    const VIDA_UTIL_AQUA = 'VIDA_UTIL_AQUA';
+    const PERC_RESIDUAL_RODO = 'PERC_RESIDUAL_RODO';
+    const PERC_RESIDUAL_AQUA = 'PERC_RESIDUAL_AQUA';
+    const PERC_TRC = 'PERC_TRC';
+    const PRECO_MEDIO_COMBUSTIVEIS = 'PRECO_MEDIO_COMBUSTIVEIS';
+    const CFT_CONSUMO_OLEO_LUBRIFICANTE = 'CFT_CONSUMO_OLEO_LUBRIFICANTE';
+    const PRECO_MEDIO_PNEUS = 'PRECO_MEDIO_PNEUS';
+    const PRECO_MEDIO_RECAPAGEM = 'PRECO_MEDIO_RECAPAGEM';
+    const CFT_CONSUMO_PECAS = 'CFT_CONSUMO_PECAS';
+    const NUM_RECAPAGEM = 'NUM_RECAPAGEM';
+    const PERC_SEGURO_AQUA = 'PERC_SEGURO_AQUA';
+    const DENSIDADE_COMBUSTIVEL = 'DENSIDADE_COMBUSTIVEL';
+    const CONSUMO_LUBRIFICANTE = 'CONSUMO_LUBRIFICANTE';
+    const DENSIDADE_LUBRIFICANTE = 'DENSIDADE_LUBRIFICANTE';
+    const PRECO_MEDIO_LUBRIFICANTE = 'PRECO_MEDIO_LUBRIFICANTE';
+    const PERC_MANUTENCAO_EMBARCACAO = 'PERC_MANUTENCAO_EMBARCACAO';
 
     const PARAMETROS = [
         ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor_padrao' => 20, 'valor' => 20, 'descricao_parametro' => 'PERCENTUAL DOS ENCARGOS SOCIAIS SOB O SALÁRIOS DOS MOTORISTAS.'],
@@ -59,6 +80,15 @@ class SeteParametros extends AbstractDatabasePostgres {
             $arLista[] = $row;
         }
         return $arLista;                
+    }
+    
+    public function getParametros($codigoCidade){
+        $arListaParametros = $this->getLista($codigoCidade);
+        $arParametros = [];
+        foreach ($arListaParametros as $row){
+            $arParametros[$row['codigo_parametro']] = $row['valor'];
+        }
+        return $arParametros;        
     }
 
     public function startupParametros($codigoCidade) {

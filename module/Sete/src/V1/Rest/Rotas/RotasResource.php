@@ -314,7 +314,7 @@ class RotasResource extends API {
         foreach ($arResposta as $key => $row){
             $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
         }
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
     }
     
     private function getMotoristasRota($codigoCidade, $idRota) {
@@ -326,7 +326,7 @@ class RotasResource extends API {
             $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
             $arResposta[$key]['data_validade_cnh'] = date("d/m/Y", strtotime($row['data_validade_cnh']));
         }
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
     }
 
     private function getAlunosRota($codigoCidade, $idRota) {
