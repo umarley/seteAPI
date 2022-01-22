@@ -266,7 +266,9 @@ class RotasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $idRota = $arParams['rotas_id'];
-            $rota = $arParams['rota'];
+            if(isset($arParams['rota'])){
+                $rota = $arParams['rota'];
+            }
             if (isset($rota)) {
                 $this->processarGetRota($rota, $codigoCidade, $idRota);
             } else if ($idRota != "" && is_numeric($idRota)) {

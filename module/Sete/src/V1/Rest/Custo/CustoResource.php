@@ -63,10 +63,12 @@ class CustoResource extends API
     private function processarValidacaoParametrosCusto($codigoCidade, $idRota){
         $this->_model = new \Sete\V1\Rest\Custo\CustoModel();
         $boValidate = $this->_model->validarParametrosCusto($codigoCidade, $idRota);
-        
-        
-        
-        
+        foreach ($boValidate['params'] as $rowParam){
+            if(!$rowParam['result']){
+                $boValidate['result'] = $rowParam['result'];
+            }
+        }
+        $this->populaResposta(200, $boValidate, false);
     }
 
     /**
