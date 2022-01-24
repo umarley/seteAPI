@@ -32,7 +32,6 @@ class VeiculosResource extends API
         }
     }
 
-
     private function processarInsertVeiculo($arData) {
         $modelVeiculos = new VeiculosModel();
         $boValidate = $modelVeiculos->validarInsert($arData);
