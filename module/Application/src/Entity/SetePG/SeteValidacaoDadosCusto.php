@@ -30,6 +30,21 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         return $arLista;
     }
     
+    private function getMonitoresDaRota($idRota, $codigoCidade){
+        $sql = "select mnt.cpf, mnt.salario  from sete.sete_rota_atendida_por_monitor ram
+                inner join sete.sete_monitores mnt on mnt.codigo_cidade = ram.codigo_cidade and ram.cpf_monitor = mnt.cpf 
+                where ram.codigo_cidade = {$codigoCidade} and id_rota = {$idRota}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $execute = $statement->execute();
+        $this->getResultSet($execute);
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+    
     private function getVeiculosFrotaAquaviaria($idRota, $codigoCidade){
         $sql = "select v.placa, v.id_veiculo, v.potencia_do_motor from sete.sete_rota_possui_veiculo rpv 
                 inner join sete.sete_veiculos v on v.codigo_cidade = rpv.codigo_cidade and v.id_veiculo = rpv.id_veiculo 
@@ -46,7 +61,7 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
     }
     
     private function getVeiculosFrotaGeral($idRota, $codigoCidade){
-        $sql = "select v.placa, v.id_veiculo, v.seguro_anual, v.preco from sete.sete_rota_possui_veiculo rpv 
+        $sql = "select v.placa, v.id_veiculo, v.seguro_anual, v.preco, v.ano from sete.sete_rota_possui_veiculo rpv 
                 inner join sete.sete_veiculos v on v.codigo_cidade = rpv.codigo_cidade and v.id_veiculo = rpv.id_veiculo 
                 where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota}";
         $statement = $this->AdapterBD->createStatement($sql);
@@ -102,6 +117,15 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         return $execute['qtd'];
     }
     
+    private function getQtdMonitores($idRota, $codigoCidade){
+        $sql = "select COUNT(*) as qtd from sete.sete_rota_atendida_por_monitor ram
+                where ram.codigo_cidade = {$codigoCidade} and id_rota = {$idRota}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $execute = $statement->execute()->current();
+        return $execute['qtd'];
+    }
+    
     
     public function processarSalarioMotorista($idRota, $codigoCidade){
         $arMotoristas = $this->getMotoristasDaRota($idRota, $codigoCidade);
@@ -131,6 +155,35 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         }
         return ['result' => $boValidate, 'codigo_parametro' => 'SALARIO_MEDIO_MOTORISTA', 'valor' => $valor, 'modulo' => 'Motoristas', 'motoristas_invalidos' => $cpfsInvalidos];
         //return ['result' => $boValidate, $arRetorno];
+    }
+    
+    public function processarSalarioMonitores($idRota, $codigoCidade){
+        $arMonitores = $this->getMonitoresDaRota($idRota, $codigoCidade);
+        $count = 0;
+        $salario = 0;
+        $cpfsInvalidos = [];
+        $boValidate = true;
+        foreach ($arMonitores as $rowMonitor){
+            if($rowMonitor->salario == "" || empty($rowMonitor->salario)){
+                $boValidate = false;
+                $rowMonitor->salario = 0;
+                $cpfsInvalidos[] = $rowMonitor->cpf;
+            }
+            $salario += $rowMonitor->salario;
+            $count++;
+        }
+        
+        if($boValidate){
+            if($count > 0){
+                $valor = (float) $salario / $count;
+            }else{
+                $valor = (float) $salario;
+            }
+            
+        }else{
+            $valor = "Existe salário de monitor não preenchido.";
+        }
+        return ['result' => $boValidate, 'codigo_parametro' => 'SALARIO_MEDIO_MONITORES', 'valor' => $valor, 'modulo' => 'Monitores', 'monitores_invalidos' => $cpfsInvalidos];
     }
     
     public function processarParametrosFrotaRodoviaria($idRota, $codigoCidade){
@@ -257,11 +310,14 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         $count = 0;
         $seguroAnual = 0;
         $preco = 0;
+        $idadeVeiculo = 0;
         $arValidateGeral = [];
         $veiculosInvalidosSeguroAnual = [];
         $veiculosInvalidosPreco = [];
+        $veiculosInvalidoAno    = [];
         $boValidateSeguroAnual = true;
         $boValidatePreco = true;
+        $boValidateAnoVeiculo = true;
         foreach ($arVeiculos as $rowVeiculo){
             if($rowVeiculo->seguro_anual == "" || empty($rowVeiculo->seguro_anual)){
                 $boValidateSeguroAnual = false;
@@ -272,6 +328,13 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
                 $boValidatePreco = false;
                 $rowVeiculo->preco = 0;
                 $veiculosInvalidosPreco[] = $rowVeiculo->id_veiculo;
+            }
+            if($rowVeiculo->ano == "" || empty($rowVeiculo->ano)){
+                $boValidateAnoVeiculo = false;
+                $rowVeiculo->ano = 0;
+                $veiculosInvalidoAno[] = $rowVeiculo->id_veiculo;
+            }else{
+                $idadeVeiculo += (date("Y") - $rowVeiculo->ano);
             }
             $seguroAnual += $rowVeiculo->seguro_anual;
             $preco += $rowVeiculo->preco;
@@ -296,6 +359,17 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         }
         $arValidateGeral[] = ['result' => $boValidatePreco, 'codigo_parametro' => 'PRECO_MEDIO_VEICULOS', 'valor' => $valor, 'modulo' => 'Frota', 'veiculos_invalidos' => $veiculosInvalidosPreco];
         
+        if($boValidateAnoVeiculo){
+            if($count > 0){
+                $valor = (float) $idadeVeiculo / $count;
+            }else{
+                $valor = (float) $idadeVeiculo;
+            }
+        }else{
+            $valor = "Campo Ano do veículo não preenchido.";
+        }
+        $arValidateGeral[] = ['result' => $boValidateAnoVeiculo, 'codigo_parametro' => 'IDADE_MEDIA_VEICULOS', 'valor' => $valor, 'modulo' => 'Frota', 'veiculos_invalidos' => $veiculosInvalidoAno];
+        
         return $arValidateGeral;
     }
     
@@ -303,10 +377,12 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         $qtdMotoristas = $this->getQtdMotoristas($idRota, $codigoCidade);
         $qtdVeiculos   = $this->getQtdVeiculos($idRota, $codigoCidade);
         $qtdAlunos     = $this->getQtdAlunos($idRota, $codigoCidade);
+        $qtdMonitores  = $this->getQtdMonitores($idRota, $codigoCidade);
         
         $arValidateGeral[] = ['result' => true, 'codigo_parametro' => 'NUM_MOTORISTAS', 'valor' => $qtdMotoristas, 'modulo' => 'Rota'];
         $arValidateGeral[] = ['result' => true, 'codigo_parametro' => 'NUM_VEICULOS', 'valor' => $qtdVeiculos, 'modulo' => 'Rota'];
         $arValidateGeral[] = ['result' => true, 'codigo_parametro' => 'NUM_ALUNOS', 'valor' => $qtdAlunos, 'modulo' => 'Rota'];
+        $arValidateGeral[] = ['result' => true, 'codigo_parametro' => 'NUM_MONITORES', 'valor' => $qtdMonitores, 'modulo' => 'Monitores'];
         
         return $arValidateGeral;
     }

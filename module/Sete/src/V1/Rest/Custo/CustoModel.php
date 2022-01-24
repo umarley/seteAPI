@@ -66,7 +66,6 @@ class CustoModel {
             'codigo_cidade' => $codigoCidade,
             'id_rota' => $idRota
         ]);
-
         if (!in_array($arRota['tipo'], [\Db\Enum\Rota\Tipo::AQUAVIARIO, \Db\Enum\Rota\Tipo::RODOVIARIA])) {
             return ['result' => false, 'modulo' => 'Rotas', 'valor' => 'Tipo da Rota (Mista) não configurado para o cálculo.'];
         } else {
@@ -95,11 +94,14 @@ class CustoModel {
         $codigoCidade = $arRota['codigo_cidade'];
         $arValidateMotoristas = $dbSeteValidacaoDadosCustos->processarSalarioMotorista($idRota, $codigoCidade);
         array_push($arValidateGeral, $arValidateMotoristas);
+        $arValidateMonitores = $dbSeteValidacaoDadosCustos->processarSalarioMonitores($idRota, $codigoCidade);
+        array_push($arValidateGeral, $arValidateMonitores);
         if ($tipoRota == \Db\Enum\Rota\Tipo::RODOVIARIA) {
             $arValidateFrotaRodoviaria = $dbSeteValidacaoDadosCustos->processarParametrosFrotaRodoviaria($idRota, $codigoCidade);
             foreach ($arValidateFrotaRodoviaria as $parametrosFrotaRodoviario) {
                 array_push($arValidateGeral, $parametrosFrotaRodoviario);
             }
+            array_push($arValidateGeral, $this->validarKMMensalRota($arRota));
         }
         if ($tipoRota == \Db\Enum\Rota\Tipo::AQUAVIARIO) {
             $arValidateFrotaAquaviaria = $dbSeteValidacaoDadosCustos->processarParametrosFrotaAquaviaria($idRota, $codigoCidade);
@@ -119,6 +121,16 @@ class CustoModel {
         }
 
         return $arValidateGeral;
+    }
+    
+    private function validarKMMensalRota($arRota){
+        if($arRota['km'] == "" || empty($arRota['km'])){
+            return ['result' => false, 'modulo' => 'Rotas', 'codigo_parametro' => 'KM_MENSAL_ROTA', 'valor' => 'Campo KM não informado no cadastro da rota!'];
+        }else{
+            //Tabela sete_rotas, campo km. Resultado é a somatória por 20 dias (x20).
+            $km = $arRota['km'] * 20;
+            return ['result' => true, 'modulo' => 'Rotas', 'codigo_parametro' => 'KM_MENSAL_ROTA', 'valor' => $km];
+        }
     }
 
     private function validarDadosParametrosParaCalculoCusto($arParametros, $tipoRota) {
