@@ -60,23 +60,7 @@ class GaragensModel {
             $boValidate = false;
             $arErros['nome'] = "O nome da garagem deve ser informado!";
         }
-        if (!isset($arPost['loc_latitude']) || empty($arPost['loc_latitude'])) {
-            $boValidate = false;
-            $arErros['loc_latitude'] = "A latitude da garagem deve ser informado!";
-        }
-        if (!isset($arPost['loc_longitude']) || empty($arPost['loc_longitude'])) {
-            $boValidate = false;
-            $arErros['loc_longitude'] = "A longitude da garagem deve ser informado!";
-        }
-        if (!isset($arPost['loc_endereco']) || empty($arPost['loc_endereco'])) {
-            $boValidate = false;
-            $arErros['loc_endereco'] = "O endereço da garagem deve ser informado!";
-        }
-        if (!isset($arPost['loc_cep']) || empty($arPost['loc_cep'])) {
-            $boValidate = false;
-            $arErros['loc_cep'] = "O cep da garagem deve ser informado!";
-        }
-        else{
+        if (isset($arPost['loc_cep']) || !empty($arPost['loc_cep'])) {
             $cep = trim($arPost['loc_cep']);
             $avaliaCep = preg_match("/[0-9]{5}-[0-9]{3}/", $cep);
             $avaliaCepSB = preg_match("/[0-9]{8}/", $cep);
