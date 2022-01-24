@@ -91,7 +91,7 @@ class VeiculosModel {
             $arErros['marca'] = "A marca do veiculo deve ser informada!";
         }
 
-        if (!isset($arPost['modelo']) || empty($arPost['modelo'])) {
+        if (!isset($arPost['modelo']) || $arPost['modelo'] == "") {
             $boValidate = false;
             $arErros['modelo'] = "O modelo do veiculo deve ser informado!";
         }
