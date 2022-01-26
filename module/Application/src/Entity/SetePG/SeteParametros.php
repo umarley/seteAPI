@@ -28,6 +28,11 @@ class SeteParametros extends AbstractDatabasePostgres {
     const DENSIDADE_LUBRIFICANTE = 'DENSIDADE_LUBRIFICANTE';
     const PRECO_MEDIO_LUBRIFICANTE = 'PRECO_MEDIO_LUBRIFICANTE';
     const PERC_MANUTENCAO_EMBARCACAO = 'PERC_MANUTENCAO_EMBARCACAO';
+    const PRECO_MEDIO_GASOLINA = 'PRECO_MEDIO_GASOLINA';
+    const PRECO_MEDIO_DIESEL = 'PRECO_MEDIO_DIESEL';
+    const PRECO_MEDIO_ETANOL = 'PRECO_MEDIO_ETANOL';
+    const PRECO_MEDIO_GAS_NATURAL = 'PRECO_MEDIO_GAS_NATURAL';
+    const PRECO_MEDIO_OUTRO_COMBUSTIVEL = 'PRECO_MEDIO_OUTRO_COMBUSTIVEL';
 
     const PARAMETROS = [
         ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor_padrao' => 20, 'valor' => 20, 'descricao_parametro' => 'PERCENTUAL DOS ENCARGOS SOCIAIS SOB O SALÁRIOS DOS MOTORISTAS.'],
@@ -47,7 +52,11 @@ class SeteParametros extends AbstractDatabasePostgres {
         ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (KG/HP)'],
         ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor_padrao' => 0.9, 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (KG/LITRO)'],
         ['codigo_parametro' => 'PRECO_MEDIO_LUBRIFICANTE', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LUBRIFICANTE (R$ / LITRO);'],
-        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO COMBUSTÍVEL (DIESEL, GASOLINA, ÓLEO E GÁS NATURAL)'],
+        ['codigo_parametro' => 'PRECO_MEDIO_GASOLINA', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DA GASOLINA'],
+        ['codigo_parametro' => 'PRECO_MEDIO_DIESEL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO DIESEL'],
+        ['codigo_parametro' => 'PRECO_MEDIO_ETANOL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO LITRO DO ETANOL'],
+        ['codigo_parametro' => 'PRECO_MEDIO_GAS_NATURAL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO KG DO GÁS NATURAL'],
+        ['codigo_parametro' => 'PRECO_MEDIO_OUTRO_COMBUSTIVEL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO OUTRO COMBUSTIVEL'],
         ['codigo_parametro' => 'PRECO_MEDIO_PNEUS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DOS PNEUS'],
         ['codigo_parametro' => 'PRECO_MEDIO_RECAPAGEM', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO SERVIÇO DE RECAPAGEM']
     ];
@@ -62,11 +71,11 @@ class SeteParametros extends AbstractDatabasePostgres {
     public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-                ->join(['esc' => new \Laminas\Db\Sql\TableIdentifier('sete_escolas', 'sete')], "eta.id_escola = esc.id_escola AND eta.codigo_cidade = esc.codigo_cidade", ['*'])
-                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_aluno = {$arIds['id_aluno']}");
+                ->columns(['valor'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.codigo_parametro = {$arIds['codigo_parametro']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
-        return $row;
+        return $row['valor'];
     }
     
     public function getLista($codigoCidade){

@@ -61,7 +61,7 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
     }
     
     private function getVeiculosFrotaGeral($idRota, $codigoCidade){
-        $sql = "select v.placa, v.id_veiculo, v.seguro_anual, v.preco, v.ano from sete.sete_rota_possui_veiculo rpv 
+        $sql = "select v.placa, v.id_veiculo, v.seguro_anual, v.preco, v.ano, v.tipo_combustivel from sete.sete_rota_possui_veiculo rpv 
                 inner join sete.sete_veiculos v on v.codigo_cidade = rpv.codigo_cidade and v.id_veiculo = rpv.id_veiculo 
                 where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota}";
         $statement = $this->AdapterBD->createStatement($sql);
@@ -370,7 +370,49 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         }
         $arValidateGeral[] = ['result' => $boValidateAnoVeiculo, 'codigo_parametro' => 'IDADE_MEDIA_VEICULOS', 'valor' => $valor, 'modulo' => 'Frota', 'veiculos_invalidos' => $veiculosInvalidoAno];
         
+        $arValidateGeral[] = $this->processarParametroPrecoMedioCombustivel($arVeiculos, $codigoCidade);
+        
         return $arValidateGeral;
+    }
+    
+    private function processarParametroPrecoMedioCombustivel($arVeiculos, $codigoCidade){
+        $dbSetePGParametros = new \Db\SetePG\SeteParametros();
+        $precoMedioGasolina = $dbSetePGParametros->getById(['codigo_cidade' => $codigoCidade, 'codigo_parametro' => $dbSetePGParametros::PRECO_MEDIO_GASOLINA]);
+        $precoMedioDiesel = $dbSetePGParametros->getById(['codigo_cidade' => $codigoCidade, 'codigo_parametro' => $dbSetePGParametros::PRECO_MEDIO_DIESEL]);
+        $precoMedioEtanol = $dbSetePGParametros->getById(['codigo_cidade' => $codigoCidade, 'codigo_parametro' => $dbSetePGParametros::PRECO_MEDIO_ETANOL]);
+        $precoMedioGasNatural = $dbSetePGParametros->getById(['codigo_cidade' => $codigoCidade, 'codigo_parametro' => $dbSetePGParametros::PRECO_MEDIO_GAS_NATURAL]);
+        $precoMedioOutros = $dbSetePGParametros->getById(['codigo_cidade' => $codigoCidade, 'codigo_parametro' => $dbSetePGParametros::PRECO_MEDIO_OUTRO_COMBUSTIVEL]);
+        
+        if($arVeiculos[0]['tipo_combustivel'] === \Db\Enum\TipoCombustivel::GASOLINA && (empty($precoMedioGasolina) || $precoMedioGasolina == "")){
+           return ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
+        }else{
+            ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $precoMedioGasolina];
+        }
+        
+        if($arVeiculos[0]['tipo_combustivel'] === \Db\Enum\TipoCombustivel::DIESEL && (empty($precoMedioDiesel) || $precoMedioDiesel == "")){
+           return ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
+        }else{
+           return ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $precoMedioDiesel];
+        }
+        
+        if($arVeiculos[0]['tipo_combustivel'] === \Db\Enum\TipoCombustivel::ETANOL && (empty($precoMedioEtanol) || $precoMedioEtanol == "")){
+           return ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
+        }else{
+           return ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $precoMedioEtanol];
+        }
+        
+        if($arVeiculos[0]['tipo_combustivel'] === \Db\Enum\TipoCombustivel::GAS_NATURAL && (empty($precoMedioGasNatural) || $precoMedioGasNatural == "")){
+           return ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
+        }else{
+           return ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $precoMedioGasNatural];
+        }
+        
+        if($arVeiculos[0]['tipo_combustivel'] === \Db\Enum\TipoCombustivel::OUTRO && (empty($precoMedioOutros) || $precoMedioOutros == "")){
+           return ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
+        }else{
+           return ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $precoMedioOutros];
+        }
+        
     }
     
     public function processarParametrosRota($idRota, $codigoCidade){

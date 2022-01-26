@@ -57,11 +57,11 @@ class SeteRotaPossuiVeiculo extends AbstractDatabasePostgres {
         return $arLista;
     }
     
-    public function rotaAssociadoVeiculo($idVeiculo, $codigoCidade){
+    public function rotaAssociadoVeiculo($idRota, $codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = '{$codigoCidade}' AND id_veiculo = {$idVeiculo}");
+                ->where("codigo_cidade = '{$codigoCidade}' AND id_rota = {$idRota}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {

@@ -184,12 +184,12 @@ class CustoModel {
         } else {
             $arValidacao[] = ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PERC_TRC', 'valor' => (float) $arParametros['PERC_TRC']];
         }
-        if (empty($arParametros['PRECO_MEDIO_COMBUSTIVEIS'])) {
+        /*if (empty($arParametros['PRECO_MEDIO_COMBUSTIVEIS'])) {
             $boValidate = false;
             $arValidacao[] = ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => 'Parâmetro não informado!'];
         } else {
             $arValidacao[] = ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => (float) $arParametros['PRECO_MEDIO_COMBUSTIVEIS']];
-        }
+        }*/
         if (empty($arParametros['CFT_CONSUMO_OLEO_LUBRIFICANTE'])) {
             $boValidate = false;
             $arValidacao[] = ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'CFT_CONSUMO_OLEO_LUBRIFICANTE', 'valor' => 'Parâmetro não informado!'];

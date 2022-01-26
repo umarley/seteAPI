@@ -126,8 +126,8 @@ class RotasResource extends API {
         if ($arDados->id_rota !== "") {
             if (!$dbSeteVeiculos->veiculoExisteById($arDados->id_veiculo, $arDados->codigo_cidade)) {
                 $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"], false);
-            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Veículo já associado a uma rota!"], false);
+            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_rota, $arDados->codigo_cidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "Rota já possui um veículo associado!"], false);
             } else {
                 $this->populaResposta(201, $dbSeteRotaPossuiVeiculos->_inserir([
                             'codigo_cidade' => $arDados->codigo_cidade,
