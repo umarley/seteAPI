@@ -43,6 +43,20 @@ class SeteRotaDirigidaPorMotorista extends AbstractDatabasePostgres {
         }
     }
 
+    public function getByCPFMotorista($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_rotas', 'sete')], "eta.id_rota = rot.id_rota AND eta.codigo_cidade = rot.codigo_cidade", ['*'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.cpf_motorista = '{$arIds['cpf_motorista']}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $arLista = [];
+        $this->getResultSet($prepare->execute());
+        foreach ($this->resultSet as $row){
+           $arLista[] = $row; 
+        }
+        return $arLista;
+    }
+
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
