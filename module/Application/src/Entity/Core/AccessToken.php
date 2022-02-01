@@ -40,8 +40,8 @@ class AccessToken extends AbstractDatabasePostgres {
     }
     
     public function getEmailUsuarioByAccessToken($accessToken){
-        $sql = "SELECT email FROM api_access_token ac
-                    INNER JOIN usuarios us ON us.id = ac.id_usuario
+        $sql = "SELECT email FROM api.api_access_token ac
+                    INNER JOIN sete.usuarios us ON us.id = ac.id_usuario
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
