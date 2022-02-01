@@ -21,6 +21,7 @@ return [
             \Sete\V1\Rest\Shapes\ShapesResource::class => \Sete\V1\Rest\Shapes\ShapesResourceFactory::class,
             \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
             \Sete\V1\Rest\Custo\CustoResource::class => \Sete\V1\Rest\Custo\CustoResourceFactory::class,
+            \Sete\V1\Rest\Acesso\AcessoResource::class => \Sete\V1\Rest\Acesso\AcessoResourceFactory::class,
         ],
     ],
     'router' => [
@@ -196,6 +197,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.acesso' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/acesso[/:acesso_id]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Acesso\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -219,6 +229,7 @@ return [
             16 => 'sete.rest.shapes',
             17 => 'sete.rest.parametros',
             18 => 'sete.rest.custo',
+            19 => 'sete.rest.acesso',
         ],
     ],
     'api-tools-rest' => [
@@ -653,6 +664,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Custo\CustoCollection::class,
             'service_name' => 'custo',
         ],
+        'Sete\\V1\\Rest\\Acesso\\Controller' => [
+            'listener' => \Sete\V1\Rest\Acesso\AcessoResource::class,
+            'route_name' => 'sete.rest.acesso',
+            'route_identifier_name' => 'acesso_id',
+            'collection_name' => 'acesso',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Acesso\AcessoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Acesso\AcessoCollection::class,
+            'service_name' => 'Acesso',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -675,6 +709,7 @@ return [
             'Sete\\V1\\Rest\\Shapes\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Custo\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Acesso\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -773,6 +808,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Acesso\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -849,6 +889,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Custo\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Acesso\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1082,6 +1126,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.custo',
                 'route_identifier_name' => 'id_rota',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Acesso\AcessoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.acesso',
+                'route_identifier_name' => 'acesso_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Acesso\AcessoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.acesso',
+                'route_identifier_name' => 'acesso_id',
                 'is_collection' => true,
             ],
         ],
