@@ -153,6 +153,30 @@ class MotoristasResource extends API
         }
     }
 
+    private function processarGetMotoristaRota($rota, $codigoCidade, $cpfMotorista) {
+        if ($cpfMotorista != "") {
+            switch ($rota) {
+                case 'rota':
+                    $this->getRotasMotorista($codigoCidade, $cpfMotorista);
+                    break;
+                default:
+                    $arResult = ['result' => false, 'messages' => "Recurso não existe!"];
+                    break;
+            }
+            $this->populaResposta(count($arResult) > 1 ? 200 : 404, $arResult, false);
+        } else {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro cpf_motorista deve ser informado!"], false);
+        }
+    }
+
+    private function getRotasMotorista($codigoCidade, $cpfMotorista) {
+        $dbRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        $arIds['cpf_motorista'] = $cpfMotorista;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaDirigidaPorMotorista->getByCPFMotorista($arIds);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta, true);
+    }
+
     /**
      * Fetch all or a subset of resources
      *
