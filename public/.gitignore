@@ -5,3 +5,4 @@ exports/
 api-tools-documentation-swagger/
 api-tools-ui/
 api-tools/
+storage/*
