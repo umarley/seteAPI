@@ -205,8 +205,6 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         $boValidateNumPneus = true;
         $boValidateVidaUtilPneu = true;
         $boValidateConsumo = true;
-        
-        var_dump($arVeiculos);
         foreach ($arVeiculos as $rowVeiculo){
             if($rowVeiculo->ipva == "" || empty($rowVeiculo->ipva)){
                 $boValidateIPVA = false;
