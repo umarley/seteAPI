@@ -122,6 +122,5 @@ class SeteEscolaTemAluno extends AbstractDatabasePostgres {
         }
         return ['result' => $boResultado, 'messages' => $message];
     }
-    
-
+   
 }
