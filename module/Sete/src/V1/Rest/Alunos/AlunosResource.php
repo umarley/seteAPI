@@ -207,7 +207,9 @@ class AlunosResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $idAluno = $arParams['alunos_id'];
-            $rota = $arParams['rota'];
+            if(isset($arParams['rota'])){
+                $rota = $arParams['rota'];
+            }
             if (isset($rota)) {
                 $this->processarGetAlunoRota($rota, $codigoCidade, $idAluno);
             } else if ($idAluno != "" && is_numeric($idAluno)) {

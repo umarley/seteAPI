@@ -24,7 +24,21 @@ class SeteRotaPassaPorEscola extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
-    
+        
+    public function getEscolaByRotas($codigoCidade, $idRota){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['al' => new \Laminas\Db\Sql\TableIdentifier('sete_escolas', 'sete')], "eta.id_escola = al.id_escola AND eta.codigo_cidade = al.codigo_cidade", ['nome', 'loc_latitude', 'loc_longitude', 'horario_matutino', 'horario_vespertino', 'horario_noturno', 'ensino_medio', 'ensino_fundamental', 'ensino_superior', 'ensino_pre_escola', 'mec_tp_localizacao'])
+                ->where("eta.codigo_cidade = {$codigoCidade} AND eta.id_rota = {$idRota}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $this->getResultSet($prepare->execute());
+        $arLista = [];
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
     public function getRotasByEscola($codigoCidade, $idEscola){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
