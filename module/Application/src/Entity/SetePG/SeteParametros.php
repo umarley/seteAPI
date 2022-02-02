@@ -33,6 +33,7 @@ class SeteParametros extends AbstractDatabasePostgres {
     const PRECO_MEDIO_ETANOL = 'PRECO_MEDIO_ETANOL';
     const PRECO_MEDIO_GAS_NATURAL = 'PRECO_MEDIO_GAS_NATURAL';
     const PRECO_MEDIO_OUTRO_COMBUSTIVEL = 'PRECO_MEDIO_OUTRO_COMBUSTIVEL';
+    const CONSUMO_COMBUSTIVEL_AQUAVIARIO = 'CONSUMO_COMBUSTIVEL_AQUAVIARIO';
 
     const PARAMETROS = [
         ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor_padrao' => 20, 'valor' => 20, 'descricao_parametro' => 'PERCENTUAL DOS ENCARGOS SOCIAIS SOB O SALÁRIOS DOS MOTORISTAS.'],
@@ -58,7 +59,8 @@ class SeteParametros extends AbstractDatabasePostgres {
         ['codigo_parametro' => 'PRECO_MEDIO_GAS_NATURAL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO KG DO GÁS NATURAL'],
         ['codigo_parametro' => 'PRECO_MEDIO_OUTRO_COMBUSTIVEL', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO OUTRO COMBUSTIVEL'],
         ['codigo_parametro' => 'PRECO_MEDIO_PNEUS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DOS PNEUS'],
-        ['codigo_parametro' => 'PRECO_MEDIO_RECAPAGEM', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO SERVIÇO DE RECAPAGEM']
+        ['codigo_parametro' => 'PRECO_MEDIO_RECAPAGEM', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO SERVIÇO DE RECAPAGEM'],
+        ['codigo_parametro' => 'CONSUMO_COMBUSTIVEL_AQUAVIARIO', 'valor_padrao' => 0.18, 'valor' => 0.18, 'descricao_parametro' => 'CONSUMOS ESPECIFICO PARA ROTAS AQUAVIARIAS']
     ];
 
     public function __construct() {
@@ -72,7 +74,7 @@ class SeteParametros extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
                 ->columns(['valor'])
-                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.codigo_parametro = {$arIds['codigo_parametro']}");
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.codigo_parametro = '{$arIds['codigo_parametro']}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         return $row['valor'];

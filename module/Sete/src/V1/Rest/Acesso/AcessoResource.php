@@ -122,7 +122,24 @@ class AcessoResource extends AbstractResourceListener
      */
     public function update($id, $data)
     {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['acesso_id'];
+        if (!isset($codigoCidade) || empty($codigoCidade)) {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
+        } else {
+            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
+            if (!$dbMunicipio->municipioExiste($codigoCidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
+            }
+        }
+        $dbModelAcesso = new AcessoModel();
+        $boValidate = $dbModelAcesso->validarUpdate($data);
+        if(!$boValidate['result']){
+            $this->populaResposta(400, $boValidate, false);
+        }else{
+            $arResult = $dbModelAcesso->prepareUpdate($codigoCidade, $data);
+            $this->populaResposta(400, $arResult, false);
+        }
     }
     
     private function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {
