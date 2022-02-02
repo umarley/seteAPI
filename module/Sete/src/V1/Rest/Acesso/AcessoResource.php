@@ -15,7 +15,7 @@ class AcessoResource extends AbstractResourceListener
     public function create($data)
     {
         $arParams = $this->event->getRouteMatch()->getParams();
-        $codigoCidade = $arParams['acesso_id'];
+        /*$codigoCidade = $arParams['acesso_id'];
         if (!isset($codigoCidade) || empty($codigoCidade)) {
             $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
         } else {
@@ -23,9 +23,9 @@ class AcessoResource extends AbstractResourceListener
             if (!$dbMunicipio->municipioExiste($codigoCidade)) {
                 $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
             }
-        }
+        }*/
         $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
-        $emailExiste = $dbSeteUsuarios->usuarioExisteByEmail($data->email, $codigoCidade);
+        $emailExiste = $dbSeteUsuarios->usuarioExisteByEmail($data->email);
         if (!$emailExiste) {
             $this->populaResposta(400, ['result' => false, 'messages' => "O email informado não existe para a cidade selecionada!"], false);
         }else{

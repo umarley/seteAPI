@@ -67,11 +67,11 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         }
     }
     
-    public function usuarioExisteByEmail($email, $codigoCidade) {
+    public function usuarioExisteByEmail($email, $codigoCidade = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("email = '{$email}' AND codigo_cidade = {$codigoCidade}");
+                ->where("email = '{$email}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
