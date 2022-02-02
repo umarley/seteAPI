@@ -2,6 +2,8 @@
 
 namespace Sete\V1\Rest\User;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 class UserModel {
 
     protected $_entity;
@@ -65,9 +67,13 @@ class UserModel {
     public function processarUpdate($idUsuario, $arPost, $accessToken) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $arData = (array) $arPost;
+        $arData['nivel_permissao'] = $arData['tipo_permissao'];
+        unset($arData['tipo_permissao']);
         $arData['dt_alteracao'] = date("Y-m-d H:i:s");
-        $arData['alterado_por'] = $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken);
-        return $this->_entity->_atualizar($idUsuario, $arData);
+        $arData['alterado_por'] = $dbCoreAccessToken->getEmailUsuarioSETEByAccessToken($accessToken);
+        $arId['codigo_cidade'] = $arPost->codigo_cidade;
+        $arId['id_usuario'] = $idUsuario;
+        return $this->_entityPG->_atualizar($arId, $arData);
     }
 
     public function validarUsuario($arPost) {
@@ -116,10 +122,14 @@ class UserModel {
         return strlen($md5) == 32 && ctype_xdigit($md5);
     }
     
-    public function validarUsuarioSETE($arPost) {
+    public function validarUsuarioSETE($arPost, $idUser, $codigoCidade) {
         $boValidate = true;
         $arErros = [];
         $listaTipoPermissao = ['admin', 'leitor', 'editor'];
+        if(!$this->_entityPG->usuarioExisteById($idUser, $codigoCidade)){
+            $boValidate = false;
+            $arErros[] = "Não existe usuário com este id!";
+        }
         if (empty($arPost->nome)) {
             $boValidate = false;
             $arErros[] = "O parâmetro nome é obrigatório!";
@@ -167,6 +177,13 @@ class UserModel {
         }
         return $arResult;
     }
+
+    public function removerRegistroById($codigoCidade, $idUser) {
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_usuario'] = $idUser;
+        $arResult = $this->_entityPG->_delete($arIds);
+        return $arResult;
+    }
     
     public function getListaUsuariosSeteByCidade($codigoCidade, $busca){
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
@@ -190,5 +207,4 @@ class UserModel {
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }
-
 }
