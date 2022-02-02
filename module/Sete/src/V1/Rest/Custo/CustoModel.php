@@ -157,7 +157,7 @@ class CustoModel {
         if (empty($arParametros['CONSUMO_COMBUSTIVEL_AQUAVIARIO']) && $tipoRota == \Db\Enum\Rota\Tipo::AQUAVIARIO) {
             $boValidate = false;
             $arValidacao[] = ['result' => false, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'CONSUMO_COMBUSTIVEL_AQUAVIARIO', 'valor' => 'Parâmetro não informado!'];
-        } else {
+        } else if($tipoRota == \Db\Enum\Rota\Tipo::AQUAVIARIO) {
             $arValidacao[] = ['result' => true, 'modulo' => 'Parâmetros', 'codigo_parametro' => 'CONSUMO_COMBUSTIVEL_AQUAVIARIO', 'valor' => (float) $arParametros['CONSUMO_COMBUSTIVEL_AQUAVIARIO']];
         }
         if (empty($arParametros['VIDA_UTIL_RODO']) && $tipoRota == \Db\Enum\Rota\Tipo::RODOVIARIA) {

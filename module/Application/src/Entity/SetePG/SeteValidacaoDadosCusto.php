@@ -48,7 +48,7 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
     private function getVeiculosFrotaAquaviaria($idRota, $codigoCidade){
         $sql = "select v.placa, v.id_veiculo, v.potencia_do_motor from sete.sete_rota_possui_veiculo rpv 
                 inner join sete.sete_veiculos v on v.codigo_cidade = rpv.codigo_cidade and v.id_veiculo = rpv.id_veiculo 
-                where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota} and v.tipo = 2";
+                where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];
@@ -78,7 +78,7 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
     private function getVeiculosFrotaRodoviaria($idRota, $codigoCidade){
         $sql = "select v.placa, v.id_veiculo, v.ipva, v.dpvat, v.numero_de_pneus, v.consumo, v.vida_util_do_pneu from sete.sete_rota_possui_veiculo rpv 
                 inner join sete.sete_veiculos v on v.codigo_cidade = rpv.codigo_cidade and v.id_veiculo = rpv.id_veiculo 
-                where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota} and v.tipo = 1";
+                where rpv.codigo_cidade = {$codigoCidade}  and rpv.id_rota = {$idRota}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];
@@ -205,6 +205,8 @@ class SeteValidacaoDadosCusto extends AbstractDatabasePostgres {
         $boValidateNumPneus = true;
         $boValidateVidaUtilPneu = true;
         $boValidateConsumo = true;
+        
+        var_dump($arVeiculos);
         foreach ($arVeiculos as $rowVeiculo){
             if($rowVeiculo->ipva == "" || empty($rowVeiculo->ipva)){
                 $boValidateIPVA = false;
