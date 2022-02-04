@@ -20,7 +20,7 @@ class UserModel {
     }
 
     public function getById($idUsuario, $codigoCidade) {
-        
+
         $arData = $this->_entityPG->getById($idUsuario, $codigoCidade);
         return $arData;
     }
@@ -39,8 +39,8 @@ class UserModel {
             'registros' => $arData
         ];
     }
-    
-    public function getListaTodosUsuariosSETE($codigoMunicipio){
+
+    public function getListaTodosUsuariosSETE($codigoMunicipio) {
         return $this->_entityPG->getLista($codigoMunicipio);
     }
 
@@ -91,6 +91,10 @@ class UserModel {
             $boValidate = false;
             $arErros[] = "O parâmetro senha deve ser um hash md5!";
         }
+        if (empty($arPost->tipo_permissao) || !in_array($arPost->tipo_permissao, $listaTipoPermissao)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro tipo_permissao é obrigatório!";
+        }
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
@@ -121,15 +125,11 @@ class UserModel {
     public function isValidMd5($md5 = '') {
         return strlen($md5) == 32 && ctype_xdigit($md5);
     }
-    
-    public function validarUsuarioSETE($arPost, $idUser, $codigoCidade) {
+
+    public function validarUsuarioSETE($arPost) {
         $boValidate = true;
         $arErros = [];
         $listaTipoPermissao = ['admin', 'leitor', 'editor'];
-        if(!$this->_entityPG->usuarioExisteById($idUser, $codigoCidade)){
-            $boValidate = false;
-            $arErros[] = "Não existe usuário com este id!";
-        }
         if (empty($arPost->nome)) {
             $boValidate = false;
             $arErros[] = "O parâmetro nome é obrigatório!";
@@ -137,13 +137,16 @@ class UserModel {
         if (empty($arPost->cpf) || !\Application\Utils\Utils::validarCpf($arPost->cpf)) {
             $boValidate = false;
             $arErros[] = "Informe um CPF válido!";
-        }else if($this->_entityPG->usuarioExiste($arPost->cpf)){
-           $boValidate = false;
-            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";     
+        } else if ($this->_entityPG->usuarioExiste($arPost->cpf)) {
+            $boValidate = false;
+            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";
         }
         if (empty($arPost->email) || !\Application\Utils\Utils::validarEmail($arPost->email)) {
             $boValidate = false;
             $arErros[] = "O parâmetro email deve ser válido!";
+        } else if ($this->_entityPG->usuarioExisteByEmail($arPost->email)) {
+            $boValidate = false;
+            $arErros[] = "O Email informado já existe. Verifique e tente novamente!";
         }
         if (empty($arPost->password) || !$this->isValidMd5($arPost->password)) {
             $boValidate = false;
@@ -156,8 +159,8 @@ class UserModel {
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
-    
-    public function processarInsert($arPost, $accessToken){
+
+    public function processarInsert($arPost, $accessToken) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
@@ -184,13 +187,13 @@ class UserModel {
         $arResult = $this->_entityPG->_delete($arIds);
         return $arResult;
     }
-    
-    public function getListaUsuariosSeteByCidade($codigoCidade, $busca){
+
+    public function getListaUsuariosSeteByCidade($codigoCidade, $busca) {
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
         return $dbSeteUsuario->getUsuariosLiberadosSistemaByCidade($codigoCidade, $busca);
     }
-    
-    public function validarTrocaSenhaUsuario($arPost){
+
+    public function validarTrocaSenhaUsuario($arPost) {
         $boValidate = true;
         $arErros = [];
         if (empty($arPost->id_usuario)) {
@@ -207,4 +210,5 @@ class UserModel {
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }
+
 }
