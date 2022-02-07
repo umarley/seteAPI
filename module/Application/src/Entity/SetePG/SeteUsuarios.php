@@ -172,6 +172,17 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         return $row;
     }
     
+    public function getCodigoCidadeByEmail($email){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['codigo_cidade'])
+                ->where("email = '{$email}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $execute = $prepare->execute();
+        $row = $execute->current();
+        return $row['codigo_cidade'];
+    }
+    
     public function getIdUsuarioByUsername($usuario){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)

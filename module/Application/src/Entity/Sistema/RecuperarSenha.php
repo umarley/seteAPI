@@ -106,6 +106,7 @@ class RecuperarSenha extends AbstractDatabasePostgres {
 
         $hours = $diff->h;
         $hours = $hours + ($diff->days * 24);
+        
         return $hours;
     }
 

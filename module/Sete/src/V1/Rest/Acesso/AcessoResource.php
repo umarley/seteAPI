@@ -15,20 +15,12 @@ class AcessoResource extends AbstractResourceListener
     public function create($data)
     {
         $arParams = $this->event->getRouteMatch()->getParams();
-        /*$codigoCidade = $arParams['acesso_id'];
-        if (!isset($codigoCidade) || empty($codigoCidade)) {
-            $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
-        } else {
-            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
-            if (!$dbMunicipio->municipioExiste($codigoCidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
-            }
-        }*/
         $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
         $emailExiste = $dbSeteUsuarios->usuarioExisteByEmail($data->email);
         if (!$emailExiste) {
             $this->populaResposta(400, ['result' => false, 'messages' => "O email informado não existe para a cidade selecionada!"], false);
         }else{
+            $codigoCidade = $dbSeteUsuarios->getCodigoCidadeByEmail($data->email);
             $dbSistemaRecuperarSenha = new \Db\Sistema\RecuperarSenha();
             $arResult = $dbSistemaRecuperarSenha->gerarNovoToken($codigoCidade, $data->email);
             $this->populaResposta(200, $arResult, false);
@@ -123,20 +115,13 @@ class AcessoResource extends AbstractResourceListener
     public function update($id, $data)
     {
         $arParams = $this->event->getRouteMatch()->getParams();
-        $codigoCidade = $arParams['acesso_id'];
-        if (!isset($codigoCidade) || empty($codigoCidade)) {
-            $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade deve ser informado!"], false);
-        } else {
-            $dbMunicipio = new \Db\SetePG\GlbMunicipios();
-            if (!$dbMunicipio->municipioExiste($codigoCidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "O código da cidade não existe. Verifique e tente novamente!"], false);
-            }
-        }
         $dbModelAcesso = new AcessoModel();
         $boValidate = $dbModelAcesso->validarUpdate($data);
         if(!$boValidate['result']){
             $this->populaResposta(400, $boValidate, false);
         }else{
+            $dbSeteUsuario = new \Db\SetePG\SeteUsuarios();
+            $codigoCidade = $dbSeteUsuario->getCodigoCidadeByEmail($data->email);
             $arResult = $dbModelAcesso->prepareUpdate($codigoCidade, $data);
             $this->populaResposta(400, $arResult, false);
         }
