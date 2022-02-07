@@ -99,25 +99,35 @@ class UserModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUsuarioUpdate($arPost) {
+    public function validarUsuarioUpdate($arPost, $idUser) {
         $boValidate = true;
         $arErros = [];
-        $arValoresValidosIsAtivo = ['S', 'N'];
-        if (isset($arPost->nome) && empty($arPost->nome)) {
+        $listaTipoPermissao = ['admin', 'leitor', 'editor'];
+        if (empty($arPost->nome)) {
             $boValidate = false;
             $arErros[] = "O parâmetro nome é obrigatório!";
         }
-        if (isset($arPost->email)) {
+        if (empty($arPost->cpf) || !\Application\Utils\Utils::validarCpf($arPost->cpf)) {
             $boValidate = false;
-            $arErros[] = "Não é possivel alterar o email do usuário!";
+            $arErros[] = "Informe um CPF válido!";
+        } else if ($this->_entityPG->usuarioExiste($arPost->cpf, $idUser)) {
+            $boValidate = false;
+            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";
         }
-        if (isset($arPost->senha) && (empty($arPost->senha) || !$this->isValidMd5($arPost->senha))) {
+        if (empty($arPost->email) || !\Application\Utils\Utils::validarEmail($arPost->email)) {
             $boValidate = false;
-            $arErros[] = "O parâmetro senha deve ser um hash md5!";
+            $arErros[] = "O parâmetro email deve ser válido!";
+        } else if ($this->_entityPG->usuarioExisteByEmail($arPost->email, $idUser)) {
+            $boValidate = false;
+            $arErros[] = "O Email informado já existe. Verifique e tente novamente!";
         }
-        if (isset($arPost->is_ativo) && !in_array($arPost->is_ativo, $arValoresValidosIsAtivo)) {
+        if (empty($arPost->password) || !$this->isValidMd5($arPost->password)) {
             $boValidate = false;
-            $arErros[] = "O parâmetro is_ativo deve conter S ou N!";
+            $arErros[] = "O parâmetro password deve ser um hash md5!";
+        }
+        if (empty($arPost->tipo_permissao) || !in_array($arPost->tipo_permissao, $listaTipoPermissao)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro tipo_permissao é obrigatório!";
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }

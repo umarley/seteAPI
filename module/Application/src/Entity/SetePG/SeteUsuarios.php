@@ -39,11 +39,14 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         return $arLista;
     }
 
-    public function usuarioExiste($cpf) {
+    public function usuarioExiste($cpf, $idUser = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
+        if(!empty($idUser)){
+            $select->where("id_usuario <> {$idUser}");
+        }
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -67,11 +70,14 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         }
     }
     
-    public function usuarioExisteByEmail($email, $codigoCidade = null) {
+    public function usuarioExisteByEmail($email, $idUsuario = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("email = '{$email}'");
+        if(!empty($idUsuario)){
+            $select->where("id_usuario <> {$idUsuario}");
+        }
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
