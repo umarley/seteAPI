@@ -330,8 +330,8 @@ class CensoModel {
                         'id_escola' => $idEscola,
                         'codigo_cidade' => $codigoCidade
                     ];
-                    var_dump($arDadosEscolaTemAluno);
-                    exit;
+                    //var_dump($arDadosEscolaTemAluno);
+                    //exit;
                     $arOPESTA = $this->_entityEscolaTemAlunos->_inserir($arDadosEscolaTemAluno);
                 }
             }

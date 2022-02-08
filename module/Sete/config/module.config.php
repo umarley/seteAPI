@@ -22,6 +22,7 @@ return [
             \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
             \Sete\V1\Rest\Custo\CustoResource::class => \Sete\V1\Rest\Custo\CustoResourceFactory::class,
             \Sete\V1\Rest\Acesso\AcessoResource::class => \Sete\V1\Rest\Acesso\AcessoResourceFactory::class,
+            \Sete\V1\Rest\Importacao\ImportacaoResource::class => \Sete\V1\Rest\Importacao\ImportacaoResourceFactory::class,
         ],
     ],
     'router' => [
@@ -206,6 +207,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.importacao' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/importacao[/:codigo_cidade[/:importacao_id[/:cadastro]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Importacao\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -230,6 +240,7 @@ return [
             17 => 'sete.rest.parametros',
             18 => 'sete.rest.custo',
             19 => 'sete.rest.acesso',
+            20 => 'sete.rest.importacao',
         ],
     ],
     'api-tools-rest' => [
@@ -690,6 +701,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Acesso\AcessoCollection::class,
             'service_name' => 'Acesso',
         ],
+        'Sete\\V1\\Rest\\Importacao\\Controller' => [
+            'listener' => \Sete\V1\Rest\Importacao\ImportacaoResource::class,
+            'route_name' => 'sete.rest.importacao',
+            'route_identifier_name' => 'importacao_id',
+            'collection_name' => 'importacao',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Importacao\ImportacaoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Importacao\ImportacaoCollection::class,
+            'service_name' => 'Importacao',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -713,6 +747,7 @@ return [
             'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Custo\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Acesso\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Importacao\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -816,6 +851,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Importacao\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -896,6 +936,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Acesso\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Importacao\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1141,6 +1185,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.acesso',
                 'route_identifier_name' => 'acesso_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Importacao\ImportacaoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.importacao',
+                'route_identifier_name' => 'importacao_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Importacao\ImportacaoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.importacao',
+                'route_identifier_name' => 'importacao_id',
                 'is_collection' => true,
             ],
         ],
