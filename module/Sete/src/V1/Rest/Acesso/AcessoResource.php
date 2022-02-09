@@ -123,7 +123,7 @@ class AcessoResource extends AbstractResourceListener
             $dbSeteUsuario = new \Db\SetePG\SeteUsuarios();
             $codigoCidade = $dbSeteUsuario->getCodigoCidadeByEmail($data->email);
             $arResult = $dbModelAcesso->prepareUpdate($codigoCidade, $data);
-            $this->populaResposta(400, $arResult, false);
+            $this->populaResposta(201, $arResult, false);
         }
     }
     
