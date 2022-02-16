@@ -20,12 +20,9 @@ return [
             \Sete\V1\Rest\Monitores\MonitoresResource::class => \Sete\V1\Rest\Monitores\MonitoresResourceFactory::class,
             \Sete\V1\Rest\Shapes\ShapesResource::class => \Sete\V1\Rest\Shapes\ShapesResourceFactory::class,
             \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
-<<<<<<< HEAD
-=======
             \Sete\V1\Rest\Custo\CustoResource::class => \Sete\V1\Rest\Custo\CustoResourceFactory::class,
             \Sete\V1\Rest\Acesso\AcessoResource::class => \Sete\V1\Rest\Acesso\AcessoResourceFactory::class,
             \Sete\V1\Rest\Importacao\ImportacaoResource::class => \Sete\V1\Rest\Importacao\ImportacaoResourceFactory::class,
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
     ],
     'router' => [
@@ -192,8 +189,6 @@ return [
                     ],
                 ],
             ],
-<<<<<<< HEAD
-=======
             'sete.rest.custo' => [
                 'type' => 'Segment',
                 'options' => [
@@ -221,7 +216,6 @@ return [
                     ],
                 ],
             ],
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
     ],
     'api-tools-versioning' => [
@@ -244,12 +238,9 @@ return [
             15 => 'sete.rest.monitores',
             16 => 'sete.rest.shapes',
             17 => 'sete.rest.parametros',
-<<<<<<< HEAD
-=======
             18 => 'sete.rest.custo',
             19 => 'sete.rest.acesso',
             20 => 'sete.rest.importacao',
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
     ],
     'api-tools-rest' => [
@@ -650,17 +641,10 @@ return [
                 1 => 'PATCH',
                 2 => 'PUT',
                 3 => 'DELETE',
-<<<<<<< HEAD
-            ],
-            'collection_http_methods' => [
-                0 => 'GET',
-=======
-                4 => 'POST',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -669,8 +653,6 @@ return [
             'collection_class' => \Sete\V1\Rest\Parametros\ParametrosCollection::class,
             'service_name' => 'Parametros',
         ],
-<<<<<<< HEAD
-=======
         'Sete\\V1\\Rest\\Custo\\Controller' => [
             'listener' => \Sete\V1\Rest\Custo\CustoResource::class,
             'route_name' => 'sete.rest.custo',
@@ -741,7 +723,6 @@ return [
             'collection_class' => \Sete\V1\Rest\Importacao\ImportacaoCollection::class,
             'service_name' => 'Importacao',
         ],
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -763,12 +744,9 @@ return [
             'Sete\\V1\\Rest\\Monitores\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Shapes\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
-<<<<<<< HEAD
-=======
             'Sete\\V1\\Rest\\Custo\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Acesso\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Importacao\\Controller' => 'HalJson',
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -862,8 +840,6 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
-<<<<<<< HEAD
-=======
             'Sete\\V1\\Rest\\Custo\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/hal+json',
@@ -879,7 +855,6 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -955,8 +930,6 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
-<<<<<<< HEAD
-=======
             'Sete\\V1\\Rest\\Custo\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
@@ -969,7 +942,6 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
     ],
     'api-tools-hal' => [
@@ -1190,8 +1162,6 @@ return [
                 'route_identifier_name' => 'parametros_id',
                 'is_collection' => true,
             ],
-<<<<<<< HEAD
-=======
             \Sete\V1\Rest\Custo\CustoEntity::class => [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.custo',
@@ -1228,7 +1198,6 @@ return [
                 'route_identifier_name' => 'importacao_id',
                 'is_collection' => true,
             ],
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         ],
     ],
     'api-tools-content-validation' => [
