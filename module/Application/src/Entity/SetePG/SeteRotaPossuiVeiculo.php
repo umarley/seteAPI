@@ -22,7 +22,11 @@ class SeteRotaPossuiVeiculo extends AbstractDatabasePostgres {
                 ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
-        return $row;
+        if(!$row){
+            return [];
+        }else{
+            return $row;
+        }
     }
     
     public function getAlunosByEscola($codigoCidade, $idEscola){
@@ -53,11 +57,11 @@ class SeteRotaPossuiVeiculo extends AbstractDatabasePostgres {
         return $arLista;
     }
     
-    public function rotaAssociadoVeiculo($idVeiculo, $codigoCidade){
+    public function rotaAssociadoVeiculo($idRota, $codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = '{$codigoCidade}' AND id_veiculo = {$idVeiculo}");
+                ->where("codigo_cidade = '{$codigoCidade}' AND id_rota = {$idRota}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {

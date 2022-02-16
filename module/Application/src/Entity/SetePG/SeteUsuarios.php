@@ -39,11 +39,14 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         return $arLista;
     }
 
-    public function usuarioExiste($cpf) {
+    public function usuarioExiste($cpf, $idUser = null) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("cpf = '{$cpf}'");
+        if(!empty($idUser)){
+            $select->where("id_usuario <> {$idUser}");
+        }
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
         if ($row['qtd'] > 0) {
@@ -66,6 +69,23 @@ class SeteUsuarios extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function usuarioExisteByEmail($email, $idUsuario = null) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("email = '{$email}'");
+        if(!empty($idUsuario)){
+            $select->where("id_usuario <> {$idUsuario}");
+        }
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        if ($row['qtd'] > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
@@ -80,7 +100,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_usuario' => $arId['id_usuario']]);
+        $update->where(['codigo_cidade' => $arId['codigo_cidade'], 'id_usuario' => $arId['id_usuario']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -103,7 +123,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_usuario = {$arIds['id_usuario']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
@@ -137,9 +157,10 @@ class SeteUsuarios extends AbstractDatabasePostgres {
     
     public function getUsuarioByAccessToken($accessToken){
         $sql = "select su.id_usuario, su.nome, su.nivel_permissao as tipo_permissao, su.codigo_cidade, su.cidade, su.estado, 
-                    su.cpf, su.telefone, su.email, su.foto
+                    su.cpf, su.telefone, su.email, su.foto, gm.latitude, gm.longitude 
                     from api.api_access_token aat
                     inner join sete.sete_usuarios su on su.id_usuario = aat.id_usuario and aat.codigo_cidade = su.codigo_cidade 
+                    inner join sete.glb_municipio gm on su.codigo_cidade = gm.codigo_ibge 
                     where aat.access_token  = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -156,6 +177,17 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $execute = $prepare->execute();
         $row = $execute->current();
         return $row;
+    }
+    
+    public function getCodigoCidadeByEmail($email){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['codigo_cidade'])
+                ->where("email = '{$email}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $execute = $prepare->execute();
+        $row = $execute->current();
+        return $row['codigo_cidade'];
     }
     
     public function getIdUsuarioByUsername($usuario){

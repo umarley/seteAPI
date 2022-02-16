@@ -14,20 +14,19 @@ class SeteRotaAtendidaPorMonitor extends AbstractDatabasePostgres {
         $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
-
-    public function getNomeRotaAssociadoAluno($codigoCidade, $idAluno){
-        $sql = "SELECT coalesce(r.nome, 'Não Informada') as nome FROM sete.sete_rota_atende_aluno raa 
-                inner join sete.sete_rotas r on raa.id_rota  = r.id_rota  and raa.codigo_cidade  = r.codigo_cidade 
-                WHERE raa.codigo_cidade = '{$codigoCidade}' AND raa.id_aluno = {$idAluno}";
-        $statement = $this->AdapterBD->createStatement($sql);
-        $statement->prepare();
-        $execute = $statement->execute();
-        if($execute->count() > 0){
-            $row = $execute->current();
-            return $row['nome'];
-        }else{
-            return 'Não informada';
+    
+    public function getLista($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_monitores', 'sete')], "eta.cpf_monitor = rot.cpf AND eta.codigo_cidade = rot.codigo_cidade", ['cpf', 'nome', 'data_nascimento', 'cpf', 'telefone', 'turno_manha', 'turno_tarde', 'turno_noite'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $this->getResultSet($prepare->execute());
+        $arLista = [];
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
         }
+        return $arLista;
     }
     
     public function getByCPFMonitor($arIds) {

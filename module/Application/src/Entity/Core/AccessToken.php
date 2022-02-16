@@ -3,7 +3,7 @@
 namespace Db\Core;
 
 use Db\Core\AbstractDatabasePostgres;
-use Zend\Db\Sql\Sql;
+use Laminas\Db\Sql\Sql;
 use Zend\Db\Sql\Predicate\Expression;
 
 class AccessToken extends AbstractDatabasePostgres {
@@ -40,8 +40,8 @@ class AccessToken extends AbstractDatabasePostgres {
     }
     
     public function getEmailUsuarioByAccessToken($accessToken){
-        $sql = "SELECT email FROM api_access_token ac
-                    INNER JOIN usuarios us ON us.id = ac.id_usuario
+        $sql = "SELECT email FROM api.api_access_token ac
+                    INNER JOIN sete.usuarios us ON us.id = ac.id_usuario
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -57,6 +57,16 @@ class AccessToken extends AbstractDatabasePostgres {
         $statement->prepare();
         $row = $statement->execute()->current();
         return $row['email'];            
+    }
+
+    public function getNivelByAccessToken($accessToken) {
+        $sql = "SELECT nivel_permissao FROM api.api_access_token ac
+                    INNER JOIN sete.sete_usuarios us ON us.id_usuario = ac.id_usuario
+                    WHERE ac.access_token = '{$accessToken}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['nivel_permissao']; 
     }
 
     public function getAccessTokenByUsuario($idUsuario) {

@@ -38,7 +38,7 @@ class SeteRotas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_rota', 'nome', 'km', 'turno_matutino', 'turno_vespertino', 'turno_noturno', 'shape'])
+                ->columns(['codigo_cidade', 'id_rota', 'nome', 'km', 'tipo', 'turno_matutino', 'turno_vespertino', 'turno_noturno', 'shape'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -109,7 +109,7 @@ class SeteRotas extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_escola = {$arIds['id_escola']}");
+        $delete->where("codigo_cidade =  '{$arIds['codigo_cidade']}' AND id_rota = {$arIds['id_rota']}");
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

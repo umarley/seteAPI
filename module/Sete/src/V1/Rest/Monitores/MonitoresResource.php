@@ -195,7 +195,7 @@ class MonitoresResource extends API {
         $arIds['cpf_monitor'] = $cpfMonitor;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaAtendidaPorMonitor->getByCPFMonitor($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, true);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta, true);
     }
 
     /**

@@ -17,14 +17,14 @@ class MotoristasModel {
     public function getAll($codigoMunicipio) {
         $urlHelper = new \Application\Utils\UrlHelper();
         $arDados = $this->_entity->getLista($codigoMunicipio);
-        foreach ($arDados as $key => $row) {
+        foreach ($arDados as $key => $arRow) {
             if (!empty($row['data_validade_cnh'])) {
                 $arRow['data_validade_cnh'] = date("d/m/Y", strtotime($arRow['data_validade_cnh']));
             }
             if (!empty($row['data_nascimento'])) {
                 $arRow['data_nascimento'] = date("d/m/Y", strtotime($arRow['data_nascimento']));
             }
-            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$row['cpf']}");
+            $arDados[$key]['_links']['_self'] = $urlHelper->baseUrl("motoristas/{$codigoMunicipio}/{$arRow['cpf']}");
         }
         return $arDados;
     }

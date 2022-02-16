@@ -1,7 +1,8 @@
 apigility-ui/
 zf-apigility/
 exports/
-api-tools/
-
+profile/*
 api-tools-documentation-swagger/
 api-tools-ui/
+api-tools/
+storage/*

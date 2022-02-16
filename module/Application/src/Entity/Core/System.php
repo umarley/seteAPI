@@ -164,13 +164,13 @@ class System extends AbstractDatabase {
 
         $transport = new SmtpTransport();
         $options = new SmtpOptions([
-            'name' => $dbConfig->getConfig($dbConfig::PSERVER_SMTP),
-            'host' => $dbConfig->getConfig($dbConfig::PSERVER_SMTP),
-            'port' => $dbConfig->getConfig($dbConfig::PPORTA_SMTP),
+            'name' => $dbConfig->getConfig($dbConfig::SERVER_SMTP),
+            'host' => $dbConfig->getConfig($dbConfig::SERVER_SMTP),
+            'port' => $dbConfig->getConfig($dbConfig::PORTA_SMTP),
             'connection_class' => 'plain',
             'connection_config' => [
-                'username' => $dbConfig->getConfig($dbConfig::PUSER_SMTP),
-                'password' => $dbConfig->getConfig($dbConfig::PSENHA_SMTP),
+                'username' => $dbConfig->getConfig($dbConfig::USER_SMTP),
+                'password' => $dbConfig->getConfig($dbConfig::SENHA_SMTP),
                 'ssl' => 'tls',
             ],
         ]);

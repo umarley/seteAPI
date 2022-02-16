@@ -14,7 +14,26 @@ class ParametrosResource extends API
      */
     public function create($data)
     {
+<<<<<<< HEAD
         return new ApiProblem(405, 'The POST method has not been defined');
+=======
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $parametroId  = $arParams['parametros_id'];
+        if((!isset($codigoCidade) || empty($codigoCidade)) && (!isset($parametroId) || empty($parametroId))){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro codigo_cidade e/ou codigo_parametro obrigatório!'], false);
+        }else if(!isset($data->valor) || empty($data->valor)){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro valor obrigatório!'], false);
+        }else {
+            $this->processarRequisicaoPOST($codigoCidade, $parametroId, $data->valor);
+        }
+    }
+    
+    private function processarRequisicaoPOST($codigoCidade, $codigoParametro, $valorParametro){
+        $modelParametro = new ParametrosModel();
+        $arResult = $modelParametro->gravarValorParametro($codigoCidade, $codigoParametro, $valorParametro);
+        $this->populaResposta(201, $arResult, false);
+>>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     }
 
     /**
@@ -58,7 +77,27 @@ class ParametrosResource extends API
      */
     public function fetchAll($params = [])
     {
+<<<<<<< HEAD
         return new ApiProblem(405, 'The GET method has not been defined for collections');
+=======
+        $arParams = $this->event->getRouteMatch()->getParams();
+        if(!isset($arParams['codigo_cidade'])){
+            $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro codigo_cidade obrigatório!'], false);
+        }else{
+            $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($arParams['codigo_cidade']);
+            if($usuarioPodeAcessarMunicipio){
+                $this->processarRequisicaoGETALL($arParams['codigo_cidade']);
+            }else{
+                $this->populaResposta(403, ['result' => false, 'messages' => "Usuário não tem permissão pra acessar o municipio selecionado."]);
+            }
+        }
+    }
+    
+    private function processarRequisicaoGETALL($codigoCidade){
+        $modelParametros = new ParametrosModel();
+        $arResult = $modelParametros->getAll($codigoCidade);
+        $this->populaResposta(200, $arResult);
+>>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     }
 
     /**

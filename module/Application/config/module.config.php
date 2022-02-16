@@ -75,6 +75,32 @@ return [
                     ],
                 ],
             ],
+            'web' => [
+                'type' => 'literal',
+                'options' => [
+                    'route' => '/web',
+                    'defaults' => [
+                        'controller' => 'Application\Controller\WebController',
+                        'action' => 'index',
+                    ],
+                ],
+                'may_terminate' => true,
+                'child_routes' => [
+                    // Segment route for viewing one blog post
+                    'geral' => [
+                        'type' => 'segment',
+                        'options' => [
+                            'route' => '/[:action[/:id]]',
+                            'constraints' => [
+                                'action' => '[a-zA-Z0-9_-]+',
+                            ],
+                            'defaults' => [
+                                'action' => 'index',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
@@ -82,6 +108,7 @@ return [
             Controller\IndexController::class => InvokableFactory::class,
             Controller\HomeController::class => InvokableFactory::class,
             Controller\FirebaseController::class => InvokableFactory::class,
+            Controller\WebController::class => InvokableFactory::class,
         ],
     ],
     'view_manager' => [

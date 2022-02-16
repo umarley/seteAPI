@@ -21,15 +21,6 @@ class UserResource extends API {
         $userType = $this->event->getRouteMatch()->getParam('user_type');
         $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
         switch ($userType) {
-            case 'api':
-                $validate = $this->_model->validarUsuario($data);
-                if (!$validate['result']) {
-                    $this->populaResposta(400, $validate, false);
-                } else {
-                    $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
-                    $this->populaResposta(201, $arResult, false);
-                }
-                break;
             case 'sete':
                 $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
                 if ($usuarioPodeAcessarMunicipio) {
@@ -50,7 +41,7 @@ class UserResource extends API {
                             $this->populaResposta(400, $boValidate, false);
                         } else {
                             $data->codigo_cidade = $codigoCidade;
-                            $arResult = $this->_model->processarInsertUsuarioSETE($data, $this->getAcessToken());
+                            $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
                             $this->populaResposta(201, $arResult, false);
                         }
                     }
@@ -124,7 +115,25 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+        $userType = $this->event->getRouteMatch()->getParam('user_type');
+        $codigoCidade = $this->event->getRouteMatch()->getParam('codigo_cidade');
+        switch ($userType) {
+            case 'sete':
+                $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+                if ($usuarioPodeAcessarMunicipio) {
+                    $this->processarRequestDELETE($codigoCidade, $id);
+                } else {
+                    $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+                }
+                break;
+        }
+    }
+
+    private function processarRequestDELETE($codigoCidade, $idUser) {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $modelUser = new UserModel();
+        $arResult = $modelUser->removerRegistroById($codigoCidade, $idUser);
+        $this->populaResposta(200, $arResult, false);
     }
 
     /**
@@ -258,11 +267,12 @@ class UserResource extends API {
                 $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($params['codigo_cidade']);
                 if ($params['user_id'] === 'alterar-senha' && $usuarioPodeAcessarMunicipio) {
                     $this->processarAlterarSenhaUsuario($params['codigo_cidade'], $data);
+                } else if ($usuarioPodeAcessarMunicipio){
+                    $this->processarAlterarDadosUsuario($params['codigo_cidade'], $data);
+                    
                 } else if (!$usuarioPodeAcessarMunicipio) {
                     $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
                 }
-
-
 
                 break;
         }
@@ -285,6 +295,20 @@ class UserResource extends API {
             } else {
                 $this->populaResposta(400, ['result' => false, 'messages' => 'Senha não confere. Tente novamente!'], false);
             }
+        }
+    }
+
+    private function processarAlterarDadosUsuario($codigoCidade, $arData) {
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $idUser = $arParams['user_id'];
+     
+        $boValidate = $this->_model->validarUsuarioUpdate($arData, $idUser);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, $boValidate, false);
+        } else {
+            $arData->codigo_cidade = $codigoCidade;
+            $arResult = $this->_model->processarUpdate($idUser, $arData, $this->getAcessToken());
+            $this->populaResposta(201, $arResult, false);
         }
     }
 

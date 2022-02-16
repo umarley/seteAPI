@@ -2,6 +2,8 @@
 
 namespace Sete\V1\Rest\User;
 
+use Symfony\Component\VarDumper\VarDumper;
+
 class UserModel {
 
     protected $_entity;
@@ -18,7 +20,7 @@ class UserModel {
     }
 
     public function getById($idUsuario, $codigoCidade) {
-        
+
         $arData = $this->_entityPG->getById($idUsuario, $codigoCidade);
         return $arData;
     }
@@ -37,25 +39,41 @@ class UserModel {
             'registros' => $arData
         ];
     }
-    
-    public function getListaTodosUsuariosSETE($codigoMunicipio){
+
+    public function getListaTodosUsuariosSETE($codigoMunicipio) {
         return $this->_entityPG->getLista($codigoMunicipio);
     }
 
-    public function processarInsert($arPost, $accessToken) {
+    public function processarInsertNovoUsuario($arPost) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
+        $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
+        $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
         $arData = (array) $arPost;
+        $arData['is_liberado'] = 'N';
+        //$arData['cod_cidade'] = $arData['codigo_cidade'];
+        $arData['cidade'] = $arCidade['nm_cidade'];
+        $arData['cod_estado'] = $arCidade['codigo_uf'];
+        $arData['estado'] = $arCidade['estado'];
         $arData['dt_criacao'] = date("Y-m-d H:i:s");
-        $arData['criado_por'] = $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken);
-        return $this->_entity->_inserir($arData);
+        $arData['nivel_permissao'] = $arData['tipo_permissao'];
+        unset($arData['tipo_permissao']);
+        $arResult = $this->_entityPG->_inserir($arData);
+        if ($arResult['result']) {
+            $arResult['messages']['id'] = $this->_entityPG->getUltimoIdInserido();
+        }
+        return $arResult;
     }
 
     public function processarUpdate($idUsuario, $arPost, $accessToken) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $arData = (array) $arPost;
+        $arData['nivel_permissao'] = $arData['tipo_permissao'];
+        unset($arData['tipo_permissao']);
         $arData['dt_alteracao'] = date("Y-m-d H:i:s");
-        $arData['alterado_por'] = $dbCoreAccessToken->getEmailUsuarioByAccessToken($accessToken);
-        return $this->_entity->_atualizar($idUsuario, $arData);
+        $arData['alterado_por'] = $dbCoreAccessToken->getEmailUsuarioSETEByAccessToken($accessToken);
+        $arId['codigo_cidade'] = $arPost->codigo_cidade;
+        $arId['id_usuario'] = $idUsuario;
+        return $this->_entityPG->_atualizar($arId, $arData);
     }
 
     public function validarUsuario($arPost) {
@@ -73,29 +91,43 @@ class UserModel {
             $boValidate = false;
             $arErros[] = "O parâmetro senha deve ser um hash md5!";
         }
+        if (empty($arPost->tipo_permissao) || !in_array($arPost->tipo_permissao, $listaTipoPermissao)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro tipo_permissao é obrigatório!";
+        }
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUsuarioUpdate($arPost) {
+    public function validarUsuarioUpdate($arPost, $idUser) {
         $boValidate = true;
         $arErros = [];
-        $arValoresValidosIsAtivo = ['S', 'N'];
-        if (isset($arPost->nome) && empty($arPost->nome)) {
+        $listaTipoPermissao = ['admin', 'leitor', 'editor'];
+        if (empty($arPost->nome)) {
             $boValidate = false;
             $arErros[] = "O parâmetro nome é obrigatório!";
         }
-        if (isset($arPost->email)) {
+        if (empty($arPost->cpf) || !\Application\Utils\Utils::validarCpf($arPost->cpf)) {
             $boValidate = false;
-            $arErros[] = "Não é possivel alterar o email do usuário!";
+            $arErros[] = "Informe um CPF válido!";
+        } else if ($this->_entityPG->usuarioExiste($arPost->cpf, $idUser)) {
+            $boValidate = false;
+            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";
         }
-        if (isset($arPost->senha) && (empty($arPost->senha) || !$this->isValidMd5($arPost->senha))) {
+        if (empty($arPost->email) || !\Application\Utils\Utils::validarEmail($arPost->email)) {
             $boValidate = false;
-            $arErros[] = "O parâmetro senha deve ser um hash md5!";
+            $arErros[] = "O parâmetro email deve ser válido!";
+        } else if ($this->_entityPG->usuarioExisteByEmail($arPost->email, $idUser)) {
+            $boValidate = false;
+            $arErros[] = "O Email informado já existe. Verifique e tente novamente!";
         }
-        if (isset($arPost->is_ativo) && !in_array($arPost->is_ativo, $arValoresValidosIsAtivo)) {
+        if (empty($arPost->password) || !$this->isValidMd5($arPost->password)) {
             $boValidate = false;
-            $arErros[] = "O parâmetro is_ativo deve conter S ou N!";
+            $arErros[] = "O parâmetro password deve ser um hash md5!";
+        }
+        if (empty($arPost->tipo_permissao) || !in_array($arPost->tipo_permissao, $listaTipoPermissao)) {
+            $boValidate = false;
+            $arErros[] = "O parâmetro tipo_permissao é obrigatório!";
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }
@@ -103,7 +135,7 @@ class UserModel {
     public function isValidMd5($md5 = '') {
         return strlen($md5) == 32 && ctype_xdigit($md5);
     }
-    
+
     public function validarUsuarioSETE($arPost) {
         $boValidate = true;
         $arErros = [];
@@ -115,13 +147,16 @@ class UserModel {
         if (empty($arPost->cpf) || !\Application\Utils\Utils::validarCpf($arPost->cpf)) {
             $boValidate = false;
             $arErros[] = "Informe um CPF válido!";
-        }else if($this->_entityPG->usuarioExiste($arPost->cpf)){
-           $boValidate = false;
-            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";     
+        } else if ($this->_entityPG->usuarioExiste($arPost->cpf)) {
+            $boValidate = false;
+            $arErros[] = "O CPF informado já existe. Verifique e tente novamente!";
         }
         if (empty($arPost->email) || !\Application\Utils\Utils::validarEmail($arPost->email)) {
             $boValidate = false;
             $arErros[] = "O parâmetro email deve ser válido!";
+        } else if ($this->_entityPG->usuarioExisteByEmail($arPost->email)) {
+            $boValidate = false;
+            $arErros[] = "O Email informado já existe. Verifique e tente novamente!";
         }
         if (empty($arPost->password) || !$this->isValidMd5($arPost->password)) {
             $boValidate = false;
@@ -134,8 +169,8 @@ class UserModel {
 
         return ['result' => $boValidate, 'messages' => $arErros];
     }
-    
-    public function processarInsertUsuarioSETE($arPost, $accessToken){
+
+    public function processarInsert($arPost, $accessToken) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
         $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
@@ -155,13 +190,20 @@ class UserModel {
         }
         return $arResult;
     }
-    
-    public function getListaUsuariosSeteByCidade($codigoCidade, $busca){
+
+    public function removerRegistroById($codigoCidade, $idUser) {
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_usuario'] = $idUser;
+        $arResult = $this->_entityPG->_delete($arIds);
+        return $arResult;
+    }
+
+    public function getListaUsuariosSeteByCidade($codigoCidade, $busca) {
         $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
         return $dbSeteUsuario->getUsuariosLiberadosSistemaByCidade($codigoCidade, $busca);
     }
-    
-    public function validarTrocaSenhaUsuario($arPost){
+
+    public function validarTrocaSenhaUsuario($arPost) {
         $boValidate = true;
         $arErros = [];
         if (empty($arPost->id_usuario)) {

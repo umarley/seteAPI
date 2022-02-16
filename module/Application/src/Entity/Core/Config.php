@@ -3,18 +3,23 @@
 namespace Db\Core;
 
 
-class Config extends AbstractDatabase{
+class Config extends AbstractDatabasePostgres{
    
     const SIM = 'S';
     const NAO = 'N';
     const SESSION_AUTH_ADM = 'Auth';
     const SESSION_AUTH_PUB = 'AuthPub';
+    const SERVER_SMTP = 'SERVER_SMTP';
+    const USER_SMTP = 'USER_SMTP';
+    const SENHA_SMTP = 'SENHA_SMTP';
+    const PORTA_SMTP = 'PORTA_SMTP';
     
     
     public function __construct() {
-        $this->table = 'sys_config';
+        $this->table = 'config';
         $this->primaryKey = 'variable';
-        parent::__construct(AbstractDatabase::DATABASE_CORE);
+        $this->schema = 'sistema';
+        parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
     
     public function getListaByVariable($sParametro){
@@ -30,7 +35,7 @@ class Config extends AbstractDatabase{
     }
     
     public function getById($variable){
-        $sql = "SELECT * FROM {$this->table} WHERE {$this->primaryKey} = '{$variable}'";
+        $sql = "SELECT * FROM {$this->schema}.{$this->table} WHERE {$this->primaryKey} = '{$variable}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $result = $statement->execute(); 
@@ -43,7 +48,7 @@ class Config extends AbstractDatabase{
     
     public function getConfig($variable, $idModulo = '')
     {
-        $sql = "SELECT value FROM {$this->table} WHERE {$this->primaryKey} = '{$variable}'";
+        $sql = "SELECT value FROM {$this->schema}.{$this->table} WHERE {$this->primaryKey} = '{$variable}'";
         if(!empty($idModulo)){
             $sql .= " AND modulo_id = {$idModulo}";
         }

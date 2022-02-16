@@ -14,6 +14,7 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function create($data) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPOST($codigoCidade, $data);
@@ -38,26 +39,146 @@ class RotasResource extends API {
         $codigoCidade = $arParams['codigo_cidade'];
         $idRota = $arParams['rotas_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idRota;
+        $arDados->id_rota = $idRota;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
+            case 'escolas':
+                $this->associarEscolaRota($arDados);
+                break;
             case 'veiculos':
                 $this->associarVeiculoRota($arDados);
+                break;
+            case 'alunos':
+                $this->associarAlunosRota($arDados);
+                break;
+            case 'motoristas':
+                $this->associarMotoristaRota($arDados);
                 break;
             default:
                 $this->populaResposta(404, ['result' => false, 'messages' => "O recurso não existe!"], false);
                 break;
         }
     }
+    
+    private function associarMotoristaRota($arDados) {
+        $dbSeteMotorista = new \Db\SetePG\SeteMotoristas();
+        $dbSeteRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        if ($arDados->id_rota !== "") {
+            if (!$dbSeteMotorista->motoristaExiste($arDados->cpf_motorista)) {
+                $this->populaResposta(404, ['result' => false, 'messages' => "Motorista informado não existe!"]);
+            } else if ($dbSeteRotaDirigidaPorMotorista->rotaAssociadaMotorista($arDados->cpf_motorista, $arDados->id_rota, $arDados->codigo_cidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "Motorista já associado a esta rota!"], false);
+            } else {
+                $this->populaResposta(201, $dbSeteRotaDirigidaPorMotorista->_inserir([
+                            'codigo_cidade' => $arDados->codigo_cidade,
+                            'id_rota' => $arDados->id_rota,
+                            'cpf_motorista' => $arDados->cpf_motorista
+                        ]), false);
+            }
+        } else {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
+        }
+    }
+    
+    ////////////////////////// POST OK
+    private function associarEscolaRota($arDados) {
+        $arResultado = [];
+        if ($arDados->id_rota !== "") {
+            if (isset($arDados->escolas)) {
+                foreach ($arDados->escolas as $rowEscola) {
+                    if (!empty($rowEscola['id_escola'])) {
+                        $arResultado[] = $this->processarAssociarEscolaRota($arDados, $rowEscola['id_escola']);
+                    }
+                }
+                $this->populaResposta(200, $arResultado);
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro escolas deve ser informado!"], false);
+            }
+        } else {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
+        }
+    }
+
+    ////////////////////////// POST OK
+    private function processarAssociarEscolaRota($arDados, $idEscola) {
+        $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
+        $dbSeteRotasPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $escolaExiste = $dbSeteEscolas->escolaExiste($idEscola, $arDados->codigo_cidade);
+        $arResultados = [];
+        if (!$escolaExiste) {
+            $arResultados[] = ['result' => false, 'messages' => "O id_escola {$idEscola} informando não foi encontrado. Verifique e tente novamente!"];
+        } else {
+            $dbSeteRotaExiste = $dbSeteRotas->rotaExiste($arDados->id_rota, $arDados->codigo_cidade);
+            if (!$dbSeteRotaExiste) {
+                $arResultados[] = ['result' => false, 'messages' => "Rota não existe. Não é permitido associar uma rota inexistente!"];
+            } else {
+                $result = $dbSeteRotasPassaPorEscola->_inserir([
+                    'id_rota' => $arDados->id_rota,
+                    'id_escola' => $idEscola,
+                    'codigo_cidade' => $arDados->codigo_cidade
+                ]);
+                if ($result["result"]) {
+                    $arResultados[] = ['result' => true, 'messages' => "Escola {$idEscola} vinculado com sucesso a rota {$arDados->id_rota}!"];
+                } else {
+                    $arResultados[] = ['result' => $result["result"], 'messages' => $result["messages"]];
+                }
+            }
+        }
+        return $arResultados;
+    }
+
+    private function associarAlunosRota($arDados) {
+        $arResultado = [];
+        if ($arDados->id_rota !== "") {
+            if (isset($arDados->alunos)) {
+                foreach ($arDados->alunos as $rowAluno) {
+                    if (!empty($rowAluno['id_aluno'])) {
+                        $arResultado[] = $this->processarAssociacaoRotaAluno($arDados, $rowAluno['id_aluno']);
+                    }
+                }
+                $this->populaResposta(200, $arResultado);
+            } else {
+                $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro alunos deve ser informado!"], false);
+            }
+        } else {
+            $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
+        }
+    }
+
+    private function processarAssociacaoRotaAluno($arDados, $idAluno) {
+        $dbSeteAluno = new \Db\SetePG\SeteAlunos();
+        $dbSeteRotasAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+        $arIds['codigo_cidade'] = $arDados->codigo_cidade;
+        $arIds['id_aluno'] = $idAluno;
+        $alunoExiste = $dbSeteAluno->alunoExisteById($arIds);
+        $arResultados = [];
+        if (!$alunoExiste) {
+            $arResultados[] = ['result' => false, 'messages' => "O id {$idAluno} informando não foi encontrado. Verifique e tente novamente!"];
+        } else {
+            $vinculoExisteParaAluno = $dbSeteRotasAtendeAluno->alunoAssociadoRota($idAluno, $arDados->codigo_cidade);
+            if ($vinculoExisteParaAluno) {
+                $arResultados[] = ['result' => false, 'messages' => "Aluno {$idAluno} já associado a uma rota. Não é permitido o aluno ter mais de uma rota!"];
+            } else {
+                $dbSeteRotasAtendeAluno->_inserir([
+                    'id_rota' => $arDados->id_rota,
+                    'id_aluno' => $idAluno,
+                    'codigo_cidade' => $arDados->codigo_cidade
+                ]);
+                $arResultados[] = ['result' => true, 'messages' => "Aluno {$idAluno} vinculado com sucesso!"];
+            }
+        }
+        return $arResultados;
+    }
 
     private function associarVeiculoRota($arDados) {
         $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
         $dbSeteRotaPossuiVeiculos = new \Db\SetePG\SeteRotaPossuiVeiculo();
         if ($arDados->id_rota !== "") {
-            if (!$dbSeteVeiculos->veiculoExiste($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"]);
-            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_veiculo, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Aluno já associado a uma escola!"], false);
+            if (!$dbSeteVeiculos->veiculoExisteById($arDados->id_veiculo, $arDados->codigo_cidade)) {
+                $this->populaResposta(404, ['result' => false, 'messages' => "Veículo informada não existe!"], false);
+            } else if ($dbSeteRotaPossuiVeiculos->rotaAssociadoVeiculo($arDados->id_rota, $arDados->codigo_cidade)) {
+                $this->populaResposta(400, ['result' => false, 'messages' => "Rota já possui um veículo associado!"], false);
             } else {
                 $this->populaResposta(201, $dbSeteRotaPossuiVeiculos->_inserir([
                             'codigo_cidade' => $arDados->codigo_cidade,
@@ -88,6 +209,7 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $idRota = $arParams['rotas_id'];
@@ -98,6 +220,8 @@ class RotasResource extends API {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
             $arParams = $this->event->getRouteMatch()->getParams();
+            $data = file_get_contents("php://input");
+            $arParams['arData'] = json_decode($data);
             if (isset($arParams['rota'])) {
                 $this->processarRotasDELETE($arParams);
             } else {
@@ -118,7 +242,51 @@ class RotasResource extends API {
             case 'veiculos':
                 $this->removerVeiculoRota($codigoCidade, $idRota);
                 break;
+            case 'motoristas':
+                $this->removerMotoristaRota($codigoCidade, $idRota, $arParams['arData']->cpf_motorista);
+                break;
+            case 'alunos':
+                if (isset($arParams['arData']->alunos)) {
+                    $arResult = $this->removerAlunosRota($arParams);
+                    $this->populaResposta(200, $arResult);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => 'O objeto contendo os ID\'s dos alunos deve ser informado!'], false);
+                }
+                break;
+            case 'escolas':
+                if (isset($arParams['arData']->escolas)) {
+                    $arResult = $this->removerEscolasRota($arParams);
+                    $this->populaResposta(200, $arResult);
+                } else {
+                    $this->populaResposta(400, ['result' => false, 'messages' => 'O objeto contendo os ID\'s das escolas deve ser informado!'], false);
+                }
+                break;    
         }
+    }
+    
+    private function removerAlunosRota($arParams) {
+        $arResult = [];
+        foreach ($arParams['arData']->alunos as $rowAluno) {
+            $dbSeteRotaAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+            $arIds['codigo_cidade'] = $arParams['codigo_cidade'];
+            $arIds['id_rota'] = $arParams['rotas_id'];
+            $arIds['id_aluno'] = $rowAluno->id_aluno;
+            $arResult[] = $dbSeteRotaAtendeAluno->_deleteByAlunoAndRota($arIds);
+        }
+        return $arResult;
+    }
+
+    ///////////////////////////////// DELETE OK
+    private function removerEscolasRota($arParams) {
+        $arResult = [];
+        $dbRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        foreach ($arParams['arData']->escolas as $rowEscolas) {
+            $arIds['codigo_cidade'] = $arParams['codigo_cidade'];
+            $arIds['id_rota'] = $arParams['rotas_id'];
+            $arIds['id_escola'] = $rowEscolas->id_escola;
+            $arResult[] = $dbRotaPassaPorEscola->_delete($arIds);
+        }
+        return $arResult;
     }
 
     private function removerVeiculoRota($codigoCidade, $idRota) {
@@ -126,6 +294,16 @@ class RotasResource extends API {
         $arIds['codigo_cidade'] = $codigoCidade;
         $arIds['id_rota'] = $idRota;
         $arResult = $dbSeteRotaPossuiVeiculo->_delete($arIds);
+        $this->populaResposta(200, $arResult, false);
+        exit;
+    }
+    
+    private function removerMotoristaRota($codigoCidade, $idRota, $cpfMotorista) {
+        $dbSeteRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arIds['id_rota'] = $idRota;
+        $arIds['cpf_motorista'] = $cpfMotorista;
+        $arResult = $dbSeteRotaDirigidaPorMotorista->_delete($arIds);
         $this->populaResposta(200, $arResult, false);
         exit;
     }
@@ -159,7 +337,9 @@ class RotasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $idRota = $arParams['rotas_id'];
-            $rota = $arParams['rota'];
+            if(isset($arParams['rota'])){
+                $rota = $arParams['rota'];
+            }
             if (isset($rota)) {
                 $this->processarGetRota($rota, $codigoCidade, $idRota);
             } else if ($idRota != "" && is_numeric($idRota)) {
@@ -171,11 +351,24 @@ class RotasResource extends API {
         }
     }
 
+    ////////////////////////// GET
     private function processarGetRota($rota, $codigoCidade, $idRota) {
         if ($idRota != "" && is_numeric($idRota)) {
             switch ($rota) {
                 case 'veiculos':
                     $this->getVeiculosRota($codigoCidade, $idRota);
+                    break;
+                case 'escolas':
+                    $this->getEscolasRota($codigoCidade, $idRota);
+                    break;
+                case 'alunos':
+                    $this->getAlunosRota($codigoCidade, $idRota);
+                    break;
+                case 'motoristas':
+                    $this->getMotoristasRota($codigoCidade, $idRota);
+                    break;
+                case 'monitores':
+                    $this->getMonitoresRota($codigoCidade, $idRota);
                     break;
                 case 'shape':
                     $this->getShapeRota($codigoCidade, $idRota);
@@ -188,6 +381,43 @@ class RotasResource extends API {
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
         }
+    }
+    
+    private function getMonitoresRota($codigoCidade, $idRota) {
+        $dbRotaAtendidaPorMonitor = new \Db\SetePG\SeteRotaAtendidaPorMonitor();
+        $arIds['id_rota'] = $idRota;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaAtendidaPorMonitor->getLista($arIds);
+        foreach ($arResposta as $key => $row){
+            $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
+        }
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
+    }
+    
+    private function getMotoristasRota($codigoCidade, $idRota) {
+        $dbRotaDirigidaPorMotorista = new \Db\SetePG\SeteRotaDirigidaPorMotorista();
+        $arIds['id_rota'] = $idRota;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaDirigidaPorMotorista->getLista($arIds);
+        foreach ($arResposta as $key => $row){
+            $arResposta[$key]['data_nascimento'] = date("d/m/Y", strtotime($row['data_nascimento']));
+            $arResposta[$key]['data_validade_cnh'] = date("d/m/Y", strtotime($row['data_validade_cnh']));
+        }
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
+    }
+
+    private function getEscolasRota($codigoCidade, $idRota) {
+        $dbRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
+        $arResposta = $dbRotaPassaPorEscola->getEscolaByRotas($codigoCidade, $idRota);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+    }
+
+    private function getAlunosRota($codigoCidade, $idRota) {
+        $dbRotaAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+        $arIds['id_rota'] = $idRota;
+        $arIds['codigo_cidade'] = $codigoCidade;
+        $arResposta = $dbRotaAtendeAluno->getAlunosById($arIds);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
     }
 
     private function getVeiculosRota($codigoCidade, $idRota) {
@@ -203,7 +433,7 @@ class RotasResource extends API {
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbSetePGRota->getShapeById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $this->populaResposta(!empty($arResposta['shape']) ? 200 : 404, $arResposta, false);
     }
 
     /**
@@ -279,6 +509,7 @@ class RotasResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
+        $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);
@@ -298,7 +529,7 @@ class RotasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
-    
+
     private function processarUpdateRota($idRota, $arData) {
         $modelRotas = new RotasModel();
         $boValidate = $modelRotas->validarUpdate($arData, $idRota);

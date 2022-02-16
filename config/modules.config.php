@@ -6,6 +6,9 @@
  * The previous config file has been stored in ./config/modules.config.old
  */
 return [
+    'Laminas\Mail',
+    'Laminas\Mvc\I18n',
+    'Laminas\I18n',
     'Laminas\\Cache',
     'Laminas\\Db',
     'Laminas\\Filter',
