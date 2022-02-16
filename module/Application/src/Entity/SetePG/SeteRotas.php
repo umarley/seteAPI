@@ -105,6 +105,30 @@ class SeteRotas extends AbstractDatabasePostgres {
         }
         return ['result' => $bool, 'messages' => $message];
     }
+    
+    public function _atualizarByFirebaseId($arId, $dados) {
+        $this->sql = new Sql($this->AdapterBD);
+        $update = $this->sql->update($this->tableIdentifier);
+        $update->set($dados);
+        $update->where(["id_firebase" => $arId['id_firebase']]);
+        $sql = $this->sql->buildSqlString($update);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $bool = true;
+            $message = 'Registro atualizado com sucesso!';
+        } catch (\PDOException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            echo $ex->getMessage();
+            die();
+            //$this->rollback();
+        } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            //$this->rollback();
+        }
+        return ['result' => $bool, 'messages' => $message];
+    }
 
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
