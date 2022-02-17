@@ -7,28 +7,7 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
 class SeteParametros extends AbstractDatabasePostgres {
-<<<<<<< HEAD
 
-    const PARAMETROS = [
-        ['codigo_parametro' => 'PERC_ENCARGO_SOCIAIS', 'valor' => 20, 'descricao_parametro' => 'Percentual dos encargos sociais sob o salários dos motoristas.'],
-        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_RODO', 'valor' => 13.5, 'descricao_parametro' => 'Coeficiente de custo de manutenção (RODOVIÁRIO)'],
-        ['codigo_parametro' => 'PERC_CFT_CUSTO_MANUTENCAO_AQUA', 'valor' => 13.5, 'descricao_parametro' => 'Coeficiente de custo de manutenção (AQUAVIÁRIO)'],
-        ['codigo_parametro' => 'VIDA_UTIL_RODO', 'valor' => 10, 'descricao_parametro' => 'Vida útil do veículo rodoviário em anos'],
-        ['codigo_parametro' => 'VIDA_UTIL_AQUA', 'valor' => 10, 'descricao_parametro' => 'Vida útil da embarcação rodoviário em anos'],
-        ['codigo_parametro' => 'PERC_RESIDUAL_RODO', 'valor' => 15, 'descricao_parametro' => 'Percentual do valor residual do veículo rodoviário de acordo com o que resta da vida útil.'],
-        ['codigo_parametro' => 'PERC_RESIDUAL_AQUA', 'valor' => 15, 'descricao_parametro' => 'Percentual do valor residual do veículo aquaviario de acordo com o que resta da vida útil.'],
-        ['codigo_parametro' => 'PERC_TRC', 'valor' => 9.25, 'descricao_parametro' => 'Taxa de remuneração do capital'],
-        ['codigo_parametro' => 'CFT_CONSUMO_OLEO_LUBRIFICANTE', 'valor' => 005, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE ÓLEOS E LUBRIFICANTES (l/km)'],
-        ['codigo_parametro' => 'NUM_RECAPAGEM', 'valor' => 3, 'descricao_parametro' => 'Número de recapagens que são feitas nos pneus do veículos'],
-        ['codigo_parametro' => 'CFT_CONSUMO_PECAS', 'valor' => 0.0058, 'descricao_parametro' => 'COEFICIENTE DE CONSUMO DE PEÇAS E ACESSÓRIOS'],
-        ['codigo_parametro' => 'PERC_SEGURO_AQUA', 'valor' => 4.2, 'descricao_parametro' => 'TAXA DE SEGURO DAS EMBARCAÇÕES (4.2%)'],
-        ['codigo_parametro' => 'PERC_MANUTENCAO_EMBARCACAO', 'valor' => null, 'descricao_parametro' => ' TAXA ANUAL DE MANUTENÇÃO E REPARO DA EMBARCAÇÃO-TIPO'],
-        ['codigo_parametro' => 'DENSIDADE_COMBUSTIVEL', 'valor' => 0.85, 'descricao_parametro' => 'DENSIDADE DE COMBUSTÍVEL (kg/litro)'],
-        ['codigo_parametro' => 'CONSUMO_LUBRIFICANTE', 'valor' => 0.9, 'descricao_parametro' => 'CONSUMO ESPECÍFICO DE LUBRIFICANTE (kg/hp)'],
-        ['codigo_parametro' => 'DENSIDADE_LUBRIFICANTE', 'valor' => 0.9, 'descricao_parametro' => 'DENSIDADE DO LUBRIFICANTE (kg/litro)'],
-        ['codigo_parametro' => 'PRECO_MEDIO_LUBRIFICANTE', 'valor' => null, 'descricao_parametro' => 'Preço médio do lubrificante (R$ / litro);'],
-        ['codigo_parametro' => 'PRECO_MEDIO_COMBUSTIVEIS', 'valor' => null, 'descricao_parametro' => 'Preço médio do litro do combustível (diesel, gasolina, óleo e gás natural)']
-=======
     
     const PERC_ENCARGO_SOCIAIS = 'PERC_ENCARGO_SOCIAIS';
     const PERC_CFT_CUSTO_MANUTENCAO_RODO = 'PERC_CFT_CUSTO_MANUTENCAO_RODO';
@@ -83,7 +62,6 @@ class SeteParametros extends AbstractDatabasePostgres {
         ['codigo_parametro' => 'PRECO_MEDIO_PNEUS', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DOS PNEUS'],
         ['codigo_parametro' => 'PRECO_MEDIO_RECAPAGEM', 'valor_padrao' => null, 'valor' => null, 'descricao_parametro' => 'PREÇO MÉDIO DO SERVIÇO DE RECAPAGEM'],
         ['codigo_parametro' => 'CONSUMO_COMBUSTIVEL_AQUAVIARIO', 'valor_padrao' => 0.18, 'valor' => 0.18, 'descricao_parametro' => 'CONSUMOS ESPECIFICO PARA ROTAS AQUAVIARIAS']
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     ];
 
     public function __construct() {
@@ -96,17 +74,6 @@ class SeteParametros extends AbstractDatabasePostgres {
     public function getById($arIds) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['eta' => $this->tableIdentifier])
-<<<<<<< HEAD
-                ->join(['esc' => new \Laminas\Db\Sql\TableIdentifier('sete_escolas', 'sete')], "eta.id_escola = esc.id_escola AND eta.codigo_cidade = esc.codigo_cidade", ['*'])
-                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_aluno = {$arIds['id_aluno']}");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row;
-    }
-    
-    public function getLista($codigoCidade){
-        $sql = "select codigo_parametro, valor, descricao_parametro from sete_parametros 
-=======
                 ->columns(['valor'])
                 ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.codigo_parametro = '{$arIds['codigo_parametro']}'");
         $prepare = $sql->prepareStatementForSqlObject($select);
@@ -116,7 +83,6 @@ class SeteParametros extends AbstractDatabasePostgres {
     
     public function getLista($codigoCidade){
         $sql = "select codigo_parametro, valor_padrao,  valor, descricao_parametro, descricao_detalhada from sete.sete_parametros 
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
                 where codigo_cidade = {$codigoCidade}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -127,8 +93,6 @@ class SeteParametros extends AbstractDatabasePostgres {
         }
         return $arLista;                
     }
-<<<<<<< HEAD
-=======
     
     public function getParametros($codigoCidade){
         $arListaParametros = $this->getLista($codigoCidade);
@@ -138,7 +102,6 @@ class SeteParametros extends AbstractDatabasePostgres {
         }
         return $arParametros;        
     }
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
 
     public function startupParametros($codigoCidade) {
         foreach (self::PARAMETROS as $param) {
@@ -148,13 +111,8 @@ class SeteParametros extends AbstractDatabasePostgres {
     }
 
     public function parametrosJaCriadosParaCidade($codigoCidade) {
-<<<<<<< HEAD
-        $sql = "select count(*) as qtd from sete_parametros 
-                    where codigo_cidade = {$codigoCidade}";
-=======
         $sql = "select count(*) as qtd from sete.sete_parametros 
                     where codigo_cidade = '{$codigoCidade}'";
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();
@@ -164,8 +122,6 @@ class SeteParametros extends AbstractDatabasePostgres {
             return false;
         }
     }
-<<<<<<< HEAD
-=======
     
     public function _atualizar($arIds, $valor) {
         $this->sql = new Sql($this->AdapterBD);
@@ -190,6 +146,4 @@ class SeteParametros extends AbstractDatabasePostgres {
         }
         return ['result' => $bool, 'messages' => $message];
     }
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
-
 }
