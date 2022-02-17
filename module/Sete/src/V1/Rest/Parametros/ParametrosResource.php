@@ -14,9 +14,6 @@ class ParametrosResource extends API
      */
     public function create($data)
     {
-<<<<<<< HEAD
-        return new ApiProblem(405, 'The POST method has not been defined');
-=======
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $parametroId  = $arParams['parametros_id'];
@@ -33,7 +30,6 @@ class ParametrosResource extends API
         $modelParametro = new ParametrosModel();
         $arResult = $modelParametro->gravarValorParametro($codigoCidade, $codigoParametro, $valorParametro);
         $this->populaResposta(201, $arResult, false);
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     }
 
     /**
@@ -77,9 +73,6 @@ class ParametrosResource extends API
      */
     public function fetchAll($params = [])
     {
-<<<<<<< HEAD
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
-=======
         $arParams = $this->event->getRouteMatch()->getParams();
         if(!isset($arParams['codigo_cidade'])){
             $this->populaResposta(400, ['result' => false, 'messages' => 'Parâmetro codigo_cidade obrigatório!'], false);
@@ -97,7 +90,6 @@ class ParametrosResource extends API
         $modelParametros = new ParametrosModel();
         $arResult = $modelParametros->getAll($codigoCidade);
         $this->populaResposta(200, $arResult);
->>>>>>> c0d6f6c5e29d4cf77aed11958426492001ebd936
     }
 
     /**
