@@ -32,7 +32,7 @@ class SeteOrdensServicos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['id_ordem','id_veiculo', 'id_fornecedor','data','tipo_servico','comentario'])
+                ->columns(['*'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);

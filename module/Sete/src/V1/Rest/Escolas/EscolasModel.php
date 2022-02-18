@@ -285,7 +285,7 @@ class EscolasModel {
     
     public function excluirVariasAssociacoesRotas($codigoCidade, $idEscola, $arRotas) {
 
-
+        
         $dbSetePGRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
         $arIdsRotas = [];
         foreach ($arRotas as $idRota) {
