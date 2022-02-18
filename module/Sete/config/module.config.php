@@ -57,7 +57,7 @@ return [
             'sete.rest.permissao-firebase' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/permissao-firebase[/:permissao_firebase_id]',
+                    'route' => '/permissao-firebase[/:codigo_cidade[/:permissao_firebase_id[/:rota]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\PermissaoFirebase\\Controller',
                     ],

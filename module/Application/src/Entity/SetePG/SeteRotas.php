@@ -72,6 +72,48 @@ class SeteRotas extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function qtdRotas($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+    
+    public function qtdRotasKilometragemTotal($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(sum(km), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
+    public function qtdRotasKilometragemMedia($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(avg(km), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
+    public function qtdRotasTempoMedio($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(avg(tempo), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+                //echo $sql->prepareStatementForSqlObject($select);
+                //exit;
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);

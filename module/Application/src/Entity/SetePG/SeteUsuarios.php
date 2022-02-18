@@ -139,12 +139,16 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         return ['result' => $boResultado, 'messages' => $message];
     }
     
+    private function limparTexto($texto){
+        return str_replace(["<", ">", "=", "'", "?"], "", $texto);
+    }
+    
     public function checkUsuarioAndPassword($usuario, $pass) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->columns(['email', 'password'])
-                ->where("email = '{$usuario}'")
-                ->where("password = '{$pass}'")
+                ->where("email = '". $this->limparTexto($usuario) ."'")
+                ->where("password = '". $this->limparTexto($pass)."'")
                 ->where("is_ativo = 'S'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
@@ -199,6 +203,62 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $execute = $prepare->execute();
         $row = $execute->current();
         return $row['id_usuario'];
+    }
+    
+    public function getUsuariosPendentesLiberacao($offset, $limit = 20, $busca = "") {
+        $sql = "SELECT us.id_usuario as uid, us.nome, codigo_cidade, concat(cidade, ' - ', estado) AS localidade, email  FROM sete.sete_usuarios us
+                    WHERE us.is_liberado = 'N'";
+        if (!empty($busca)) {
+            $sql .= " AND (us.email LIKE '%{$busca}%' OR us.nome LIKE '%{$busca}%' OR us.cidade LIKE '%{$busca}%' OR us.estado LIKE '%{$busca}%')";
+        }
+        $sql .= " OFFSET {$offset} LIMIT {$limit}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function getTotalUsuariosPendentesLiberacao($busca = "") {
+        $sql = "SELECT COUNT(*) AS qtd FROM sete.sete_usuarios us
+                    WHERE us.is_liberado = 'N'";
+        if (!empty($busca)) {
+            $sql .= " AND (us.email LIKE '%{$busca}%' OR us.nome LIKE '%{$busca}%' OR us.cidade LIKE '%{$busca}%' OR us.estado LIKE '%{$busca}%')";
+        }
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['qtd'];
+    }
+    
+    public function _liberarUsuario($email, $tipoPermissao) {
+        if($tipoPermissao == 'reader'){
+            $tipoPermissao = 'leitor';
+        }
+        $this->sql = new Sql($this->AdapterBD);
+        $update = $this->sql->update($this->tableIdentifier);
+        $update->set(['is_liberado' => 'S', 'dt_liberacao' => date('Y-m-d H:i:s'), 'nivel_permissao' => $tipoPermissao]);
+        $update->where(['email' => $email]);
+        $sql = $this->sql->buildSqlString($update);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $bool = true;
+            $message = 'Usuário liberado com sucesso!';
+        } catch (\PDOException $ex) {
+            $bool = false;
+            $message = "Falha ao liberar o usuário. " . $ex->getMessage();
+            echo $ex->getMessage();
+            die();
+            //$this->rollback();
+        } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
+            $bool = false;
+            $message = "Falha ao liberar o usuário. " . $ex->getMessage();
+            //$this->rollback();
+        }
+        return ['result' => $bool, 'messages' => $message];
     }
 
 }

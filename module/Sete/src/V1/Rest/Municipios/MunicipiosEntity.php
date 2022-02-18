@@ -1,7 +1,7 @@
 <?php
 namespace Sete\V1\Rest\Municipios;
 
-use Db\Sete\FirebaseMunicipios;
+use Db\SetePG\FirebaseMunicipios;
 
 class MunicipiosEntity extends FirebaseMunicipios
 {

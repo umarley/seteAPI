@@ -1,28 +1,30 @@
 <?php
 
-namespace Db\Sete;
+namespace Db\SetePG;
 
 use Db\Core\AbstractDatabase;
 use Laminas\Db\Sql\Sql;
 use Laminas\Db\Sql\TableIdentifier;
 use Laminas\Db\Adapter\Adapter;
 
-class FirebaseMunicipios extends AbstractDatabase {
+class FirebaseMunicipios extends \Db\Core\AbstractDatabasePostgres {
 
     public function __construct() {
         $this->table = 'firebase_municipios';
         $this->primaryKey = 'codigo_municipio';
-        parent::__construct(AbstractDatabase::DATABASE_CORE);
+        $this->schema = 'api';
+        parent::__construct(\Db\Core\AbstractDatabasePostgres::DATABASE_CORE);
     }
 
     public function getLista() {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select(['us' => $this->tableIdentifier])
-                ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
-                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf']);
-        $prepare = $sql->prepareStatementForSqlObject($select);
+        $sql = "select cid.nome  as nome_cidade, cid.latitude, cid.longitude, cid.codigo_ibge  from 
+                (select distinct codigo_cidade from sete.sete_usuarios su) municipio
+                inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
+                inner join sete.glb_estado est on est.codigo = cid.codigo_uf ";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
         $arLista = [];
-        $this->getResultSet($prepare->execute());
+        $this->getResultSet($statement->execute());
         foreach ($this->resultSet as $row) {
             $arLista[] = $row;
         }
@@ -30,21 +32,24 @@ class FirebaseMunicipios extends AbstractDatabase {
     }
 
     public function getByCodigoIBGE($codigo) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select(['us' => $this->tableIdentifier])
-                ->join(['cid' => new TableIdentifier('glb_municipio')], "us.codigo_municipio = cid.codigo_ibge", ['nome_cidade' => 'nome', 'latitude', 'longitude', 'codigo_ibge'])
-                ->join(['est' => new TableIdentifier('glb_estado')], "est.codigo = cid.codigo_uf", ['nome_estado' => 'nome', 'uf'])
-                ->where("cid.codigo_ibge = {$codigo}");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        return $prepare->execute()->current();
+        $sql = "select cid.nome  as nome_cidade, cid.latitude, cid.longitude, cid.codigo_ibge  from 
+                (select distinct codigo_cidade from sete.sete_usuarios su) municipio
+                inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
+                inner join sete.glb_estado est on est.codigo = cid.codigo_uf 
+                where cid.codigo_ibge = {$codigo}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
     }
 
     public function getTotalMunicipios($busca = "") {
-        $sql = "SELECT COUNT(*) AS qtd FROM firebase_municipios us     
-                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
-                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
-        if(!empty($busca)){
-            $sql .= " WHERE mun.nome LIKE '{$busca}%'";
+        $sql = "select count(*) as qtd  from 
+            (select distinct codigo_cidade from sete.sete_usuarios su) municipio
+            inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
+            inner join sete.glb_estado est on est.codigo = cid.codigo_uf ";
+        if (!empty($busca)) {
+            $sql .= " WHERE cid.nome LIKE '{$busca}%'";
         }
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
@@ -53,18 +58,19 @@ class FirebaseMunicipios extends AbstractDatabase {
     }
 
     public function getMunicipiosLista($offset, $limit = 20, $busca = "") {
-        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
-        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
-        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
-        $dbSeteRotas = new \Db\Sete\SeteRotas();
-        $dbSeteMotoristas = new \Db\Sete\SeteMotoristas();
-        $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
-                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
-                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf";
-        if(!empty($busca)){
-            $sql .= " WHERE mun.nome LIKE '{$busca}%'";
+        $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
+        $dbSeteAlunos = new \Db\SetePG\SeteAlunos();
+        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
+        $dbSeteMotoristas = new \Db\SetePG\SeteMotoristas();
+        $sql = "select cid.codigo_ibge AS codigo_municipio, cid.nome AS nome_cidade, est.nome AS nome_estado, est.uf  from 
+                (select distinct codigo_cidade from sete.sete_usuarios su) municipio
+                inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
+                inner join sete.glb_estado est on est.codigo = cid.codigo_uf";
+        if (!empty($busca)) {
+            $sql .= " WHERE cid.nome LIKE '{$busca}%'";
         }
-        $sql .= " LIMIT {$offset}, {$limit}";
+        $sql .= " OFFSET {$offset} LIMIT {$limit}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];
@@ -85,25 +91,26 @@ class FirebaseMunicipios extends AbstractDatabase {
         }
         return $arLista;
     }
-    
+
     public function getMunicipiosListaExcel() {
-        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
-        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
-        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
-        $dbSeteRotas = new \Db\Sete\SeteRotas();
-        $dbSeteMotoristas = new \Db\Sete\SeteMotoristas();
-        $sql = "SELECT mun.codigo_ibge AS codigo_municipio, mun.nome AS nome_cidade, est.nome AS nome_estado, est.uf FROM firebase_municipios us
-                    INNER JOIN glb_municipio mun ON us.codigo_municipio = mun.codigo_ibge
-                    INNER JOIN glb_estado est ON est.codigo = mun.codigo_uf
-                    ORDER BY est.nome, mun.nome ASC";
+        $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
+        $dbSeteAlunos = new \Db\SetePG\SeteAlunos();
+        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
+        $dbSeteMotoristas = new \Db\SetePG\SeteMotoristas();
+        $sql = "select cid.codigo_ibge AS codigo_municipio, cid.nome AS nome_cidade, est.nome AS nome_estado, est.uf  from 
+                (select distinct codigo_cidade from sete.sete_usuarios su) municipio
+                inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
+                inner join sete.glb_estado est on est.codigo = cid.codigo_uf
+                    ORDER BY est.nome, cid.nome ASC";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $arLista = [];
         $this->getResultSet($statement->execute());
         foreach ($this->resultSet as $key => $row) {
             $rowArray = (array) $row;
-            
-            $arLista[] = array_merge($rowArray,  [
+
+            $arLista[] = array_merge($rowArray, [
                 'n_escolas' => !empty($dbSeteEscolas->qtdEscolasAtendidas($row['codigo_municipio'])) ? $dbSeteEscolas->qtdEscolasAtendidas($row['codigo_municipio']) : '0',
                 'n_alunos' => !empty($dbSeteAlunos->qtdAlunosAtendidos($row['codigo_municipio'])) ? $dbSeteAlunos->qtdAlunosAtendidos($row['codigo_municipio']) : '0',
                 'n_veiculos_funcionamento' => !empty($dbSeteVeiculos->qtdVeiculosFuncionando($row['codigo_municipio'])) ? $dbSeteVeiculos->qtdVeiculosFuncionando($row['codigo_municipio']) : '0',

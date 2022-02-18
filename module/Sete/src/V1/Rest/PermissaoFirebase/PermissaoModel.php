@@ -39,16 +39,15 @@ class PermissaoModel {
     }
 
     public function processarPermissaoFirebase($arDados, $accessToken) {
-        $dbModelFirebase = new \Application\Model\FirebaseModel();
-        $findEmail = $dbModelFirebase->procurarDocumentoUsuarioPorEmail($arDados->email);
-        if (!empty($findEmail)) {
-            $uidUsuario = key($findEmail);
-            $codigoCidade = $findEmail[$uidUsuario]['COD_CIDADE'];
-            $documentoFirestore = $dbModelFirebase->getDocumentoByIdConfig($codigoCidade);
-            if (!$documentoFirestore) {
-                return $this->criarDocumentoComCamposColecaoConfig($dbModelFirebase, $findEmail, $arDados, $accessToken);
-            } else {
-                return $this->liberarUsuarioFirebaseColecaoConfig($dbModelFirebase, $findEmail, $arDados, $documentoFirestore, $accessToken);
+        $dbSetePGUsuarios = new \Db\SetePG\SeteUsuarios();               
+        $findEmail = $dbSetePGUsuarios->usuarioExisteByEmail($arDados->email);
+        if ($findEmail) {
+            $arUsuario = $dbSetePGUsuarios->getUsuarioByUsername($arDados->email);
+            if($arUsuario['is_liberado'] === 'S'){
+                return ['resposta' => ['result' => false, 'messages' => "Usuário já se encontra liberado para usar o sistema!"], 'codeHTTP' => 200];
+            }else{
+                $arResult = $dbSetePGUsuarios->_liberarUsuario($arDados->email, $arDados->tipo_permissao);
+                return ['resposta' => ['result' => $arResult['result'], 'messages' => $arResult['messages']], 'codeHTTP' => 201];
             }
         } else {
             return ['resposta' => ['result' => false, 'messages' => "Email não encontrado no firestore!"], 'codeHTTP' => 404];
@@ -92,7 +91,7 @@ class PermissaoModel {
     }
     
     public function getUsuariosLiberar($pagina, $busca = ""){
-        $dbSeteUsuario = new \Db\Sete\SeteUsuarios();
+        $dbSeteUsuario = new \Db\SetePG\SeteUsuarios();
         $qtdPerPage = 20;
         $totalRegistros = $dbSeteUsuario->getTotalUsuariosPendentesLiberacao($busca);
         $qtdPaginas = ceil($totalRegistros / $qtdPerPage);
@@ -107,31 +106,9 @@ class PermissaoModel {
           ];
     }
     
-    public function excluirUsuarioNaoLiberado($uid){
-        $boOperacao = $this->excluirUsuarioFirebaseAuthentication($uid);
-        if(!$boOperacao['result']){
-            return ['result' => false, 'messages' => $boOperacao['messages']];
-        }else{
-            $dbFirebaseModel = new \Application\Model\FirebaseModel();
-            $dbSeteUsuarios = new \Db\Sete\SeteUsuarios();
-            $dbFirebaseModel->excluirDocumentoUsuarioPorUID($uid);
-            return $dbSeteUsuarios->_delete($uid);
-        }
-    }
-    
-    private function excluirUsuarioFirebaseAuthentication($uid){
-       exec("export GOOGLE_APPLICATION_CREDENTIALS='/var/www/seteAPI/config/autoload/google.local.json' && node /var/www/seteAPI/daemon/firebase_del_user.js {$uid}", $retorno, $var);
-       $strRetorno = ""; 
-       foreach ($retorno as $line){
-           $strRetorno .= str_replace(["code", "message"], ["\"code\"", "\"message\""], $line);
-       }
-       $objeto = str_replace("'", "\"", $strRetorno);
-       $arRetorno = json_decode($objeto, true);
-       if(isset($arRetorno['code'])){
-           return ['result' => false, 'messages' => $arRetorno['code']. " / ". $arRetorno['message']];
-       }else{
-           return ['result' => true];
-       }
+    public function excluirUsuarioNaoLiberado($codigoCidade, $idUsuario){
+        $dbSetePGUsuarios = new \Db\SetePG\SeteUsuarios();
+        return $dbSetePGUsuarios->_delete(['codigo_cidade' => $codigoCidade, 'id_usuario' => $idUsuario]);
     }
 
 }
