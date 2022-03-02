@@ -1,3 +1,14 @@
+# SETE
+<a href="#">
+<img src="https://files.cercomp.ufg.br/weby/up/767/o/setepretoPrancheta_1_4x.png" alt="SETE Logo" width="400">
+</a>
+
+
+[![Build status](https://ci.appveyor.com/api/projects/status/3b989hf236b2i47d?svg=true)](https://ci.appveyor.com/project/marcosroriz/sete)
+
+
+O Sistema Eletrônico de Gestão do Transporte Escolar (SETE) é um software de _e-governança_ desenvolvido pelo [CECATE UFG](https://transportes.fct.ufg.br/p/31447-apresentacao-do-cecate-ufg) voltado a auxiliar na gestão do transporte escolar dos municípios brasileiros considerados suas singularidades.  O sistema foi projeto com intuito de não depender de nenhum software proprietário, desta forma é possível utilizá-lo sem ter de licenciar programas dependentes.
+
 Laminas API Tools Skeleton Application
 ======================================
 
