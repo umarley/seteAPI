@@ -143,6 +143,7 @@ class FornecedoresResource extends API {
      * @return ApiProblem|mixed
      */
     public function patch($id, $data) {
+        
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
