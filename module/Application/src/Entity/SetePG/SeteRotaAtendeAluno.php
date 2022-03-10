@@ -105,5 +105,13 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         }
         return ['result' => $boResultado, 'messages' => $message];
     }
+    
+    public function getQtdAlunosSemRota($codigoCidade){
+        
+    }
+    
+    public function getQtdAlunosComRota($codigoCidade){
+        
+    }
 
 }
