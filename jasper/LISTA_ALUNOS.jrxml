@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LISTA_ALUNOS" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74ee9aa9-7b1e-4b40-9281-a72751f7431a">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="postgres"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#1C6794">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#DCDFE3"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="RelacaoAlunos" uuid="b64c4f73-4cbf-4fee-97d4-2026251208d2">
+		<property name="com.jaspersoft.studio.data.sql.tables">
+			<![CDATA[c2V0ZS5zZXRlX2VzY29sYXMgLDE1LDEwMzIsNmY2Yjc2YTUtOWFkNy00NGMxLTllNWMtNGJjNTgx
+MjcyOGY5O3NldGUuc2V0ZV9lc2NvbGFfdGVtX2FsdW5vcyAsMzA1LDE0NTIsYzE1ODIwZjEtMjIz
+ZC00NzFkLTgxYTMtZGYwNTdjMDZmMzM2O3NldGUuc2V0ZV9hbHVub3MgLDE1LDE1LDllMjFhZWZm
+LTc2OGQtNDhmYS04MDc0LTRhZTU0NWJjZmVjNDs=]]>
+		</property>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="postgres"/>
+		<parameter name="codigo_cidade" class="java.lang.Integer"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT al.nome AS nm_aluno,
+	coalesce( al.nome_responsavel,'NÃO INFORMADO') AS nome_responsavel,
+	coalesce( ec.nome,'NÃO INFORMADO') AS nm_escola
+FROM sete.sete_alunos al
+	left join sete.sete_escola_tem_alunos eta ON 
+	 al.codigo_cidade = eta.codigo_cidade 
+	 AND al.id_aluno = eta.id_aluno 
+	left join sete.sete_escolas ec ON 
+	 ec.codigo_cidade = eta.codigo_cidade 
+	 AND ec.id_escola = eta.id_escola 
+WHERE 
+	 al.codigo_cidade =  $P{codigo_cidade} 
+ORDER BY al.nome ASC]]>
+		</queryString>
+		<field name="nm_aluno" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="nm_aluno"/>
+			<property name="com.jaspersoft.studio.field.label" value="nm_aluno"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="sete_alunos"/>
+		</field>
+		<field name="nome_responsavel" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="nome_responsavel"/>
+			<property name="com.jaspersoft.studio.field.label" value="nome_responsavel"/>
+		</field>
+		<field name="nm_escola" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="nm_escola"/>
+			<property name="com.jaspersoft.studio.field.label" value="nm_escola"/>
+		</field>
+	</subDataset>
+	<parameter name="usuario_sistema" class="java.lang.String"/>
+	<parameter name="codigo_cidade" class="java.lang.Integer"/>
+	<queryString language="SQL">
+		<![CDATA[select 
+m.codigo_ibge, 
+m.nome as nm_cidade, 
+e.nome  as nm_estado, 
+e.uf,
+(SELECT count(*) as qtd
+FROM sete.sete_alunos al
+	left join sete.sete_escola_tem_alunos eta ON 
+	 al.codigo_cidade = eta.codigo_cidade 
+	 AND al.id_aluno = eta.id_aluno 
+	left join sete.sete_escolas ec ON 
+	 ec.codigo_cidade = eta.codigo_cidade 
+	 AND ec.id_escola = eta.id_escola 
+WHERE 
+	 al.codigo_cidade =  m.codigo_ibge) as qtd_registros
+from sete.glb_municipio m
+inner join sete.glb_estado e on m.codigo_uf = e.codigo 
+where m.codigo_ibge  =  $P{codigo_cidade}]]>
+	</queryString>
+	<field name="codigo_ibge" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="codigo_ibge"/>
+		<property name="com.jaspersoft.studio.field.label" value="codigo_ibge"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="glb_municipio"/>
+	</field>
+	<field name="nm_cidade" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nm_cidade"/>
+		<property name="com.jaspersoft.studio.field.label" value="nm_cidade"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="glb_municipio"/>
+	</field>
+	<field name="nm_estado" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nm_estado"/>
+		<property name="com.jaspersoft.studio.field.label" value="nm_estado"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="glb_estado"/>
+	</field>
+	<field name="uf" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="uf"/>
+		<property name="com.jaspersoft.studio.field.label" value="uf"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="glb_estado"/>
+	</field>
+	<field name="qtd_registros" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="qtd_registros"/>
+		<property name="com.jaspersoft.studio.field.label" value="qtd_registros"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="114">
+			<image>
+				<reportElement x="6" y="5" width="269" height="60" uuid="9c02dd82-2664-4583-a524-abb1efd2b7ac"/>
+				<imageExpression><![CDATA["/var/www/seteAPI/jasper/images/logo-cecate2.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="285" y="20" width="320" height="30" uuid="be2f3c55-b162-4e01-bbc4-a8a88580c8c5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Relação de Alunos"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="655" y="27" width="41" height="16" uuid="5ed3ed60-93ec-46a8-b0e6-0f9fa6051b37"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Usuário:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="644" y="13" width="53" height="16" uuid="64f39342-2546-4715-b96b-c13a94804cb3"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Emissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="700" y="27" width="94" height="16" uuid="a5f185fd-753b-4835-bd36-e948cd9f0094"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{usuario_sistema}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm">
+				<reportElement x="700" y="12" width="94" height="16" uuid="e77dcb0f-e078-40a5-9fa4-d256ec15949b"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="10" y="84" width="460" height="30" uuid="8e2a681a-9f55-49ea-ad2a-5b4f7ce38656"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Cidade:  " +  $F{codigo_ibge} + " - " + $F{nm_cidade} + " / " + $F{uf}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="82" width="190" height="30" uuid="a37aff0d-6638-4fbe-8076-f9d2d0f74dca"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Total de Registros: " + $F{qtd_registros}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="93">
+			<componentElement>
+				<reportElement x="1" y="31" width="799" height="60" uuid="ae75635e-1c44-4fb2-a075-6b003ec2517a">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="RelacaoAlunos" uuid="8ac11455-be48-464a-8e97-ffa6b4cd6fdd">
+						<datasetParameter name="codigo_cidade">
+							<datasetParameterExpression><![CDATA[$P{codigo_cidade}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="200" uuid="51c4d79f-965d-4fd0-aaaf-3b7d7be6a662">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="200" height="30" forecolor="#FAF3F2" uuid="44fb9536-3765-4eb1-b21b-cc792c9cd362">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="12"/>
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<text><![CDATA[Nome do Aluno]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="200" height="30" uuid="e711acd8-3cda-4acc-9d96-a70b9a2da990">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{nm_aluno}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="294" uuid="91db776a-c6dc-4603-814a-67ddf0a52f01">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="294" height="30" forecolor="#FAF3F2" uuid="4eee9269-abf4-457f-9401-40f44b61fc08">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="12"/>
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<text><![CDATA[Responsável]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="294" height="30" uuid="e74f8b66-a93d-466f-89af-759372f4b49a">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{nome_responsavel}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="290" uuid="b1a6d69d-b849-4ed5-8489-a01d2141d29b">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="290" height="30" forecolor="#FAF3F2" uuid="56d8b2c2-d6fa-48c0-8aa1-07e203841545">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Arial" size="12"/>
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<text><![CDATA[Escola]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="290" height="30" uuid="c97edbd9-6448-44d3-828d-3ba36c0c6654">
+									<property name="com.jaspersoft.studio.unit.leftIndent" value="px"/>
+								</reportElement>
+								<textElement verticalAlignment="Middle">
+									<paragraph leftIndent="10"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{nm_escola}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="74" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<image>
+				<reportElement x="1" y="0" width="799" height="74" uuid="f5036a67-3f96-4405-9143-0625793994af"/>
+				<imageExpression><![CDATA["/var/www/seteAPI/jasper/images/rodape.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="720" y="30" width="80" height="30" uuid="76177496-aa06-47e9-a740-4d4cc0b53f66"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -9,9 +9,6 @@ CREATE TABLE sistema.relatorios (
 	alterado_por varchar(255) NULL
 );
 
-
-
-
 CREATE TABLE sistema.relatorios_parametros (
 	id_relatorio int8 NOT NULL,
 	parametro varchar(255) NOT NULL,
@@ -22,3 +19,7 @@ CREATE TABLE sistema.relatorios_parametros (
 
 ALTER TABLE sistema.relatorios ADD CONSTRAINT relatorios_pk PRIMARY KEY (id_relatorio);
 ALTER TABLE sistema.relatorios_parametros ADD CONSTRAINT relatorios_parametros_fk FOREIGN KEY (id_relatorio) REFERENCES sistema.relatorios(id_relatorio) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Auto-generated SQL script #202203161901
+INSERT INTO sistema.relatorios (nome,descricao,path_jasper)
+	VALUES ('Relação de alunos','Lista todos os alunos cadastrados no municipio.','LISTA_ALUNOS.jrxml');
