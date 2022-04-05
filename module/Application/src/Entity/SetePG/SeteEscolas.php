@@ -110,6 +110,19 @@ class SeteEscolas extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
+    public function qtdAlunosPorCidade($municipio) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(new \Laminas\Db\Sql\TableIdentifier('sete_escola_tem_alunos', 'sete'))
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("codigo_cidade = {$municipio}");
+        if (!empty($idEscola)) {
+            $select->where("id_escola = {$idEscola}");
+        }
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+
     public function escolaExiste($idEscola, $codigoCidade) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)

@@ -89,6 +89,159 @@ class SeteAlunos extends AbstractDatabasePostgres {
         }
     }
 
+    public function qtdAlunosEscolaridade($codigoCidade) {
+        $sql = "SELECT 1 AS nivel,
+                    'Infantil' AS nm_nivel,
+                    (select count(*) from sete.sete_alunos al where al.codigo_cidade = '{$codigoCidade}' and al.nivel = 1) as qtd
+            UNION ALL SELECT 2 AS nivel,
+                            'Fundamental' AS nm_nivel,
+                            (select count(*) from sete.sete_alunos al where al.codigo_cidade = '{$codigoCidade}' and al.nivel = 2) as qtd
+            UNION ALL SELECT 3 AS nivel,
+                            'Médio' AS nm_nivel,
+                            (select count(*) from sete.sete_alunos al where al.codigo_cidade = '{$codigoCidade}' and al.nivel = 3) as qtd
+            UNION ALL SELECT 4 AS nivel,
+                            'Superior' AS nm_nivel,
+                            (select count(*) from sete.sete_alunos al where al.codigo_cidade = '{$codigoCidade}' and al.nivel = 4) as qtd
+            UNION ALL SELECT 5 AS nivel,
+                            'Outro' AS nm_nivel,
+                            (select count(*) from sete.sete_alunos al where al.codigo_cidade = '{$codigoCidade}' and al.nivel = 5) as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function qtdAlunosTurno($codigoCidade) {
+        $sql = "select 1 as tp_turno,
+                'Manhã' as nm_tp_turno,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and turno = 1) as qtd
+                union all 
+                select 2 as tp_turno,
+                'Tarde' as nm_tp_turno,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and turno = 2) as qtd
+                union all 
+                select 3 as tp_turno,
+                'Integral' as nm_tp_turno,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and turno = 3) as qtd
+                union all 
+                select 4 as tp_turno,
+                'Noturno' as nm_tp_turno,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and turno = 4) as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function qtdAlunosResidencia($codigoCidade) {
+        $sql = "select 1 as tp_residencia,
+                'Área Urbana' as nm_tp_residencia,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and mec_tp_localizacao = 1) as qtd
+                union all 
+                select 2 as tp_residencia,
+                'Área Rural' as nm_tp_residencia,
+                (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and mec_tp_localizacao = 2) as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function qtdAlunosCor($codigoCidade) {
+        $sql = "select '0' as tp_cor,
+        'Não informado' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = '0') as qtd
+          union all
+        select '1' as tp_cor,
+        'Branco' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = '1') as qtd
+        union all 
+        select '2' as tp_cor,
+        'Preto' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = '2') as qtd
+        union all 
+        select '3' as tp_cor,
+        'Pardo' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = '3') as qtd
+        union all 
+        select '4' as tp_cor,
+        'Amarelo' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = '4') as qtd
+        union all 
+        select '5' as tp_cor,
+        'Indígena' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor =' 5') as qtd
+        union all
+        select 'NAN' as tp_cor,
+        'Outra' as nm_tp_cor,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and cor = 'NAN') as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function qtdAlunosSexo($codigoCidade) {
+        $sql = "select '1' as tp_sexo,
+        'Masculino' as nm_tp_sexo,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and sexo = '1') as qtd
+          union all
+        select '2' as tp_sexo,
+        'Feminino' as nm_tp_sexo,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and sexo = '2') as qtd
+        union all 
+        select '3' as tp_sexo,
+        'Não Informado' as nm_tp_sexo,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and sexo = '3') as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
+    public function qtdAlunosResponsavel($codigoCidade) {
+        $sql = "select '-1' as tp_responsavel,
+        'Não informado' as nm_tp_responsavel,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and grau_responsavel = '-1') as qtd
+          union all
+        select '0' as tp_responsavel,
+        'Pai, Mãe, Padrasto ou Madrasta ' as nm_tp_responsavel,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and grau_responsavel = '0') as qtd
+        union all 
+        select '1' as tp_responsavel,
+        'Avô ou Avó' as nm_tp_responsavel,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and grau_responsavel = '1') as qtd
+        union all 
+        select '2' as tp_responsavel,
+        'Irmão ou Irmã' as nm_tp_responsavel,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and grau_responsavel = '2') as qtd
+        union all 
+        select '4' as tp_responsavel,
+        'Outro parente' as nm_tp_responsavel,
+        (select count(*) from sete.sete_alunos al where al.codigo_cidade  = '{$codigoCidade}' and grau_responsavel = '4') as qtd";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
     /**
      * Método utilizado na importação do censo
      */
