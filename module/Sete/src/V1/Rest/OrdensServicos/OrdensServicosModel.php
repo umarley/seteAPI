@@ -96,61 +96,60 @@ class OrdensServicosModel {
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
-    public function validarUpdate($arPost, $idAluno) {
+    public function validarUpdate($arPost, $arId) {
         $arPost = (Array) $arPost;
         $boValidate = true;
         $arErros = [];
-        if (!isset($arPost['nome']) || empty($arPost['nome'])) {
+        $arRow = $this->_entity->getById($arId);
+        if(empty($arRow)){
             $boValidate = false;
-            $arErros['nome'] = "O nome do aluno deve ser informado!";
+            $arErros['id_ordem'] = "O id informado não existe!";
         }
-        if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
-            $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
-            $dbAluno = new \Db\SetePG\SeteAlunos();
-            if (!$cpfValido) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado é inválido!";
-            }
-            if ($dbAluno->alunoExistePUT($arPost['cpf'], $idAluno)) {
-                $boValidate = false;
-                $arErros['cpf'] = "O cpf informado já existe!";
-            }
-        }
-        if (!isset($arPost['data_nascimento']) || empty($arPost['data_nascimento'])) {
+        if (!isset($arPost['id_fornecedor']) || empty($arPost['id_fornecedor'])) {
             $boValidate = false;
-            $arErros['data_nascimento'] = "O campo data de nascimento deve ser informado!";
+            $arErros['id_fornecedor'] = "O id do fornecedor deve ser informado!";
+        }else 
+            if (!$this->_entity->fornecedorExisteById($arPost['id_fornecedor'],$arPost['codigo_cidade'])){
+                $boValidate = false;
+                $arErros['id_fornecedor'] = "O id do fornecedor não está cadastrado!";
+            }
+        if (!isset($arPost['id_veiculo']) || empty($arPost['id_veiculo'])) {
+            $boValidate = false;
+            $arErros['id_veiculo'] = "O id do veículo deve ser informada!";
+        } 
+        else 
+            if (!$this->_entity->veiculoExisteById($arPost['id_veiculo'],$arPost['codigo_cidade'])){
+                $boValidate = false;
+                $arErros['id_veiculo'] = "O id do veículo não está cadastrado!";
+            }
+        if (!isset($arPost['data']) || empty($arPost['data'])) {
+            $boValidate = false;
+            $arErros['data'] = "A data deve ser informada!";
         } else {
-            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data_nascimento'])) {
+            if (!\Application\Utils\Utils::ValidaDataDDMMYYYY($arPost['data'])) {
                 $boValidate = false;
-                $arErros['data_nascimento'] = "A data informada é inválida!";
+                $arErros['data'] = "A data informada é inválida!";
             }
         }
-        if (!isset($arPost['nome_responsavel']) || empty($arPost['nome_responsavel'])) {
+        if (!isset($arPost['tipo_servico']) || empty($arPost['tipo_servico'])) {
             $boValidate = false;
-            $arErros['nome_responsavel'] = "O nome do responsável pelo aluno deve ser informado!";
-        }
-        if (!isset($arPost['grau_responsavel']) || $arPost['grau_responsavel'] === "") {
+            $arErros['tipo_servico'] = "O tipo de serviço deve ser informado!";
+
+        } else if (!is_numeric($arPost['tipo_servico'])){
             $boValidate = false;
-            $arErros['grau_responsavel'] = "Informe o grau de parentesco do responsável pelo aluno!";
+            $arErros['tipo_servico'] = "O serviço deve ser um numeral!";
         }
         if ($boValidate) {
-            return $this->validarParametrosInsertAluno($arPost);
+            return $this->validarParametrosInsertOrdensServicos($arPost);
         } else {
             return ['result' => $boValidate, 'messages' => $arErros];
         }
     }
 
-    public function prepareUpdate($codigoCidade, $idAluno, $arPost) {
+    public function prepareUpdate($codigoCidade, $idOrdensServicos, $arPost) {
         $arPost = (Array) $arPost;
-        unset($arPost['codigo_cidade']);
-        unset($arPost['id_aluno']);
-        $arPost['da_porteira'] = isset($arPost['da_porteira']) ? $arPost['da_porteira'] : 'N';
-        $arPost['da_mataburro'] = isset($arPost['da_mataburro']) ? $arPost['da_mataburro'] : 'N';
-        $arPost['da_colchete'] = isset($arPost['da_colchete']) ? $arPost['da_colchete'] : 'N';
-        $arPost['da_atoleiro'] = isset($arPost['da_atoleiro']) ? $arPost['da_atoleiro'] : 'N';
-        $arPost['da_ponterustica'] = isset($arPost['da_ponterustica']) ? $arPost['da_ponterustica'] : 'N';
         $arId['codigo_cidade'] = $codigoCidade;
-        $arId['id_aluno'] = $idAluno;
+        $arId['id_ordem'] = $idOrdensServicos;
         $arResult = $this->_entity->_atualizar($arId, $arPost);
         return $arResult;
     }

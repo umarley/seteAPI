@@ -104,7 +104,7 @@ class SeteOrdensServicos extends AbstractDatabasePostgres {
         $this->sql = new Sql($this->AdapterBD);
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
-        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_veiculo' => $arId['id_veiculo']]);
+        $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_ordem' => $arId['id_ordem']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
