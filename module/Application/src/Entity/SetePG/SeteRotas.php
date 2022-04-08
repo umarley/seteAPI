@@ -38,7 +38,7 @@ class SeteRotas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_rota', 'nome', 'km', 'tipo', 'turno_matutino', 'turno_vespertino', 'turno_noturno', 'shape'])
+                ->columns(['codigo_cidade', 'id_rota', 'nome', 'km', 'tipo', 'turno_matutino', 'turno_vespertino', 'turno_noturno', 'shape', 'qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
