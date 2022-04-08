@@ -126,4 +126,19 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
+    public function getQtdAlunosPorRota($codigoCidade){
+        $sql = "SELECT id_rota, COUNT(*) as qtd 
+                FROM sete.sete_rota_atende_aluno rota 
+                WHERE rota.codigo_cidade  = 3540606
+                GROUP BY id_rota
+                ORDER BY id_rota";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
 }

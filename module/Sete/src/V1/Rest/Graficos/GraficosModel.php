@@ -81,7 +81,6 @@ class GraficosModel
         foreach ($arCores as $nivel){
             $arLabel[] = $nivel['nm_tp_cor'];
             $arValues[] = $nivel['qtd'];
-
         } 
         $arDados['labels'] = $arLabel;
         $arDados['values'] = $arValues;
