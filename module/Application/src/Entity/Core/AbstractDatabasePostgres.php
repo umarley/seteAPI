@@ -20,14 +20,17 @@ class AbstractDatabasePostgres extends TableGateway {
     protected $tableIdentifier;
     protected $configName;
     protected $resultSet;
+    protected $dbConfig;
 
     /**
      * 
      * @param type $configName - Nome do array que contém a configuração de conexão com o banco de dados
      */
     public function __construct($configName) {
-        $config = $this->montaConfiguracaoAdapter($configName);
-        $this->AdapterBD = new Adapter($config);
+        if (is_null($this->dbConfig)) {
+            $this->dbConfig = $this->montaConfiguracaoAdapter($configName);
+        }
+        $this->AdapterBD = new Adapter($this->dbConfig);
         $this->tableIdentifier = new TableIdentifier($this->table, $this->schema);
         parent::__construct($this->table, $this->AdapterBD);
     }
@@ -73,9 +76,9 @@ class AbstractDatabasePostgres extends TableGateway {
         $insert->columns($arColunas);
         $insert->values($arValues);
         $sql = $this->sql->buildSqlString($insert);
-        /*echo "=====<br />";
-        echo $sql;
-        echo "===========<br />";*/
+        /* echo "=====<br />";
+          echo $sql;
+          echo "===========<br />"; */
         //$sql = str_replace("`", "", $sql);
         $statement = $this->AdapterBD->createStatement($sql);
         try {
@@ -91,7 +94,7 @@ class AbstractDatabasePostgres extends TableGateway {
         }
         return ['result' => $bool, 'messages' => $message];
     }
-    
+
     public function _deleteAll() {
         $sql = "DELETE FROM {$this->table}";
         try {

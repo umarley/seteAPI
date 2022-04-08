@@ -72,6 +72,48 @@ class SeteRotas extends AbstractDatabasePostgres {
             return false;
         }
     }
+    
+    public function qtdRotas($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
+    
+    public function qtdRotasKilometragemTotal($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(sum(km), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
+    public function qtdRotasKilometragemMedia($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(avg(km), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    } 
+    
+    public function qtdRotasTempoMedio($municipio){
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select($this->tableIdentifier)
+                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("COALESCE(avg(tempo), 0)")])
+                ->where("codigo_cidade = {$municipio}");
+                //echo $sql->prepareStatementForSqlObject($select);
+                //exit;
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['qtd'];
+    }
 
     public function getUltimoIdInserido() {
         $sql = new Sql($this->AdapterBD);
@@ -87,6 +129,30 @@ class SeteRotas extends AbstractDatabasePostgres {
         $update = $this->sql->update($this->tableIdentifier);
         $update->set($dados);
         $update->where(["codigo_cidade" => $arId['codigo_cidade'], 'id_rota' => $arId['id_rota']]);
+        $sql = $this->sql->buildSqlString($update);
+        try {
+            $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);
+            $bool = true;
+            $message = 'Registro atualizado com sucesso!';
+        } catch (\PDOException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            echo $ex->getMessage();
+            die();
+            //$this->rollback();
+        } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
+            $bool = false;
+            $message = "Falha ao atualizar o registro. " . $ex->getMessage();
+            //$this->rollback();
+        }
+        return ['result' => $bool, 'messages' => $message];
+    }
+    
+    public function _atualizarByFirebaseId($arId, $dados) {
+        $this->sql = new Sql($this->AdapterBD);
+        $update = $this->sql->update($this->tableIdentifier);
+        $update->set($dados);
+        $update->where(["id_firebase" => $arId['id_firebase']]);
         $sql = $this->sql->buildSqlString($update);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

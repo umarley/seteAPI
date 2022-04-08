@@ -16,10 +16,9 @@ class ShapesResource extends AbstractResourceListener
     {
        
         $dbSeteRotas = new \Db\SetePG\SeteRotas();
-        $arId['codigo_cidade'] = $data->codigo_cidade;
-        $arId['id_rota'] = $data->id_rota;
+        $arId['id_firebase'] = $data->id_firebase;
         $shape = (array) $data->shape;
-        $arOP = $dbSeteRotas->_atualizar($arId, ['shape' => json_encode($shape)]);
+        $arOP = $dbSeteRotas->_atualizarByFirebaseId($arId, ['shape' => json_encode($shape)]);
         return $arOP;      
     }
 

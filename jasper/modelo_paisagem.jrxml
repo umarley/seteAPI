@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LISTA_ALUNOS" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74ee9aa9-7b1e-4b40-9281-a72751f7431a">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="postgres"/>
+	<parameter name="usuario_sistema" class="java.lang.String"/>
+	<parameter name="codigo_cidade" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[select NOW()]]>
+	</queryString>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="63" splitType="Stretch">
+			<image>
+				<reportElement x="1" y="0" width="269" height="60" uuid="e829c5aa-5a5c-402b-b0d3-8b8a828152f9"/>
+				<imageExpression><![CDATA["/images/logo-cecate2.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="280" y="15" width="320" height="30" uuid="d50f9df2-c9b7-4b6d-9a4f-ed87974123c8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Título do Relatório"]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm">
+				<reportElement x="705" y="7" width="89" height="16" uuid="77bc5c3b-2902-4122-b016-dfb49306f94f"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="650" y="8" width="53" height="16" uuid="2520f7f0-7ddd-4615-9ba4-068ca5d88626"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Emissão:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="702" y="22" width="94" height="16" uuid="da4eca4b-f495-4e6a-9693-bc26c85fa7a5"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{usuario_sistema}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="661" y="22" width="41" height="16" uuid="fc6859bd-65f8-4643-9ba6-5cf32c8f45f9"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Usuário:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="74" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<image>
+				<reportElement x="1" y="0" width="799" height="74" uuid="f5036a67-3f96-4405-9143-0625793994af"/>
+				<imageExpression><![CDATA["/images/rodape.png"]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="720" y="30" width="80" height="30" uuid="76177496-aa06-47e9-a740-4d4cc0b53f66"/>
+				<textElement textAlignment="Center">
+					<font size="18"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

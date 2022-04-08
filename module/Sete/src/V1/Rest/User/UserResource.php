@@ -41,7 +41,7 @@ class UserResource extends API {
                             $this->populaResposta(400, $boValidate, false);
                         } else {
                             $data->codigo_cidade = $codigoCidade;
-                            $arResult = $this->_model->processarUpdate($data, $this->getAcessToken());
+                            $arResult = $this->_model->processarInsert($data, $this->getAcessToken());
                             $this->populaResposta(201, $arResult, false);
                         }
                     }
@@ -302,7 +302,7 @@ class UserResource extends API {
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $idUser = $arParams['user_id'];
      
-        $boValidate = $this->_model->validarUsuarioSETE($arData, $idUser,$codigoCidade);
+        $boValidate = $this->_model->validarUsuarioUpdate($arData, $idUser);
         if (!$boValidate['result']) {
             $this->populaResposta(400, $boValidate, false);
         } else {

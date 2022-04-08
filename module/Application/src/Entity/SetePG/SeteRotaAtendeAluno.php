@@ -105,5 +105,25 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         }
         return ['result' => $boResultado, 'messages' => $message];
     }
+    
+    public function getQtdAlunosSemRota($codigoCidade){
+        $sql = "SELECT count(*) as qtd FROM sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}'
+                AND al.id_aluno not in (SELECT id_aluno FROM sete.sete_rota_atende_aluno 
+                                    WHERE codigo_cidade = '{$codigoCidade}' and id_aluno = al.id_aluno)";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['qtd'];
+    }
+    
+    public function getQtdAlunosComRota($codigoCidade){
+        $sql = "SELECT count(*) as qtd FROM sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}'
+                AND al.id_aluno in (SELECT id_aluno FROM sete.sete_rota_atende_aluno 
+                                    WHERE codigo_cidade = '{$codigoCidade}' and id_aluno = al.id_aluno)";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['qtd'];
+    }
 
 }

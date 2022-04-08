@@ -7,6 +7,7 @@ use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\Sql\Sql;
 
 class SeteParametros extends AbstractDatabasePostgres {
+
     
     const PERC_ENCARGO_SOCIAIS = 'PERC_ENCARGO_SOCIAIS';
     const PERC_CFT_CUSTO_MANUTENCAO_RODO = 'PERC_CFT_CUSTO_MANUTENCAO_RODO';
@@ -145,5 +146,4 @@ class SeteParametros extends AbstractDatabasePostgres {
         }
         return ['result' => $bool, 'messages' => $message];
     }
-
 }

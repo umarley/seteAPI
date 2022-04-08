@@ -24,10 +24,13 @@ class PermissaoFirebaseResource extends \Sete\V1\API
 
     public function delete($id)
     {
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $idUsuario = $arParams['permissao_firebase_id'];
        if(empty($id)){
-           $this->populaResposta(400, ['result' => false, 'messages' => 'O UID do usuário deve ser informado!'], false);         
+           $this->populaResposta(400, ['result' => false, 'messages' => 'O ID do usuário deve ser informado!'], false);         
        }else{
-           $this->populaResposta(200, $this->_model->excluirUsuarioNaoLiberado($id), false);
+           $this->populaResposta(200, $this->_model->excluirUsuarioNaoLiberado($codigoCidade, $id), false);
        } 
        
     }

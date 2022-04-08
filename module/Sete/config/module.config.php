@@ -22,6 +22,9 @@ return [
             \Sete\V1\Rest\Parametros\ParametrosResource::class => \Sete\V1\Rest\Parametros\ParametrosResourceFactory::class,
             \Sete\V1\Rest\Custo\CustoResource::class => \Sete\V1\Rest\Custo\CustoResourceFactory::class,
             \Sete\V1\Rest\Acesso\AcessoResource::class => \Sete\V1\Rest\Acesso\AcessoResourceFactory::class,
+            \Sete\V1\Rest\Importacao\ImportacaoResource::class => \Sete\V1\Rest\Importacao\ImportacaoResourceFactory::class,
+            \Sete\V1\Rest\Graficos\GraficosResource::class => \Sete\V1\Rest\Graficos\GraficosResourceFactory::class,
+            \Sete\V1\Rest\Relatorios\RelatoriosResource::class => \Sete\V1\Rest\Relatorios\RelatoriosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -56,7 +59,7 @@ return [
             'sete.rest.permissao-firebase' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/permissao-firebase[/:permissao_firebase_id]',
+                    'route' => '/permissao-firebase[/:codigo_cidade[/:permissao_firebase_id[/:rota]]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\PermissaoFirebase\\Controller',
                     ],
@@ -206,6 +209,33 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.importacao' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/importacao[/:codigo_cidade[/:importacao_id[/:cadastro]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Importacao\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.graficos' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/graficos[/:codigo_cidade[/:graficos_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Graficos\\Controller',
+                    ],
+                ],
+            ],
+            'sete.rest.relatorios' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/relatorios[/:codigo_cidade[/:relatorios_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Relatorios\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -230,6 +260,9 @@ return [
             17 => 'sete.rest.parametros',
             18 => 'sete.rest.custo',
             19 => 'sete.rest.acesso',
+            20 => 'sete.rest.importacao',
+            21 => 'sete.rest.graficos',
+            22 => 'sete.rest.relatorios',
         ],
     ],
     'api-tools-rest' => [
@@ -630,7 +663,6 @@ return [
                 1 => 'PATCH',
                 2 => 'PUT',
                 3 => 'DELETE',
-                4 => 'POST',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
@@ -681,6 +713,7 @@ return [
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -688,6 +721,78 @@ return [
             'entity_class' => \Sete\V1\Rest\Acesso\AcessoEntity::class,
             'collection_class' => \Sete\V1\Rest\Acesso\AcessoCollection::class,
             'service_name' => 'Acesso',
+        ],
+        'Sete\\V1\\Rest\\Importacao\\Controller' => [
+            'listener' => \Sete\V1\Rest\Importacao\ImportacaoResource::class,
+            'route_name' => 'sete.rest.importacao',
+            'route_identifier_name' => 'importacao_id',
+            'collection_name' => 'importacao',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Importacao\ImportacaoEntity::class,
+            'collection_class' => \Sete\V1\Rest\Importacao\ImportacaoCollection::class,
+            'service_name' => 'Importacao',
+        ],
+        'Sete\\V1\\Rest\\Graficos\\Controller' => [
+            'listener' => \Sete\V1\Rest\Graficos\GraficosResource::class,
+            'route_name' => 'sete.rest.graficos',
+            'route_identifier_name' => 'graficos_id',
+            'collection_name' => 'graficos',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+                2 => 'PATCH',
+                3 => 'DELETE',
+                4 => 'PUT',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Graficos\GraficosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Graficos\GraficosCollection::class,
+            'service_name' => 'Graficos',
+        ],
+        'Sete\\V1\\Rest\\Relatorios\\Controller' => [
+            'listener' => \Sete\V1\Rest\Relatorios\RelatoriosResource::class,
+            'route_name' => 'sete.rest.relatorios',
+            'route_identifier_name' => 'relatorios_id',
+            'collection_name' => 'relatorios',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Relatorios\RelatoriosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Relatorios\RelatoriosCollection::class,
+            'service_name' => 'Relatorios',
         ],
     ],
     'api-tools-content-negotiation' => [
@@ -712,6 +817,9 @@ return [
             'Sete\\V1\\Rest\\Parametros\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Custo\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Acesso\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Importacao\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Graficos\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Relatorios\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -815,6 +923,21 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Importacao\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Graficos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Relatorios\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -895,6 +1018,18 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Acesso\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Importacao\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Graficos\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Relatorios\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1140,6 +1275,42 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.acesso',
                 'route_identifier_name' => 'acesso_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Importacao\ImportacaoEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.importacao',
+                'route_identifier_name' => 'importacao_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Importacao\ImportacaoCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.importacao',
+                'route_identifier_name' => 'importacao_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Graficos\GraficosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.graficos',
+                'route_identifier_name' => 'graficos_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Graficos\GraficosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.graficos',
+                'route_identifier_name' => 'graficos_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Relatorios\RelatoriosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.relatorios',
+                'route_identifier_name' => 'relatorios_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Relatorios\RelatoriosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.relatorios',
+                'route_identifier_name' => 'relatorios_id',
                 'is_collection' => true,
             ],
         ],

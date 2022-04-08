@@ -16,7 +16,7 @@ class MunicipiosModel {
 
     public function getAll() {
         $cacheRedis = new \Db\Core\CacheRedis();
-        $cache = $cacheRedis->criaCacheAdapter(10800);
+        $cache = $cacheRedis->criaCacheAdapter(86400);
         $existeCache = $cache->getItem('mapaMunicipios');
         if (empty($existeCache)) {
             $arDados = $this->_entity->getLista();
@@ -31,10 +31,10 @@ class MunicipiosModel {
     }
 
     private function checarSeMunicipioEstaUsandoSistema($codigoMunicipio) {
-        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
-        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
-        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
-        $dbSeteRotas = new \Db\Sete\SeteRotas();
+        $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
+        $dbSeteAlunos = new \Db\SetePG\SeteAlunos();
+        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
 
         $qtdEscolas = $dbSeteEscolas->qtdEscolasAtendidas($codigoMunicipio);
         $qtdAlunos = $dbSeteAlunos->qtdAlunosAtendidos($codigoMunicipio);
@@ -51,10 +51,10 @@ class MunicipiosModel {
     }
 
     public function getById($codigo) {
-        $dbSeteEscolas = new \Db\Sete\SeteEscolas();
-        $dbSeteAlunos = new \Db\Sete\SeteAlunos();
-        $dbSeteVeiculos = new \Db\Sete\SeteVeiculos();
-        $dbSeteRotas = new \Db\Sete\SeteRotas();
+        $dbSeteEscolas = new \Db\SetePG\SeteEscolas();
+        $dbSeteAlunos = new \Db\SetePG\SeteAlunos();
+        $dbSeteVeiculos = new \Db\SetePG\SeteVeiculos();
+        $dbSeteRotas = new \Db\SetePG\SeteRotas();
         $arData = $this->_entity->getByCodigoIBGE($codigo);
         $arData['data'] = [
             'n_escolas' => $dbSeteEscolas->qtdEscolasAtendidas($codigo),
@@ -116,7 +116,7 @@ class MunicipiosModel {
                 ->setCellValue('L1', 'Quantidade de motoristas')
                 ->setCellValue('M1', 'Tempo médio das rotas (min)');
         $sheet->fromArray($arDados, NULL, 'A2');
-
+        $messages = "";
         $writer = new Xlsx($spreadsheet);
         $pathArquivoGerado = "./data/{$nomeExcel}";
         try {
@@ -131,11 +131,11 @@ class MunicipiosModel {
 
     private function retornoProcessamentoExcel($operacao, $pathArquivoGerado, $nomeExcel, $messages = "") {
         if ($operacao) {
-            rename($pathArquivoGerado, $_SERVER['DOCUMENT_ROOT'] . "/exports/{$nomeExcel}");
+            rename($pathArquivoGerado, $_SERVER['DOCUMENT_ROOT'] . "/storage/exports/{$nomeExcel}");
             return [
                 'result' => true,
                 'messages' => "Arquivo gerado com sucesso!",
-                'file' => "exports/{$nomeExcel}"
+                'file' => "storage/exports/{$nomeExcel}"
             ];
         } else {
             return [

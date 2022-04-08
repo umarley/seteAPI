@@ -21,6 +21,7 @@ class AuthenticatorResource extends AbstractResourceListener {
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $conteudo = file_get_contents("php://input");
         $arPost = json_decode($conteudo, true);
+        
         if (isset($arParams['tipo']) && $arParams['tipo'] === 'sete') {
             $arResult = $this->_model->autenticarUsuarioSETE($arPost);
         } else {

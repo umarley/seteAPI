@@ -14,13 +14,14 @@ class AuthenticatorModel {
         if($dbCoreUsuario->checkUsuarioAndPassword($arPost['usuario'], $arPost['senha'])){
             $dbCoreAccessToken = new \Db\Core\AccessToken();
             $arDadosUsuario = $dbCoreUsuario->getUsuarioByUsername($arPost['usuario']);
-            $arAccessToken = $dbCoreAccessToken->gerarAccessToken($arDadosUsuario['email']);
+            $arAccessToken = $dbCoreAccessToken->gerarAccessTokenAPI($arDadosUsuario['email']);
             $arResult['result'] = true;
             $arResult['access_token'] = $arAccessToken;
             $arResult['messages'] = "Login efetuado com sucesso!";
+            $arResult['status'] =  201;
         }else{
             $arResult['result'] = false;
-            $arResult['status'] =  400;
+            $arResult['status'] =  403;
             $arResult['messages'] = "Usuário / Senha não conferem!";
         }
         return $arResult;
