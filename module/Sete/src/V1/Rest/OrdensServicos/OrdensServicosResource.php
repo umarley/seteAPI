@@ -168,6 +168,35 @@ class OrdensServicosResource extends API
      */
     public function update($id, $data)
     {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $this->usuarioPodeGravar();
+        $arParams = $this->event->getRouteMatch()->getParams();
+        $codigoCidade = $arParams['codigo_cidade'];
+        $this->processarRequestPUT($codigoCidade,$id, $data);
+        echo 'Teste';
+        exit;
+    }
+
+    private function processarRequestPUT($codigoCidade,$id, $arData) {
+        $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
+        if ($usuarioPodeAcessarMunicipio) {
+            $arParams = $this->event->getRouteMatch()->getParams();
+            $arData->codigo_cidade = $codigoCidade;
+            $this->processarUpdateOrdensServicos($codigoCidade,$id,$arData);
+        } else {
+            $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
+        }
+    }
+
+    private function processarUpdateOrdensServicos($codigoCidade,$id,$arData) {
+        $modelOrdensServicos = new OrdensServicosModel();
+        $arId['codigo_cidade'] = $codigoCidade;
+        $arId['id_ordem'] = $id;
+        $boValidate = $modelOrdensServicos->validarUpdate($arData,$arId);
+        if ($boValidate['result']) {
+            $arResult = $modelOrdensServicos->prepareUpdate($codigoCidade,$id,$arData);
+            $this->populaResposta(200, $arResult, false);
+        } else {
+            $this->populaResposta(400, $boValidate, false);
+        }
     }
 }
