@@ -86,16 +86,6 @@ class SeteEscolas extends AbstractDatabasePostgres {
             return 0;
         }
     }
-    // Refatoração API administrativa
-    /*public function qtdAlunosAtendidos($municipio) {
-        $sql = new Sql($this->AdapterBD);
-        $select = $sql->select($this->tableIdentifier)
-                ->columns(['qtd' => new \Laminas\Db\Sql\Expression("count(*)")])
-                ->where("codigo_cidade = {$municipio}");
-        $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        return $row['qtd'];
-    }*/
 
     public function qtdAlunosPorEscola($municipio, $idEscola = null) {
         $sql = new Sql($this->AdapterBD);
@@ -161,11 +151,9 @@ class SeteEscolas extends AbstractDatabasePostgres {
             $message = "Falha ao atualizar o registro. " . $ex->getMessage();
             echo $ex->getMessage();
             die();
-            //$this->rollback();
         } catch (\Zend\Db\Adapter\Exception\InvalidQueryException $ex) {
             $bool = false;
             $message = "Falha ao atualizar o registro. " . $ex->getMessage();
-            //$this->rollback();
         }
         return ['result' => $bool, 'messages' => $message];
     }

@@ -24,6 +24,14 @@ class AuthenticatorResource extends AbstractResourceListener {
         
         if (isset($arParams['tipo']) && $arParams['tipo'] === 'sete') {
             $arResult = $this->_model->autenticarUsuarioSETE($arPost);
+            if($arResult['result']){
+                if($arResult['data']['is_liberado'] == 'N'){
+                    unset($arResult);
+                    $arResult['result'] = false;
+                    $arResult['status'] =  403;
+                    $arResult['messages'] = "Usuário não liberado pela equipe do CECATE. Entre em contato com o suporte!";
+                }
+            }
         } else {
             $arResult = $this->_model->autenticarUsuario($arPost);
         }

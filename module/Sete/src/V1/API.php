@@ -38,34 +38,39 @@ class API extends AbstractResourceListener {
             exit;
         }
     }
-    
-    public function getAcessToken(){
-        return $this->accessToken;        
+
+    public function getAcessToken() {
+        return $this->accessToken;
     }
-    
-    protected function getBody(){
+
+    protected function getBody() {
         $data = file_get_contents("php://input");
         return json_decode($data);
     }
-    
-    protected function usuarioPodeAcessarCidade($codigoCidade){
+
+    protected function usuarioPodeAcessarCidade($codigoCidade) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
-        $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);
-        if($cidadeUsuario == $codigoCidade){
+        $tipoAccessToken = $dbCoreAccessToken->getTipoAccessToken($this->accessToken);
+        if ($tipoAccessToken === $dbCoreAccessToken::TIPO_ADMINISTRATIVO) {
             return true;
-        }else{
-            return false;
+        } else {
+            $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);
+            if ($cidadeUsuario == $codigoCidade) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
-    protected function usuarioPodeGravar(){
+    protected function usuarioPodeGravar() {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $nivelPermissao = $dbCoreAccessToken->getNivelByAccessToken($this->accessToken);
-        if(!in_array($nivelPermissao,["admin","editor"])){
-            $this->populaResposta(401,["result" => false, "messages"=>"Usuário não autorizado a realizar gravações no sistema!"],false);
+        if (!in_array($nivelPermissao, ["admin", "editor"])) {
+            $this->populaResposta(401, ["result" => false, "messages" => "Usuário não autorizado a realizar gravações no sistema!"], false);
         }
     }
-    
+
     public function populaResposta($codigoStatus, $arResposta, $retornaLista = true) {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
@@ -75,13 +80,13 @@ class API extends AbstractResourceListener {
         if ($retornaLista) {
             $arResult['data'] = $arResposta;
             $arResult['total'] = count($arResposta);
-        }else{
+        } else {
             $arResult = $arResposta;
         }
-        
-        if($codigoStatus !== 404){
+
+        if ($codigoStatus !== 404) {
             $arResult['result'] = isset($arResposta['result']) ? $arResposta['result'] : true;
-        }else{
+        } else {
             $arResult['result'] = false;
         }
 

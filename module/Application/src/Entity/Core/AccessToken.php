@@ -9,9 +9,10 @@ use Zend\Db\Sql\Predicate\Expression;
 class AccessToken extends AbstractDatabasePostgres {
 
     const EXPIRES_ACCESS_TOKEN = 10800; //3 horas
+    const TIPO_ADMINISTRATIVO = 'administrativo';
 
     public function __construct() {
-        $this->table = 'api_access_token'; 
+        $this->table = 'api_access_token';
         $this->primaryKey = 'access_token';
         $this->schema = 'api';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
@@ -38,25 +39,25 @@ class AccessToken extends AbstractDatabasePostgres {
             return false;
         }
     }
-    
-    public function getEmailUsuarioByAccessToken($accessToken){
+
+    public function getEmailUsuarioByAccessToken($accessToken) {
         $sql = "SELECT email FROM api.api_access_token ac
                     INNER JOIN sete.usuarios us ON us.id = ac.id_usuario
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();
-        return $row['email'];            
+        return $row['email'];
     }
-    
-    public function getEmailUsuarioSETEByAccessToken($accessToken){
+
+    public function getEmailUsuarioSETEByAccessToken($accessToken) {
         $sql = "SELECT email FROM api.api_access_token ac
                     INNER JOIN sete.sete_usuarios us ON us.id_usuario = ac.id_usuario
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();
-        return $row['email'];            
+        return $row['email'];
     }
 
     public function getNivelByAccessToken($accessToken) {
@@ -66,7 +67,7 @@ class AccessToken extends AbstractDatabasePostgres {
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();
-        return $row['nivel_permissao']; 
+        return $row['nivel_permissao'];
     }
 
     public function getAccessTokenByUsuario($idUsuario) {
@@ -91,7 +92,8 @@ class AccessToken extends AbstractDatabasePostgres {
             'access_token' => $accessToken,
             'id_usuario' => $idUsuario,
             'expires' => self::EXPIRES_ACCESS_TOKEN,
-            'dt_criacao' => $dataCriacao
+            'dt_criacao' => $dataCriacao,
+            'tipo' => self::TIPO_ADMINISTRATIVO
         ]);
 
         return [
@@ -99,7 +101,7 @@ class AccessToken extends AbstractDatabasePostgres {
             'expires_in' => self::EXPIRES_ACCESS_TOKEN
         ];
     }
-    
+
     public function gerarAccessTokenUsuarioSETE($usuario) {
         $dbSIRUsuario = new \Db\SetePG\SeteUsuarios();
         $idUsuario = $dbSIRUsuario->getIdUsuarioByUsername($usuario);
@@ -120,15 +122,32 @@ class AccessToken extends AbstractDatabasePostgres {
             'expires_in' => self::EXPIRES_ACCESS_TOKEN
         ];
     }
-    
-    public function getCodigoCidadeUsuarioAutenticado($accessToken){
+
+    public function getCodigoCidadeUsuarioAutenticado($accessToken) {
         $sql = "select us.codigo_cidade from api.api_access_token aat 
                     inner join sete.sete_usuarios us on aat.id_usuario = us.id_usuario 
                     where aat.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
-        $row = $statement->execute()->current();
-        return $row['codigo_cidade']; 
+        if ($statement->execute()->count() > 0) {
+            $row = $statement->execute()->current();
+            return $row['codigo_cidade'];
+        } else {
+            return null;
+        }
+    }
+    
+    public function getTipoAccessToken($accessToken){
+        $sql = "select tipo from api.api_access_token aat  where "
+                . "aat.access_token = '{$accessToken}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        if ($statement->execute()->count() > 0) {
+            $row = $statement->execute()->current();
+            return $row['tipo'];
+        } else {
+            return null;
+        }
     }
 
 }
