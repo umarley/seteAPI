@@ -17,7 +17,7 @@ class FirebaseMunicipios extends \Db\Core\AbstractDatabasePostgres {
     }
 
     public function getLista() {
-        $sql = "select cid.nome  as nome_cidade, cid.latitude, cid.longitude, cid.codigo_ibge  from 
+        $sql = "select cid.nome  as nome_cidade, cid.latitude, cid.longitude, cid.codigo_ibge, cid.codigo_ibge as codigo_municipio, est.nome as nome_estado, est.uf  from 
                 (select distinct codigo_cidade from sete.sete_usuarios su) municipio
                 inner join sete.glb_municipio cid on municipio .codigo_cidade = cid.codigo_ibge
                 inner join sete.glb_estado est on est.codigo = cid.codigo_uf ";

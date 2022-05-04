@@ -50,7 +50,6 @@ class UserModel {
         $arCidade = $dbGlbMunicipios->getByCodigo($arPost->codigo_cidade);
         $arData = (array) $arPost;
         $arData['is_liberado'] = 'N';
-        //$arData['cod_cidade'] = $arData['codigo_cidade'];
         $arData['cidade'] = $arCidade['nm_cidade'];
         $arData['cod_estado'] = $arCidade['codigo_uf'];
         $arData['estado'] = $arCidade['estado'];
