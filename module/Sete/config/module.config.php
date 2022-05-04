@@ -59,7 +59,7 @@ return [
             'sete.rest.permissao-firebase' => [
                 'type' => 'Segment',
                 'options' => [
-                    'route' => '/permissao-firebase[/:codigo_cidade[/:permissao_firebase_id[/:rota]]]',
+                    'route' => '/permissao-firebase[/:permissao_firebase_id[/:rota]]',
                     'defaults' => [
                         'controller' => 'Sete\\V1\\Rest\\PermissaoFirebase\\Controller',
                     ],
@@ -340,6 +340,7 @@ return [
             ],
             'collection_http_methods' => [
                 0 => 'POST',
+                1 => 'GET',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
