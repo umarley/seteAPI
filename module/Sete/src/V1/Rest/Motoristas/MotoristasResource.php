@@ -101,15 +101,6 @@ class MotoristasResource extends API
         }
     }
 
-    /*private function removerEscolaAluno($codigoCidade, $idAluno) {
-        $dbSeteEscolaTemAluno = new \Db\SetePG\SeteEscolaTemAluno();
-        $arIds['codigo_cidade'] = $codigoCidade;
-        $arIds['id_aluno'] = $idAluno;
-        $arResult = $dbSeteEscolaTemAluno->_delete($arIds);
-        $this->populaResposta(200, $arResult, false);
-        exit;
-    }*/
-
     /**
      * Delete a collection, or members of a collection
      *
