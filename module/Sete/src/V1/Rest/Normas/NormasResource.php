@@ -126,7 +126,10 @@ class NormasResource extends API {
      * @return ApiProblem|mixed
      */
     public function delete($id) {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+        $this->usuarioPodeGravar();
+        $dbNormas = new \Db\Normas\Normas();
+        $arResult = $dbNormas->_delete($id);
+        $this->populaResposta(200, $arResult, false);
     }
 
     /**
