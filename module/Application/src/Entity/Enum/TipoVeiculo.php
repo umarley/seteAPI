@@ -17,6 +17,7 @@ class TipoVeiculo {
     const BARCO_DE_ALUMINIO = 11;
     const CANOA_MOTORIZADA = 12;
     const CANOA_A_REMO = 13;
+    const BICICLETA = 14;
     const TIPO_VEICULO = [
         self::ONIBUS,
         self::MICRO_ONIBUS,
@@ -31,6 +32,7 @@ class TipoVeiculo {
         self::BARCO_DE_ALUMINIO,
         self::CANOA_MOTORIZADA,
         self::CANOA_A_REMO,
+        self::BICICLETA
     ];
 
     public static function getLabel($valor) {
@@ -74,6 +76,9 @@ class TipoVeiculo {
             case self::CANOA_A_REMO:
                 return "Canoa a remo";
                 break;
+            case self::BICICLETA:
+                return "Bicicleta";
+                break;
         }
     }
 
@@ -91,7 +96,8 @@ class TipoVeiculo {
             ['id' => self::BARCO_DE_MADEIRA, 'tipo' => 'Barco de madeira'],
             ['id' => self::BARCO_DE_ALUMINIO, 'tipo' => 'Barco de alumínio'],
             ['id' => self::CANOA_MOTORIZADA, 'tipo' => 'Canoa motorizada'],
-            ['id' => self::CANOA_A_REMO, 'tipo' => 'Canoa a remo']
+            ['id' => self::CANOA_A_REMO, 'tipo' => 'Canoa a remo'],
+            ['id' => self::BICICLETA, 'tipo' => 'Bicicleta']
         ];
     }
 

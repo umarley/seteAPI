@@ -25,6 +25,7 @@ return [
             \Sete\V1\Rest\Importacao\ImportacaoResource::class => \Sete\V1\Rest\Importacao\ImportacaoResourceFactory::class,
             \Sete\V1\Rest\Graficos\GraficosResource::class => \Sete\V1\Rest\Graficos\GraficosResourceFactory::class,
             \Sete\V1\Rest\Relatorios\RelatoriosResource::class => \Sete\V1\Rest\Relatorios\RelatoriosResourceFactory::class,
+            \Sete\V1\Rest\Normas\NormasResource::class => \Sete\V1\Rest\Normas\NormasResourceFactory::class,
         ],
     ],
     'router' => [
@@ -236,6 +237,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.normas' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/normas[/:codigo_cidade[/:normas_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Normas\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -263,6 +273,7 @@ return [
             20 => 'sete.rest.importacao',
             21 => 'sete.rest.graficos',
             22 => 'sete.rest.relatorios',
+            23 => 'sete.rest.normas',
         ],
     ],
     'api-tools-rest' => [
@@ -795,6 +806,28 @@ return [
             'collection_class' => \Sete\V1\Rest\Relatorios\RelatoriosCollection::class,
             'service_name' => 'Relatorios',
         ],
+        'Sete\\V1\\Rest\\Normas\\Controller' => [
+            'listener' => \Sete\V1\Rest\Normas\NormasResource::class,
+            'route_name' => 'sete.rest.normas',
+            'route_identifier_name' => 'normas_id',
+            'collection_name' => 'normas',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Normas\NormasEntity::class,
+            'collection_class' => \Sete\V1\Rest\Normas\NormasCollection::class,
+            'service_name' => 'Normas',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -821,6 +854,7 @@ return [
             'Sete\\V1\\Rest\\Importacao\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Graficos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Relatorios\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Normas\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -939,6 +973,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Normas\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -1031,6 +1070,10 @@ return [
                 1 => 'application/json',
             ],
             'Sete\\V1\\Rest\\Relatorios\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Normas\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1312,6 +1355,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.relatorios',
                 'route_identifier_name' => 'relatorios_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Normas\NormasEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.normas',
+                'route_identifier_name' => 'normas_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Normas\NormasCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.normas',
+                'route_identifier_name' => 'normas_id',
                 'is_collection' => true,
             ],
         ],

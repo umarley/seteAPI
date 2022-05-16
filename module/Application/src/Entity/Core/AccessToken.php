@@ -46,8 +46,12 @@ class AccessToken extends AbstractDatabasePostgres {
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
-        $row = $statement->execute()->current();
-        return $row['email'];
+        if ($statement->execute()->count() > 0) {
+            $row = $statement->execute()->current();
+            return $row['email'];
+        } else {
+            return null;
+        }
     }
 
     public function getEmailUsuarioSETEByAccessToken($accessToken) {
@@ -56,8 +60,12 @@ class AccessToken extends AbstractDatabasePostgres {
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
-        $row = $statement->execute()->current();
-        return $row['email'];
+        if ($statement->execute()->count() > 0) {
+            $row = $statement->execute()->current();
+            return $row['email'];
+        } else {
+            return null;
+        }
     }
 
     public function getNivelByAccessToken($accessToken) {
