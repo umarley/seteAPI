@@ -409,7 +409,7 @@ class RotasResource extends API {
     private function getEscolasRota($codigoCidade, $idRota) {
         $dbRotaPassaPorEscola = new \Db\SetePG\SeteRotaPassaPorEscola();
         $arResposta = $dbRotaPassaPorEscola->getEscolaByRotas($codigoCidade, $idRota);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
     }
 
     private function getAlunosRota($codigoCidade, $idRota) {
@@ -417,7 +417,7 @@ class RotasResource extends API {
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaAtendeAluno->getAlunosById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta);
     }
 
     private function getVeiculosRota($codigoCidade, $idRota) {
@@ -425,7 +425,7 @@ class RotasResource extends API {
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaPossuiVeiculo->getById($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta, false);
     }
 
     private function getShapeRota($codigoCidade, $idRota) {
