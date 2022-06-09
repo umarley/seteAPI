@@ -7,12 +7,6 @@ use Sete\V1\API;
 
 class NormasResource extends API {
 
-    /**
-     * Create a resource
-     *
-     * @param  mixed $data
-     * @return ApiProblem|mixed
-     */
     public function create($data) {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
@@ -37,18 +31,12 @@ class NormasResource extends API {
             }
         }
         exit;
-        $arConteudo = file_get_contents($_FILES['file']['tmp_name']);
-        header("Content-type: application/pdf");
-        echo $arConteudo;
-
-        exit;
     }
 
     private function validarNorma($arCampos, $arFile) {
         $boValidate = true;
         $arErros = [];
         $arCampos = (Array) $arCampos;
-
         if (!isset($arCampos['titulo']) || empty($arCampos['titulo'])) {
             $boValidate = false;
             $arErros['titulo'] = "O ttuílo deve ser informado!";
@@ -66,18 +54,19 @@ class NormasResource extends API {
                 $arErros['id_tipo'] = "O tipo informado não existe!";
             }
         }
-
-        if (!isset($arCampos['id_assunto']) || empty($arCampos['id_assunto'])) {
-            $boValidate = false;
-            $arErros['titulo'] = "O assunto da norma deve ser informado!";
-        } else {
-            $dbNormasAssunto = new \Db\Normas\AssuntosRegulamento();
-            if ($arCampos['id_assunto'] == 14 && empty($arCampos['outro_assunto'])) {
+        foreach ($arCampos['id_assunto'] as $idAssunto) {
+            if (empty($idAssunto)) {
                 $boValidate = false;
-                $arErros['id_assunto'] = "Para o assunto Outros o campo especifique deve ser informado!";
-            } else if (!$dbNormasAssunto->assuntoExiste($arCampos['id_assunto'])) {
-                $boValidate = false;
-                $arErros['id_assunto'] = "O assunto informado não existe!";
+                $arErros['id_assunto'][] = "O assunto da norma deve ser informado!";
+            } else {
+                $dbNormasAssunto = new \Db\Normas\AssuntosRegulamento();
+                if ($idAssunto == 14 && empty($arCampos['outro_assunto'])) {
+                    $boValidate = false;
+                    $arErros['id_assunto'][] = "Para o assunto Outros o campo especifique deve ser informado!";
+                } else if (!$dbNormasAssunto->assuntoExiste($idAssunto)) {
+                    $boValidate = false;
+                    $arErros['id_assunto'][] = "O assunto informado não existe!";
+                }
             }
         }
 
@@ -114,8 +103,28 @@ class NormasResource extends API {
     }
 
     private function processarInsertNorma($arData) {
+        $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
+        $arAssuntos = $arData['id_assunto'];
+        $outroAssunto = $arData['outro_assunto'];
+        unset($arData['id_assunto']);
+        unset($arData['outro_assunto']);
+        $arData['dt_criacao'] = date("Y-m-d H:i:s");
+        $arData['criado_por'] = $dbSeteUsuarios->getUsuarioByAccessToken($this->getAcessToken())['email'];
         $dbNormas = new \Db\Normas\Normas();
+        $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $arResult = $dbNormas->_inserir($arData);
+        $idNorma = $dbNormas->getUltimoIdInserido();
+        foreach ($arAssuntos as $assunto){
+            $outroAssuntoInsert = null;
+            if($assunto == 14){
+                $outroAssuntoInsert = $outroAssunto;
+            }
+            $dbNormasAssunto->_inserir([
+                'id_norma' => $idNorma,
+                'id_assunto' => $assunto,
+                'outro_assunto' => $outroAssuntoInsert
+            ]);
+        }
         $this->populaResposta(200, $arResult, false);
     }
 
@@ -161,7 +170,7 @@ class NormasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             if (isset($arParams['rota'])) {
-                switch ($arParams['rota']){
+                switch ($arParams['rota']) {
                     case 'visualizar':
                         $this->visualizarPDF($arParams['normas_id']);
                         break;
@@ -179,8 +188,8 @@ class NormasResource extends API {
             }
         }
     }
-    
-    private function visualizarPDF($idNorma){
+
+    private function visualizarPDF($idNorma) {
         $dbNormas = new \Db\Normas\Normas();
         $pdf = $dbNormas->getConteudoPDF($idNorma);
         header('Content-type: application/pdf');

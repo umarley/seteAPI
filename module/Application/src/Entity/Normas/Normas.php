@@ -50,6 +50,14 @@ class Normas extends AbstractDatabasePostgres {
         return $row['arquivo_pdf'];
     }
     
+    public function getUltimoIdInserido(){
+        $sql = "select max(id) as id from normas.normas n";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $id = $statement->execute()->current();
+        return $id['id'];
+    }
+    
     
 
 }

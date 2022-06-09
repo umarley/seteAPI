@@ -74,8 +74,12 @@ class AccessToken extends AbstractDatabasePostgres {
                     WHERE ac.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
-        $row = $statement->execute()->current();
-        return $row['nivel_permissao'];
+        if ($statement->execute()->count() > 0) {
+            $row = $statement->execute()->current();
+            return $row['nivel_permissao'];
+        } else {
+            return null;
+        }
     }
 
     public function getAccessTokenByUsuario($idUsuario) {
@@ -144,8 +148,8 @@ class AccessToken extends AbstractDatabasePostgres {
             return null;
         }
     }
-    
-    public function getTipoAccessToken($accessToken){
+
+    public function getTipoAccessToken($accessToken) {
         $sql = "select tipo from api.api_access_token aat  where "
                 . "aat.access_token = '{$accessToken}'";
         $statement = $this->AdapterBD->createStatement($sql);
