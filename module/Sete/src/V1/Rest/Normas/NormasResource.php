@@ -245,7 +245,11 @@ class NormasResource extends API {
 
     private function obterTodasNormasCidade($codigoCidade) {
         $dbNormas = new \Db\Normas\Normas();
+        $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $arNormas = $dbNormas->getLista($codigoCidade);
+        foreach ($arNormas as $key => $norma){
+            $arNormas[$key]['assuntos'] = $dbNormasAssunto->getAssuntoByNorma($norma['id']);
+        }
         $arResultado['data'] = $arNormas;
         $arResultado['total'] = count($arNormas);
         $this->populaResposta(200, $arResultado, false);

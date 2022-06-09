@@ -16,5 +16,20 @@ class NormasAssunto extends AbstractDatabasePostgres {
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
     
+    public function getAssuntoByNorma($idNorma){
+        $sql = "select na.id_assunto,  ar.assunto, na.outro_assunto
+                from normas.normas_assunto na 
+                inner join normas.assuntos_regulamento ar on ar.id_assunto = na.id_assunto 
+                where na.id_norma = {$idNorma}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $arLista = [];
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $rowAssunto){
+            $arLista[] = $rowAssunto;
+        }
+        return $arLista;
+    }
+    
 
 }
