@@ -2,14 +2,6 @@
 return [
     'db' => [
         'adapters' => [
-            'sete_api' => [
-                'database' => 'sete',
-                'driver' => 'PDO_Mysql',
-                'hostname' => 'localhost',
-                'username' => 'root',
-                'password' => '834451',
-                'charset' => 'utf8'
-            ],
             'sete_postgres' => [
                 'database' => 'sete',
                 'driver' => 'PDO_pgsql',
