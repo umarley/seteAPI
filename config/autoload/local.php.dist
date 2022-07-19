@@ -2,11 +2,11 @@
 return [
     'db' => [
         'adapters' => [
-            'sete_postgres' => [
+            'sete_api' => [
                 'database' => 'sete',
                 'driver' => 'PDO_pgsql',
                 'hostname' => 'localhost',
-                'username' => 'root',
+                'username' => 'postgres',
                 'password' => '834451',
                 'charset' => 'utf8'
             ],

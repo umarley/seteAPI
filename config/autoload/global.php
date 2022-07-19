@@ -5,7 +5,7 @@ return [
     ],
     'db' => [
         'adapters' => [
-            'sete_api' => [],
+            'sete_postgres' => [],
         ],
     ],
 ];
