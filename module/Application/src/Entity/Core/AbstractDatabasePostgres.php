@@ -11,7 +11,7 @@ use Laminas\Db\ResultSet;
 class AbstractDatabasePostgres extends TableGateway {
 
     const NUMERO_MAXIMO_REGISTRO = 1000;
-    const DATABASE_CORE = 'sete_postgres';
+    const DATABASE_CORE = 'sete_api';
 
     protected $AdapterBD;
     protected $primaryKey;
