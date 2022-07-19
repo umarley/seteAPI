@@ -6,7 +6,7 @@ return [
                 'database' => 'sete',
                 'driver' => 'PDO_pgsql',
                 'hostname' => '192.168.0.104',
-                'username' => 'root',
+                'username' => 'postgres',
                 'password' => '834451',
                 'charset' => 'utf8'
             ],
