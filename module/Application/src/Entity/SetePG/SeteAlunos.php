@@ -40,7 +40,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
     }
 
     public function getLista($municipio) {
-        $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno,
+        $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno, a.mec_tp_localizacao,
                     coalesce(esc.nome, 'Não Informada') as escola,
                     coalesce(rta.nome, 'Não Informada') as rota
                     from sete.sete_alunos a 
