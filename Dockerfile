@@ -27,10 +27,6 @@ VOLUME /var/www
 USER root
 WORKDIR /var/www
 
-COPY * /var/www/seteAPI
-
-COPY docker-assets/local.php /var/www/seteAPI/config/autoload/local.php
-
 
 LABEL description="Web SeteAPI"
 LABEL version="2.0.0"
