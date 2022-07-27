@@ -188,6 +188,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['codigo_cidade'])
                 ->where("email = '{$email}'");
+                
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         $row = $execute->current();
@@ -199,6 +200,7 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['id_usuario'])
                 ->where("email = '{$usuario}'");
+                echo $sql->buildSqlString($select);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         $row = $execute->current();
