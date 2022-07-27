@@ -147,9 +147,9 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->columns(['email', 'password'])
-                ->where("email = '". $this->limparTexto($usuario) ."'")
-                ->where("password = '". $this->limparTexto($pass)."'");
-                //->where("is_ativo = 'S'");
+                ->where("us.email = '". $this->limparTexto($usuario) ."'")
+                ->where("us.password = '". $this->limparTexto($pass)."'")
+                ->where("us.is_ativo = 'S'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         if ($execute->count() > 0) {
@@ -200,7 +200,6 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $select = $sql->select($this->tableIdentifier)
                 ->columns(['id_usuario'])
                 ->where("email = '{$usuario}'");
-                echo $sql->buildSqlString($select);
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         $row = $execute->current();
