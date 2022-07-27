@@ -148,8 +148,8 @@ class SeteUsuarios extends AbstractDatabasePostgres {
         $select = $sql->select(['us' => $this->tableIdentifier])
                 ->columns(['email', 'password'])
                 ->where("email = '". $this->limparTexto($usuario) ."'")
-                ->where("password = '". $this->limparTexto($pass)."'")
-                ->where("is_ativo = 'S'");
+                ->where("password = '". $this->limparTexto($pass)."'");
+                //->where("is_ativo = 'S'");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $execute = $prepare->execute();
         if ($execute->count() > 0) {
