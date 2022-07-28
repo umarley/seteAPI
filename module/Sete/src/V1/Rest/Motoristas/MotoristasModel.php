@@ -84,6 +84,9 @@ class MotoristasModel {
         if (!isset($arPost['sexo']) || empty($arPost['sexo'])) {
             $boValidate = false;
             $arErros['sexo'] = "O sexo do motorista deve ser informado!";
+        }else if(!in_array($arPost['sexo'], ['1', '2', '3'])){
+            $boValidate = false;
+            $arErros['sexo'] = "O sexo do motorista informado é inválido!";
         }
         if (isset($arPost['cpf']) && !empty($arPost['cpf'])) {
             $cpfValido = \Application\Utils\Utils::validarCpf($arPost['cpf']);
