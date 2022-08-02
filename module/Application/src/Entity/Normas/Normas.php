@@ -19,7 +19,7 @@ class Normas extends AbstractDatabasePostgres {
     public function getLista($codigoCidade){
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['marc' => $this->tableIdentifier])
-                ->columns(['id', 'numero_norma', 'titulo', 'id_tipo', 'outro_tipo'])
+                ->columns(['id', 'numero_norma', 'titulo', 'id_tipo', 'outro_tipo', 'dt_criacao'])
                 ->where("marc.codigo_cidade = {$codigoCidade}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $arLista = [];
@@ -34,7 +34,7 @@ class Normas extends AbstractDatabasePostgres {
         $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select(['v' => $this->tableIdentifier])
-                ->columns(['id', 'numero_norma', 'titulo','id_tipo', 'tipo_veiculo', 'outro_tipo', 'codigo_cidade'])
+                ->columns(['id', 'numero_norma', 'titulo','id_tipo', 'tipo_veiculo', 'outro_tipo', 'codigo_cidade', 'dt_criacao'])
                 ->where("codigo_cidade = {$arIds['codigo_cidade']} AND id = {$arIds['id_norma']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
         $row = $prepare->execute()->current();
