@@ -12,7 +12,7 @@ class NormasAssunto extends AbstractDatabasePostgres {
     public function __construct() {
         $this->table = 'normas_assunto';
         $this->primaryKey = 'id_norma';
-        $this->schema = 'normas';
+        $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
     

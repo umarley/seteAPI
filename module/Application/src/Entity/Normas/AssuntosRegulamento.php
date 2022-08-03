@@ -12,7 +12,7 @@ class AssuntosRegulamento extends AbstractDatabasePostgres {
     public function __construct() {
         $this->table = 'assuntos_regulamento';
         $this->primaryKey = 'id_assunto';
-        $this->schema = 'normas';
+        $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
     

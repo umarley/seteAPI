@@ -12,7 +12,7 @@ class TiposNormativo extends AbstractDatabasePostgres {
     public function __construct() {
         $this->table = 'tipos_normativo';
         $this->primaryKey = 'id_tipo';
-        $this->schema = 'normas';
+        $this->schema = 'sete';
         parent::__construct(AbstractDatabasePostgres::DATABASE_CORE);
     }
     

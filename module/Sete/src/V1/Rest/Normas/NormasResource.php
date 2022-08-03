@@ -110,6 +110,9 @@ class NormasResource extends API {
         unset($arData['outro_assunto']);
         $arData['dt_criacao'] = date("Y-m-d H:i:s");
         $arData['criado_por'] = $dbSeteUsuarios->getUsuarioByAccessToken($this->getAcessToken())['email'];
+        if(isset($arData['data_norma']) && !empty($arData['data_norma'])){
+            $arData['data_norma'] = $this->formataDataSQL($arData['data_norma']);
+        }
         $dbNormas = new \Db\Normas\Normas();
         $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $arResult = $dbNormas->_inserir($arData);
@@ -139,6 +142,21 @@ class NormasResource extends API {
         $dbNormas = new \Db\Normas\Normas();
         $arResult = $dbNormas->_delete($id);
         $this->populaResposta(200, $arResult, false);
+    }
+    
+    private function formataDataSQL($data){
+        return implode('-', array_reverse(explode("/", $data)));
+    }
+    
+    private function formataDataBR($data, $formato = 'dd/mm/yyyy')
+    {
+
+        $dateParts = explode(" ", $data);
+        if ((!empty($dateParts[1]) && $dateParts[1] !== '00:00:00') && $formato !== 'dd/mm/yyyy') {
+            return date("d/m/Y H:i", strtotime($data));
+        } else {
+            return date("d/m/Y", strtotime($data));
+        }
     }
 
     /**
@@ -180,8 +198,9 @@ class NormasResource extends API {
                 if ($idNorma != "" && is_numeric($idNorma)) {
                     $arIds['codigo_cidade'] = $codigoCidade;
                     $arIds['id_norma'] = $idNorma;
-                    $arVeiculo = $dbNormas->getById($arIds);
-                    $this->populaResposta(count($arVeiculo) > 1 ? 200 : 404, $arVeiculo, false);
+                    $arNorma = $dbNormas->getById($arIds);
+                    $arNorma['data_norma'] = $this->formataDataBR($arNorma['data_norma']);
+                    $this->populaResposta(count($arNorma) > 1 ? 200 : 404, $arNorma, false);
                 } else {
                     $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_veiculo deve ser informado!"], false);
                 }
@@ -249,6 +268,7 @@ class NormasResource extends API {
         $arNormas = $dbNormas->getLista($codigoCidade);
         foreach ($arNormas as $key => $norma){
             $arNormas[$key]['assuntos'] = $dbNormasAssunto->getAssuntoByNorma($norma['id']);
+            $arNormas[$key]['data_norma'] = $this->formataDataBR($norma['data_norma']);
         }
         $arResultado['data'] = $arNormas;
         $arResultado['total'] = count($arNormas);
