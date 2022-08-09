@@ -132,8 +132,8 @@ class MotoristasResource extends API
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $cpfMotorista = $arParams['motoristas_id'];
-            $rota = $arParams['rota'];
-            if (isset($rota)) {
+            $rota = isset($arParams['rota']) ? $arParams['rota'] : null;
+            if (!empty($rota)) {
                 $this->processarGetMotoristaRota($rota, $codigoCidade, $cpfMotorista);
             } else if ($cpfMotorista != "" && is_numeric($cpfMotorista)) {
                 $arMotorista = $modelMotoristas->getById($codigoCidade, $cpfMotorista);
