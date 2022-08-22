@@ -18,8 +18,8 @@ class NormasAssunto extends AbstractDatabasePostgres {
     
     public function getAssuntoByNorma($idNorma){
         $sql = "select na.id_assunto,  ar.assunto, na.outro_assunto
-                from normas.normas_assunto na 
-                inner join normas.assuntos_regulamento ar on ar.id_assunto = na.id_assunto 
+                from sete.normas_assunto na 
+                inner join sete.assuntos_regulamento ar on ar.id_assunto = na.id_assunto 
                 where na.id_norma = {$idNorma}";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
