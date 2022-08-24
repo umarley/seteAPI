@@ -186,7 +186,7 @@ class EscolasResource extends API {
         } else {
             $idEscola = $arParams['escolas_id'];
             $rota = isset($arParams['rota']) ?? null;
-            if (!emptyisset($rota)) {
+            if (!empty($rota)) {
                 $this->processarGetEscolaRota($rota, $codigoCidade, $idEscola);
             } else if ($idEscola != "" && is_numeric($idEscola)) {
                 $arEscola = $modelEscola->getById($codigoCidade, $idEscola);
