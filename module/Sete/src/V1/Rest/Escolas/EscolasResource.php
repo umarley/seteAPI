@@ -185,7 +185,7 @@ class EscolasResource extends API {
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $idEscola = $arParams['escolas_id'];
-            $rota = isset($arParams['rota']) ?? null;
+            $rota = isset($arParams['rota']) ? $arParams['rota'] : null;
             if (!empty($rota)) {
                 $this->processarGetEscolaRota($rota, $codigoCidade, $idEscola);
             } else if ($idEscola != "" && is_numeric($idEscola)) {
