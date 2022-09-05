@@ -105,7 +105,7 @@ class NormasResource extends API {
     private function processarInsertNorma($arData) {
         $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
         $arAssuntos = $arData['id_assunto'];
-        $outroAssunto = $arData['outro_assunto'];
+        $outroAssunto = isset($arData['outro_assunto']) ? $arData['outro_assunto'] : null;
         unset($arData['id_assunto']);
         unset($arData['outro_assunto']);
         $arData['dt_criacao'] = date("Y-m-d H:i:s");

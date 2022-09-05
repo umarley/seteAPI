@@ -53,7 +53,7 @@ class Normas extends AbstractDatabasePostgres {
     }
     
     public function getUltimoIdInserido(){
-        $sql = "select max(id) as id from normas.normas n";
+        $sql = "select max(id) as id from sete.normas n";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $id = $statement->execute()->current();
