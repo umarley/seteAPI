@@ -816,10 +816,12 @@ return [
                 1 => 'PATCH',
                 2 => 'PUT',
                 3 => 'DELETE',
+                4 => 'POST',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
                 1 => 'POST',
+                2 => 'PUT',
             ],
             'collection_query_whitelist' => [],
             'page_size' => 25,
@@ -977,6 +979,7 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/hal+json',
                 2 => 'application/json',
+                3 => 'application/form-data',
             ],
         ],
         'content_type_whitelist' => [
@@ -1076,6 +1079,7 @@ return [
             'Sete\\V1\\Rest\\Normas\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
+                2 => 'application/form-data',
             ],
         ],
     ],

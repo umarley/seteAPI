@@ -56,7 +56,7 @@ class RecuperarSenha extends AbstractDatabasePostgres {
             $dbSystem = new \Db\Core\System();
             $dbSystem->enviarEmail([
                 'tituloRemetente' => "CECATE",
-                'emailFrom' => 'cecateufg@gmail.com',
+                'emailFrom' => 'suporte.cecate@gmail.com',
                 'emailTo' => $email,
                 'emailAssunto' => 'Recuperação de Acesso - SETE',
                 'emailMensagem' => "Segue o seu código de recuperação de senha: \r\n {$tokenGerado} \r\n Copie e cole no SETE para continuar a redefinição de sua senha."

@@ -11,20 +11,21 @@ class NormasResource extends API {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
+        if (isset($arParams['rota'])) {
+            $this->processarRequisicaoPOSTComRota($arParams);
+        }
         $this->processarRequestPOST($codigoCidade, $data);
     }
 
     private function processarRequestPOST($codigoCidade, $arData) {
-        $boValidate = $this->validarNorma($arData, $_FILES);
+        $arNorma = (Array) $arData;
+        $boValidate = $this->validarNorma($arNorma);
         if (!$boValidate['result']) {
             $this->populaResposta(400, ['result' => $boValidate['result'], 'messages' => $boValidate['messages']], false);
         } else {
             $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
             if ($usuarioPodeAcessarMunicipio) {
-                $arData->codigo_cidade = $codigoCidade;
-                $arNorma = (Array) $arData;
-                $conteudoPDF = base64_encode(file_get_contents($_FILES['file']['tmp_name']));
-                $arNorma['arquivo_pdf'] = $conteudoPDF;
+                $arNorma['codigo_cidade'] = $codigoCidade;
                 $this->processarInsertNorma($arNorma);
             } else {
                 $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
@@ -33,10 +34,34 @@ class NormasResource extends API {
         exit;
     }
 
-    private function validarNorma($arCampos, $arFile) {
+    private function processarRequisicaoPOSTComRota($arParams) {
+        $idNorma = $arParams['normas_id'];
+        switch ($arParams['rota']) {
+            case 'file':
+                $this->gravarArquivoNorma($idNorma);
+                break;
+        }
+    }
+
+    private function gravarArquivoNorma($idNorma) {
+        $boValidate = $this->validarArquivoPDF($_FILES);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, ['result' => $boValidate['result'], 'messages' => $boValidate['messages']], false);
+        } else {
+            $dbNormas = new \Db\Normas\Normas();
+            $conteudoPDF = base64_encode(file_get_contents($_FILES['file']['tmp_name']));
+            $arNorma['arquivo_pdf'] = $conteudoPDF;
+            $arResult = $dbNormas->_atualizar($idNorma, $arNorma);
+            $this->populaResposta($arResult['result'] ? 200 : 500, [
+                'result' => $boValidate['result'],
+                'messages' => $boValidate['messages']
+                    ], false);
+        }
+    }
+
+    private function validarNorma($arCampos) {
         $boValidate = true;
         $arErros = [];
-        $arCampos = (Array) $arCampos;
         if (!isset($arCampos['titulo']) || empty($arCampos['titulo'])) {
             $boValidate = false;
             $arErros['titulo'] = "O ttuílo deve ser informado!";
@@ -80,6 +105,12 @@ class NormasResource extends API {
             }
         }
 
+        return ['result' => $boValidate, 'messages' => $arErros];
+    }
+
+    private function validarArquivoPDF($arFile) {
+        $boValidate = true;
+        $arErros = [];
         if (!isset($arFile['file']) || empty($arFile['file'])) {
             $boValidate = false;
             $arErros['file'] = "O arquivo PDF deve ser informado!";
@@ -98,7 +129,6 @@ class NormasResource extends API {
                 $arErros['file'] = "O tamanho mxáimo do arquivo permitido para o envio é de 5Mb ";
             }
         }
-
         return ['result' => $boValidate, 'messages' => $arErros];
     }
 
@@ -110,16 +140,16 @@ class NormasResource extends API {
         unset($arData['outro_assunto']);
         $arData['dt_criacao'] = date("Y-m-d H:i:s");
         $arData['criado_por'] = $dbSeteUsuarios->getUsuarioByAccessToken($this->getAcessToken())['email'];
-        if(isset($arData['data_norma']) && !empty($arData['data_norma'])){
+        if (isset($arData['data_norma']) && !empty($arData['data_norma'])) {
             $arData['data_norma'] = $this->formataDataSQL($arData['data_norma']);
         }
         $dbNormas = new \Db\Normas\Normas();
         $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $arResult = $dbNormas->_inserir($arData);
         $idNorma = $dbNormas->getUltimoIdInserido();
-        foreach ($arAssuntos as $assunto){
+        foreach ($arAssuntos as $assunto) {
             $outroAssuntoInsert = null;
-            if($assunto == 14){
+            if ($assunto == 14) {
                 $outroAssuntoInsert = $outroAssunto;
             }
             $dbNormasAssunto->_inserir([
@@ -127,6 +157,9 @@ class NormasResource extends API {
                 'id_assunto' => $assunto,
                 'outro_assunto' => $outroAssuntoInsert
             ]);
+        }
+        if ($arResult['result']) {
+            $arResult['messages']['id'] = $idNorma;
         }
         $this->populaResposta(200, $arResult, false);
     }
@@ -143,13 +176,12 @@ class NormasResource extends API {
         $arResult = $dbNormas->_delete($id);
         $this->populaResposta(200, $arResult, false);
     }
-    
-    private function formataDataSQL($data){
+
+    private function formataDataSQL($data) {
         return implode('-', array_reverse(explode("/", $data)));
     }
-    
-    private function formataDataBR($data, $formato = 'dd/mm/yyyy')
-    {
+
+    private function formataDataBR($data, $formato = 'dd/mm/yyyy') {
 
         $dateParts = explode(" ", $data);
         if ((!empty($dateParts[1]) && $dateParts[1] !== '00:00:00') && $formato !== 'dd/mm/yyyy') {
@@ -266,7 +298,7 @@ class NormasResource extends API {
         $dbNormas = new \Db\Normas\Normas();
         $dbNormasAssunto = new \Db\Normas\NormasAssunto();
         $arNormas = $dbNormas->getLista($codigoCidade);
-        foreach ($arNormas as $key => $norma){
+        foreach ($arNormas as $key => $norma) {
             $arNormas[$key]['assuntos'] = $dbNormasAssunto->getAssuntoByNorma($norma['id']);
             $arNormas[$key]['data_norma'] = $this->formataDataBR($norma['data_norma']);
         }
@@ -315,7 +347,43 @@ class NormasResource extends API {
      * @return ApiProblem|mixed
      */
     public function update($id, $data) {
-        return new ApiProblem(405, 'The PUT method has not been defined for individual resources');
+        $arNorma = (Array) $this->getBody();
+        $boValidate = $this->validarNorma($arNorma);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, ['result' => $boValidate['result'], 'messages' => $boValidate['messages']], false);
+        } else {
+            $dbSeteNormas = new \Db\Normas\Normas();
+            $dbSeteNormasAssuntos = new \Db\Normas\NormasAssunto();
+            $dbSeteUsuarios = new \Db\SetePG\SeteUsuarios();
+            $outroAssunto = $arNorma['outro_assunto'];
+            $arAssuntos = $arNorma['id_assunto'];
+            unset($arNorma['id_assunto']);
+            unset($arNorma['outro_assunto']);
+            $dbSeteNormasAssuntos->_delete($id);
+            $arNorma['dt_alteracao'] = date("Y-m-d H:i:s");
+            $arNorma['alterado_por'] = $dbSeteUsuarios->getUsuarioByAccessToken($this->getAcessToken())['email'];
+            if (isset($arNorma['data_norma']) && !empty($arNorma['data_norma'])) {
+                $arNorma['data_norma'] = $this->formataDataSQL($arNorma['data_norma']);
+            }
+            $arResult = $dbSeteNormas->_atualizar($id, $arNorma);
+            if ($arResult['result']) {
+                foreach ($arAssuntos as $assunto) {
+                    $outroAssuntoInsert = null;
+                    if ($assunto == 14) {
+                        $outroAssuntoInsert = $outroAssunto;
+                    }
+                    $dbSeteNormasAssuntos->_inserir([
+                        'id_norma' => $id,
+                        'id_assunto' => $assunto,
+                        'outro_assunto' => $outroAssuntoInsert
+                    ]);
+                }
+            }
+            $this->populaResposta($arResult['result'] ? 200 : 500, [
+                'result' => $boValidate['result'],
+                'messages' => $boValidate['messages']
+                    ], false);
+        }
     }
 
 }
