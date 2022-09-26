@@ -243,6 +243,9 @@ class NormasResource extends API {
     private function visualizarPDF($idNorma) {
         $dbNormas = new \Db\Normas\Normas();
         $pdf = $dbNormas->getConteudoPDF($idNorma);
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
         header('Content-type: application/pdf');
         echo base64_decode($pdf);
         exit;
