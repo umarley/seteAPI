@@ -127,7 +127,7 @@ class SeteOrdensServicos extends AbstractDatabasePostgres {
     public function _delete($arIds) {
         $this->sql = new Sql($this->AdapterBD);
         $delete = $this->sql->delete($this->tableIdentifier);
-        $delete->where(["codigo_cidade" => $arIds['codigo_cidade'], 'id_veiculo' => $arIds['id_veiculo']]);
+        $delete->where(["codigo_cidade" => $arIds['codigo_cidade'], 'id_ordem' => $arIds['id_ordem']]);
         $sql = $this->sql->buildSqlString($delete);
         try {
             $this->AdapterBD->query($sql, Adapter::QUERY_MODE_EXECUTE);

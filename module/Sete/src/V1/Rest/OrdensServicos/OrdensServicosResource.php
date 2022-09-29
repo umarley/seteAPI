@@ -1,20 +1,20 @@
 <?php
+
 namespace Sete\V1\Rest\OrdensServicos;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
 use Sete\V1\API;
 
-class OrdensServicosResource extends API
-{
+class OrdensServicosResource extends API {
+
     /**
      * Create a resource
      *
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function create($data)
-    {
+    public function create($data) {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
@@ -49,9 +49,14 @@ class OrdensServicosResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id)
-    {
-        return new ApiProblem(405, 'The DELETE method has not been defined for individual resources');
+    public function delete($id) {
+        $arParams = $this->getEvent()->getRouteMatch()->getParams();
+        $dbSeteOrdemServico = new \Db\SetePG\SeteOrdensServicos();
+        $arIds['codigo_cidade'] = $arParams['codigo_cidade'];
+        $arIds['id_ordem'] = $arParams['ordens_id'];
+        $arResult = $dbSeteOrdemServico->_delete($arIds);
+        $codigoHTTP = 200;
+        $this->populaResposta($codigoHTTP, $arResult, false);
     }
 
     /**
@@ -60,8 +65,7 @@ class OrdensServicosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function deleteList($data)
-    {
+    public function deleteList($data) {
         return new ApiProblem(405, 'The DELETE method has not been defined for collections');
     }
 
@@ -71,8 +75,7 @@ class OrdensServicosResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id)
-    {
+    public function fetch($id) {
         $modelOrdensServicos = new OrdensServicosModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
@@ -85,12 +88,12 @@ class OrdensServicosResource extends API
             $this->populaResposta(403, ['result' => false, 'messages' => "Usuário sem permissão para acessar o municipio informado!"], false);
         } else {
             $idOrdem = $arParams['ordens_id'];
-            if ($idOrdem != "" && is_numeric($idOrdem) ) {
+            if ($idOrdem != "" && is_numeric($idOrdem)) {
                 $arOrdem = $modelOrdensServicos->getById($codigoCidade, $idOrdem);
                 $this->populaResposta(count($arOrdem) > 1 ? 200 : 404, $arOrdem, false);
             } else {
                 $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_ordem deve ser informado!"], false);
-            } 
+            }
         }
     }
 
@@ -100,8 +103,7 @@ class OrdensServicosResource extends API
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = [])
-    {
+    public function fetchAll($params = []) {
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
@@ -132,8 +134,7 @@ class OrdensServicosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patch($id, $data)
-    {
+    public function patch($id, $data) {
         
     }
 
@@ -143,8 +144,7 @@ class OrdensServicosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patchList($data)
-    {
+    public function patchList($data) {
         return new ApiProblem(405, 'The PATCH method has not been defined for collections');
     }
 
@@ -154,8 +154,7 @@ class OrdensServicosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function replaceList($data)
-    {
+    public function replaceList($data) {
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -166,37 +165,37 @@ class OrdensServicosResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data)
-    {
+    public function update($id, $data) {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
-        $this->processarRequestPUT($codigoCidade,$id, $data);
+        $this->processarRequestPUT($codigoCidade, $id, $data);
         echo 'Teste';
         exit;
     }
 
-    private function processarRequestPUT($codigoCidade,$id, $arData) {
+    private function processarRequestPUT($codigoCidade, $id, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
             $arParams = $this->event->getRouteMatch()->getParams();
             $arData->codigo_cidade = $codigoCidade;
-            $this->processarUpdateOrdensServicos($codigoCidade,$id,$arData);
+            $this->processarUpdateOrdensServicos($codigoCidade, $id, $arData);
         } else {
             $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
         }
     }
 
-    private function processarUpdateOrdensServicos($codigoCidade,$id,$arData) {
+    private function processarUpdateOrdensServicos($codigoCidade, $id, $arData) {
         $modelOrdensServicos = new OrdensServicosModel();
         $arId['codigo_cidade'] = $codigoCidade;
         $arId['id_ordem'] = $id;
-        $boValidate = $modelOrdensServicos->validarUpdate($arData,$arId);
+        $boValidate = $modelOrdensServicos->validarUpdate($arData, $arId);
         if ($boValidate['result']) {
-            $arResult = $modelOrdensServicos->prepareUpdate($codigoCidade,$id,$arData);
+            $arResult = $modelOrdensServicos->prepareUpdate($codigoCidade, $id, $arData);
             $this->populaResposta(200, $arResult, false);
         } else {
             $this->populaResposta(400, $boValidate, false);
         }
     }
+
 }
