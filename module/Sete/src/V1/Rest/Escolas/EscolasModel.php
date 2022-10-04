@@ -76,6 +76,10 @@ class EscolasModel {
             $boValidate = false;
             $arErros['mec_co_municipio'] = "O mec_co_municipio da escola deve ser informado!";
         }
+        if((isset($arPost['mec_co_entidade']) && !empty($arPost['mec_co_entidade'])) && (isset($arPost['codigo_cidade']) && !empty($arPost['codigo_cidade'])) ){
+            $boValidate = false;
+            $arErros['mec_co_entidade'] = "A escola informada já está cadastrada para o municipio!";
+        }
         if (!isset($arPost['mec_tp_localizacao_diferenciada']) || empty($arPost['mec_tp_localizacao_diferenciada'])) {
             $boValidate = false;
             $arErros['mec_tp_localizacao_diferenciada'] = "O mec_tp_localizacao_diferenciada da escola deve ser informado!";

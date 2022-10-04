@@ -106,6 +106,9 @@ class VeiculosModel {
         if (!isset($arPost['tipo']) || empty($arPost['tipo'])) {
             $boValidate = false;
             $arErros['tipo'] = "O tipo do veiculo deve ser informado!";
+        }else if($arPost['tipo'] == \Db\Enum\TipoVeiculo::OUTRO && (!isset($arPost['outro_tipo_text']) || empty($arPost['outro_tipo_text']))){
+            $boValidate = false;
+            $arErros['outro_tipo_text'] = "Especifique o tipo do veículo!";
         }
         
         if ($boValidate) {
