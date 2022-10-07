@@ -14,12 +14,16 @@ class ChamadosResource extends API
      */
     public function create($data)
     {
+        $arParams = $this->event->getRouteMatch()->getParams();
         $arDadosChamado = (Array) $data;
-        
-        
-        var_dump($arDadosChamado);
-        exit;
-        return new ApiProblem(405, 'The POST method has not been defined');
+        $modelChamados = new ChamadosModel();
+        $boValidate = $modelChamados->validarAberturaOS($arDadosChamado);
+        if(!$boValidate['result']){
+            $this->populaResposta(400, $boValidate, false);
+        }else{
+            $arResult = $modelChamados->abrirChamadoOsTicket($arParams['codigo_cidade'], $arDadosChamado);
+            $this->populaResposta(($arResult['result']) ? 201 : 500, $arResult, false);
+        }
     }
 
     /**
