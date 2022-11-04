@@ -26,6 +26,7 @@ return [
             \Sete\V1\Rest\Graficos\GraficosResource::class => \Sete\V1\Rest\Graficos\GraficosResourceFactory::class,
             \Sete\V1\Rest\Relatorios\RelatoriosResource::class => \Sete\V1\Rest\Relatorios\RelatoriosResourceFactory::class,
             \Sete\V1\Rest\Normas\NormasResource::class => \Sete\V1\Rest\Normas\NormasResourceFactory::class,
+            \Sete\V1\Rest\Chamados\ChamadosResource::class => \Sete\V1\Rest\Chamados\ChamadosResourceFactory::class,
         ],
     ],
     'router' => [
@@ -246,6 +247,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.chamados' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/chamados[/:codigo_cidade[/:chamados_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Chamados\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -274,6 +284,7 @@ return [
             21 => 'sete.rest.graficos',
             22 => 'sete.rest.relatorios',
             23 => 'sete.rest.normas',
+            24 => 'sete.rest.chamados',
         ],
     ],
     'api-tools-rest' => [
@@ -831,6 +842,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Normas\NormasCollection::class,
             'service_name' => 'Normas',
         ],
+        'Sete\\V1\\Rest\\Chamados\\Controller' => [
+            'listener' => \Sete\V1\Rest\Chamados\ChamadosResource::class,
+            'route_name' => 'sete.rest.chamados',
+            'route_identifier_name' => 'chamados_id',
+            'collection_name' => 'chamados',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Chamados\ChamadosEntity::class,
+            'collection_class' => \Sete\V1\Rest\Chamados\ChamadosCollection::class,
+            'service_name' => 'Chamados',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -858,6 +892,7 @@ return [
             'Sete\\V1\\Rest\\Graficos\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Relatorios\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Normas\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Chamados\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -982,6 +1017,11 @@ return [
                 2 => 'application/json',
                 3 => 'application/form-data',
             ],
+            'Sete\\V1\\Rest\\Chamados\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -1081,6 +1121,10 @@ return [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
                 2 => 'application/form-data',
+            ],
+            'Sete\\V1\\Rest\\Chamados\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
             ],
         ],
     ],
@@ -1372,6 +1416,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.normas',
                 'route_identifier_name' => 'normas_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Chamados\ChamadosEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.chamados',
+                'route_identifier_name' => 'chamados_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Chamados\ChamadosCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.chamados',
+                'route_identifier_name' => 'chamados_id',
                 'is_collection' => true,
             ],
         ],
