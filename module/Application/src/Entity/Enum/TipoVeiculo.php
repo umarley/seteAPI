@@ -18,7 +18,7 @@ class TipoVeiculo {
     const CANOA_MOTORIZADA = 12;
     const CANOA_A_REMO = 13;
     const BICICLETA = 14;
-    const OUTRO = 15;
+    const OUTRO = 99;
     const TIPO_VEICULO = [
         self::ONIBUS,
         self::MICRO_ONIBUS,
