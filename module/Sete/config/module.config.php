@@ -298,6 +298,7 @@ return [
                 1 => 'PUT',
                 2 => 'POST',
                 3 => 'DELETE',
+                4 => 'PATCH',
             ],
             'collection_http_methods' => [
                 0 => 'GET',
