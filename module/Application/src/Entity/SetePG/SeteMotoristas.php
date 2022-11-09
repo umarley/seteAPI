@@ -24,6 +24,16 @@ class SeteMotoristas extends AbstractDatabasePostgres {
         $row = $prepare->execute()->current();
         return $row;
     }
+    
+    public function getConteudoPDF($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['v' => $this->tableIdentifier])
+                ->columns(['arquivo_docpessoais_anexo'])
+                ->where("codigo_cidade = {$arIds['codigo_cidade']} AND cpf = '{$arIds['cpf_motorista']}'");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $row = $prepare->execute()->current();
+        return $row['arquivo_docpessoais_anexo'];
+    }
 
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
