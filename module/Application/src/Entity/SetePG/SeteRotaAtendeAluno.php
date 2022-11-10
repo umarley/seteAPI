@@ -141,4 +141,16 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         return $arLista;
     }
 
+    public function getAllLocatedAlunos($codigoCidade){
+        $sql = "SELECT * FROM sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}'
+                AND loc_latitude IS NOT NULL AND loc_longitude IS NOT NULL";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+
 }
