@@ -66,8 +66,6 @@ class UserModel {
     public function processarUpdate($idUsuario, $arPost, $accessToken) {
         $dbCoreAccessToken = new \Db\Core\AccessToken();
         $arData = (array) $arPost;
-        $arData['nivel_permissao'] = $arData['tipo_permissao'];
-        unset($arData['tipo_permissao']);
         $arData['dt_alteracao'] = date("Y-m-d H:i:s");
         $arData['alterado_por'] = $dbCoreAccessToken->getEmailUsuarioSETEByAccessToken($accessToken);
         $arId['codigo_cidade'] = $arPost->codigo_cidade;
@@ -78,6 +76,7 @@ class UserModel {
     public function validarUsuario($arPost) {
         $boValidate = true;
         $arErros = [];
+        $listaTipoPermissao= ['admin', 'leitor', 'editor'];
         if (empty($arPost->nome)) {
             $boValidate = false;
             $arErros[] = "O parâmetro nome é obrigatório!";
@@ -124,9 +123,9 @@ class UserModel {
             $boValidate = false;
             $arErros[] = "O parâmetro password deve ser um hash md5!";
         }
-        if (empty($arPost->tipo_permissao) || !in_array($arPost->tipo_permissao, $listaTipoPermissao)) {
+        if (empty($arPost->nivel_permissao) || !in_array($arPost->nivel_permissao, $listaTipoPermissao)) {
             $boValidate = false;
-            $arErros[] = "O parâmetro tipo_permissao é obrigatório!";
+            $arErros[] = "O parâmetro nivel_permissao é obrigatório!";
         }
         return ['result' => $boValidate, 'messages' => $arErros];
     }

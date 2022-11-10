@@ -1,12 +1,13 @@
 <?php
+
 namespace Sete\V1\Rest\Motoristas;
 
 use Sete\V1\API;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Sete\V1\Rest\Motoristas\MotoristasModel;
 
-class MotoristasResource extends API
-{
+class MotoristasResource extends API {
+
     /**
      * Create a resource
      *
@@ -37,17 +38,23 @@ class MotoristasResource extends API
 
     private function processarRotasPOST($arParams, $arDados) {
         $codigoCidade = $arParams['codigo_cidade'];
-        $idAluno = $arParams['alunos_id'];
+        $idMotorista = $arParams['motoristas_id'];
         $rota = $arParams['rota'];
-        $arDados->id_aluno = $idAluno;
+        $arDados->id_motorista = $idMotorista;
         $arDados->codigo_cidade = $codigoCidade;
         switch ($rota) {
             case 'rota':
                 $this->associarRotaMotorista($arDados);
                 break;
+            case 'file':
+                $this->gravarArquivoDocPessoais([
+                    'codigo_cidade' => $codigoCidade,
+                    'cpf' => $idMotorista
+                ]);
+                break;
         }
     }
-    
+
     private function processarInsertMotorista($arData) {
         $modelMotoristas = new MotoristasModel();
         $boValidate = $modelMotoristas->validarInsert($arData);
@@ -59,21 +66,60 @@ class MotoristasResource extends API
         }
     }
 
+    private function gravarArquivoDocPessoais($arIds) {
+        $boValidate = $this->validarArquivoPDF($_FILES);
+        if (!$boValidate['result']) {
+            $this->populaResposta(400, ['result' => $boValidate['result'], 'messages' => $boValidate['messages']], false);
+        } else {
+            $dbMotoristas = new \Db\SetePG\SeteMotoristas();
+            $conteudoPDF = base64_encode(file_get_contents($_FILES['file']['tmp_name']));
+            $arMotorista['arquivo_docpessoais_anexo'] = $conteudoPDF;
+            $arResult = $dbMotoristas->_atualizar($arIds, $arMotorista);
+            $this->populaResposta($arResult['result'] ? 200 : 500, [
+                'result' => $boValidate['result'],
+                'messages' => $boValidate['messages']
+                    ], false);
+        }
+    }
+
+    private function validarArquivoPDF($arFile) {
+        $boValidate = true;
+        $arErros = [];
+        if (!isset($arFile['file']) || empty($arFile['file'])) {
+            $boValidate = false;
+            $arErros['file'] = "O arquivo PDF deve ser informado!";
+        } else {
+            $maxFileSize = ini_get('upload_max_filesize');
+            if ($arFile['file']['type'] != 'application/pdf') {
+                $boValidate = false;
+                $arErros['file'] = "O arquivo deve ser do tipo PDF!";
+            }
+            if ($arFile['file']['error'] === 1) {
+                $boValidate = false;
+                $arErros['file'] = "O tamanho do arquivo enviado é maior que o tamanho suportado no servidor. Configuração atual do upload_max_filesize: {$maxFileSize}";
+            }
+            if ($arFile['file']['size'] > 5000000) {
+                $boValidate = false;
+                $arErros['file'] = "O tamanho máximo do arquivo permitido para o envio é de 5Mb ";
+            }
+        }
+        return ['result' => $boValidate, 'messages' => $arErros];
+    }
+
     /**
      * Delete a resource
      *
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function delete($id)
-    {
+    public function delete($id) {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $cpfMotorista = $arParams['motoristas_id'];
         $this->processarRequestDELETE($codigoCidade, $cpfMotorista);
     }
-    
+
     private function processarRequestDELETE($codigoCidade, $cpfMotorista) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
@@ -107,8 +153,7 @@ class MotoristasResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function deleteList($data)
-    {
+    public function deleteList($data) {
         return new ApiProblem(405, 'The DELETE method has not been defined for collections');
     }
 
@@ -118,8 +163,7 @@ class MotoristasResource extends API
      * @param  mixed $id
      * @return ApiProblem|mixed
      */
-    public function fetch($id)
-    {
+    public function fetch($id) {
         $modelMotoristas = new MotoristasModel();
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
@@ -150,6 +194,12 @@ class MotoristasResource extends API
                 case 'rota':
                     $this->getRotasMotorista($codigoCidade, $cpfMotorista);
                     break;
+                case 'visualizar-pdf':
+                    $this->visualizarPDF([
+                        'codigo_cidade' => $codigoCidade,
+                        'cpf_motorista' => $cpfMotorista
+                    ]);
+                    break;
                 default:
                     $arResult = ['result' => false, 'messages' => "Recurso não existe!"];
                     break;
@@ -158,6 +208,17 @@ class MotoristasResource extends API
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro cpf_motorista deve ser informado!"], false);
         }
+    }
+
+    private function visualizarPDF($arIds) {
+        $dbMotoristas = new \Db\SetePG\SeteMotoristas();
+        $pdf = $dbMotoristas->getConteudoPDF($arIds);
+        header('Access-Control-Allow-Methods: PUT, GET, POST, PATCH, DELETE, OPTIONS');
+        header('Access-Control-Allow-Headers: Authorization, Origin, X-Requested-With, Content-Type, Accept');
+        header('Access-Control-Allow-Origin: *');
+        header('Content-type: application/pdf');
+        echo base64_decode($pdf);
+        exit;
     }
 
     private function getRotasMotorista($codigoCidade, $cpfMotorista) {
@@ -174,8 +235,7 @@ class MotoristasResource extends API
      * @param  array $params
      * @return ApiProblem|mixed
      */
-    public function fetchAll($params = [])
-    {
+    public function fetchAll($params = []) {
         $arParams = $this->getEvent()->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $dbGlbMunicipios = new \Db\SetePG\GlbMunicipios();
@@ -189,7 +249,7 @@ class MotoristasResource extends API
             $this->obterTodosMotoristasCidade($codigoCidade);
         }
     }
-    
+
     private function obterTodosMotoristasCidade($codigoCidade) {
         $modelMotoristas = new MotoristasModel();
         $arMotoristas = $modelMotoristas->getAll($codigoCidade);
@@ -205,8 +265,7 @@ class MotoristasResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patch($id, $data)
-    {
+    public function patch($id, $data) {
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
@@ -216,8 +275,7 @@ class MotoristasResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function patchList($data)
-    {
+    public function patchList($data) {
         return new ApiProblem(405, 'The PATCH method has not been defined for collections');
     }
 
@@ -227,8 +285,7 @@ class MotoristasResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function replaceList($data)
-    {
+    public function replaceList($data) {
         return new ApiProblem(405, 'The PUT method has not been defined for collections');
     }
 
@@ -239,14 +296,13 @@ class MotoristasResource extends API
      * @param  mixed $data
      * @return ApiProblem|mixed
      */
-    public function update($id, $data)
-    {
+    public function update($id, $data) {
         $this->usuarioPodeGravar();
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $data);
     }
-    
+
     private function processarRequestPUT($codigoCidade, $arData) {
         $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
         if ($usuarioPodeAcessarMunicipio) {
@@ -271,4 +327,5 @@ class MotoristasResource extends API
             $this->populaResposta(400, $boValidate, false);
         }
     }
+
 }

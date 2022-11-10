@@ -170,8 +170,6 @@ class OrdensServicosResource extends API {
         $arParams = $this->event->getRouteMatch()->getParams();
         $codigoCidade = $arParams['codigo_cidade'];
         $this->processarRequestPUT($codigoCidade, $id, $data);
-        echo 'Teste';
-        exit;
     }
 
     private function processarRequestPUT($codigoCidade, $id, $arData) {

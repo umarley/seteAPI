@@ -126,7 +126,7 @@ class NormasResource extends API {
             }
             if ($arFile['file']['size'] > 5000000) {
                 $boValidate = false;
-                $arErros['file'] = "O tamanho mxáimo do arquivo permitido para o envio é de 5Mb ";
+                $arErros['file'] = "O tamanho máximo do arquivo permitido para o envio é de 5Mb ";
             }
         }
         return ['result' => $boValidate, 'messages' => $arErros];

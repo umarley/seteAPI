@@ -220,6 +220,8 @@ class UserResource extends API {
      * @return ApiProblem|mixed
      */
     public function patch($id, $data) {
+        var_dump($data);
+        exit;
         return new ApiProblem(405, 'The PATCH method has not been defined for individual resources');
     }
 
