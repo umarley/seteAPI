@@ -5,9 +5,9 @@ return [
             'sete_api' => [
                 'database' => 'sete',
                 'driver' => 'PDO_pgsql',
-                'hostname' => '192.168.0.104',
+                'hostname' => 'localhost',
                 'username' => 'postgres',
-                'password' => '834451',
+                'password' => 'postgres',
                 'charset' => 'utf8'
             ],
         ],

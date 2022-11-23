@@ -20,7 +20,11 @@
     },
     "config": {
         "process-timeout": 5000,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "laminas-api-tools/api-tools-asset-manager": true,
+            "laminas/laminas-component-installer": true
+        }
     },
     "require": {
         "php": "^5.6 || ^7.0",

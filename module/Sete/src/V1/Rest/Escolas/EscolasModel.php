@@ -42,6 +42,7 @@ class EscolasModel {
         $arPost['horario_matutino'] = isset($arPost['horario_matutino']) ? $arPost['horario_matutino'] : 'N';
         $arPost['horario_vespertino'] = isset($arPost['horario_vespertino']) ? $arPost['horario_vespertino'] : 'N';
         $arPost['horario_noturno'] = isset($arPost['horario_noturno']) ? $arPost['horario_noturno'] : 'N';
+        $arPost['horario_integral'] = isset($arPost['horario_integral']) ? $arPost['horario_integral'] : 'N';
         $arPost['ensino_superior'] = isset($arPost['ensino_superior']) ? $arPost['ensino_superior'] : 'N';
         $arPost['ensino_medio'] = isset($arPost['ensino_medio']) ? $arPost['ensino_medio'] : 'N';
         $arPost['ensino_fundamental'] = isset($arPost['ensino_fundamental']) ? $arPost['ensino_fundamental'] : 'N';

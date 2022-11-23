@@ -215,6 +215,8 @@ class AlunosResource extends API {
             } else if ($idAluno != "" && is_numeric($idAluno)) {
                 $arAluno = $modelAlunos->getById($codigoCidade, $idAluno);
                 $this->populaResposta(count($arAluno) > 1 ? 200 : 404, $arAluno, false);
+            } else if($idAluno == "georeferenciados"){
+                $this->getAlunosLocalizados($codigoCidade);
             } else {
                 $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
             }
@@ -229,7 +231,7 @@ class AlunosResource extends API {
                     break;
                 case 'rota':
                     $this->getRotaAluno($codigoCidade, $idAluno);
-                    break;
+                    break;                    
                 default:
                     $arResult = ['result' => false, 'messages' => "Recurso não existe!"];
                     break;
@@ -253,7 +255,13 @@ class AlunosResource extends API {
         $arIds['id_aluno'] = $idAluno;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaAtendeAluno->getByIdAluno($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, ['data'=>$arResposta], false);
+    }
+
+    private function getAlunosLocalizados($codigoCidade){
+        $dbRotaAtendeAluno = new \Db\SetePG\SeteRotaAtendeAluno();
+        $arResposta = $dbRotaAtendeAluno->getAllLocatedAlunos($codigoCidade);
+        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, ['data'=>$arResposta], false);
     }
 
     /**
