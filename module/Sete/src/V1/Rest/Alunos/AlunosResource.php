@@ -255,7 +255,7 @@ class AlunosResource extends API {
         $arIds['id_aluno'] = $idAluno;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaAtendeAluno->getByIdAluno($arIds);
-        $this->populaResposta(empty($arResposta) ? 200 : 404, ['data'=>$arResposta], false);
+        $this->populaResposta(200, ['data'=>$arResposta], false);
     }
 
     private function getAlunosLocalizados($codigoCidade){
