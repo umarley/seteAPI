@@ -91,14 +91,13 @@ class AlunosResource extends API {
         if ($arDados->id_rota !== "") {
             if (!$dbSeteRotas->rotaExiste($arDados->id_rota, $arDados->codigo_cidade)) {
                 $this->populaResposta(404, ['result' => false, 'messages' => "Rota informada não existe!"], false);
-            } else if ($dbSeteRotaAtendeAluno->alunoAssociadoRota($arDados->id_aluno, $arDados->codigo_cidade)) {
-                $this->populaResposta(400, ['result' => false, 'messages' => "Aluno já associado a uma rota. Não é permitido o aluno ter mais de uma rota!"], false);
             } else {
-                $this->populaResposta(201, $dbSeteRotaAtendeAluno->_inserir([
-                            'codigo_cidade' => $arDados->codigo_cidade,
-                            'id_rota' => $arDados->id_rota,
-                            'id_aluno' => $arDados->id_aluno
-                        ]), false);
+                $dbSeteRotaAtendeAluno->_inserir([
+                    'codigo_cidade' => $arDados->codigo_cidade,
+                    'id_rota' => $arDados->id_rota,
+                    'id_aluno' => $arDados->id_aluno
+                ]);
+                $this->populaResposta(201, ['result' => true, 'messages' => "Rota foi associada ao aluno!"], false);
             }
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
