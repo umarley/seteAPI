@@ -91,13 +91,12 @@ class AlunosResource extends API {
         if ($arDados->id_rota !== "") {
             if (!$dbSeteRotas->rotaExiste($arDados->id_rota, $arDados->codigo_cidade)) {
                 $this->populaResposta(404, ['result' => false, 'messages' => "Rota informada não existe!"], false);
-            } else {
-                $dbSeteRotaAtendeAluno->_inserir([
-                    'codigo_cidade' => $arDados->codigo_cidade,
-                    'id_rota' => $arDados->id_rota,
-                    'id_aluno' => $arDados->id_aluno
-                ]);
-                $this->populaResposta(201, ['result' => true, 'messages' => "Rota foi associada ao aluno!"], false);
+             }else {
+                $this->populaResposta(201, $dbSeteRotaAtendeAluno->_inserir([
+                            'codigo_cidade' => $arDados->codigo_cidade,
+                            'id_rota' => $arDados->id_rota,
+                            'id_aluno' => $arDados->id_aluno
+                        ]), false);
             }
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_rota deve ser informado!"], false);
@@ -254,7 +253,7 @@ class AlunosResource extends API {
         $arIds['id_aluno'] = $idAluno;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta = $dbRotaAtendeAluno->getByIdAluno($arIds);
-        $this->populaResposta(count($arResposta) > 1 ? 200 : 404, $arResposta, false);
+        $this->populaResposta(200, ['data'=>$arResposta], false);
     }
 
     private function getAlunosLocalizados($codigoCidade){

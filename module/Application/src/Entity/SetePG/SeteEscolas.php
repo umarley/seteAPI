@@ -61,7 +61,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = new Sql($this->AdapterBD);
         $select = $sql->select($this->tableIdentifier)
-                ->columns(['codigo_cidade', 'id_escola', 'nome', 'loc_latitude', 'loc_longitude', 'horario_matutino', 'horario_vespertino', 'horario_noturno', 'ensino_medio', 'ensino_fundamental', 'ensino_superior', 'ensino_pre_escola', 'mec_tp_localizacao'])
+                ->columns(['codigo_cidade', 'id_escola', 'nome', 'loc_latitude', 'loc_longitude', 'horario_matutino', 'horario_vespertino', 'horario_noturno', 'horario_integral', 'ensino_medio', 'ensino_fundamental', 'ensino_superior', 'ensino_pre_escola', 'mec_tp_localizacao'])
                 ->where("codigo_cidade = {$municipio}");
         $arLista = [];
         $prepare = $sql->prepareStatementForSqlObject($select);
