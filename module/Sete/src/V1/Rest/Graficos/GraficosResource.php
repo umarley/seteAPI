@@ -61,15 +61,15 @@ class GraficosResource extends API
                 $rota = $arParams['graficos_id'];
                 switch ($rota) {
                     case 'alunos':
-                        $arResult['elementos'][0] = $this->getInfosAlunosAtendimento($codigoCidade);
-                        array_push($arResult['elementos'], $this->getInfosAlunosEscola($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosRota($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosEscolaridade($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosTurno($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosResidencia($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosCor($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosSexo($codigoCidade));
-                        array_push($arResult['elementos'], $this->getInfosAlunosResponsavel($codigoCidade));
+                        $arResult['data'][0] = $this->getInfosAlunosAtendimento($codigoCidade);
+                        array_push($arResult['data'], $this->getInfosAlunosEscola($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosRota($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosEscolaridade($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosTurno($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosResidencia($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosCor($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosSexo($codigoCidade));
+                        array_push($arResult['data'], $this->getInfosAlunosResponsavel($codigoCidade));
                         break;
                     case 'rotas':
                         break;
