@@ -27,6 +27,7 @@ return [
             \Sete\V1\Rest\Relatorios\RelatoriosResource::class => \Sete\V1\Rest\Relatorios\RelatoriosResourceFactory::class,
             \Sete\V1\Rest\Normas\NormasResource::class => \Sete\V1\Rest\Normas\NormasResourceFactory::class,
             \Sete\V1\Rest\Chamados\ChamadosResource::class => \Sete\V1\Rest\Chamados\ChamadosResourceFactory::class,
+            \Sete\V1\Rest\Dashboard\DashboardResource::class => \Sete\V1\Rest\Dashboard\DashboardResourceFactory::class,
         ],
     ],
     'router' => [
@@ -256,6 +257,15 @@ return [
                     ],
                 ],
             ],
+            'sete.rest.dashboard' => [
+                'type' => 'Segment',
+                'options' => [
+                    'route' => '/dashboard[/:codigo_cidade[/:dashboard_id[/:rota]]]',
+                    'defaults' => [
+                        'controller' => 'Sete\\V1\\Rest\\Dashboard\\Controller',
+                    ],
+                ],
+            ],
         ],
     ],
     'api-tools-versioning' => [
@@ -285,6 +295,7 @@ return [
             22 => 'sete.rest.relatorios',
             23 => 'sete.rest.normas',
             24 => 'sete.rest.chamados',
+            25 => 'sete.rest.dashboard',
         ],
     ],
     'api-tools-rest' => [
@@ -867,6 +878,29 @@ return [
             'collection_class' => \Sete\V1\Rest\Chamados\ChamadosCollection::class,
             'service_name' => 'Chamados',
         ],
+        'Sete\\V1\\Rest\\Dashboard\\Controller' => [
+            'listener' => \Sete\V1\Rest\Dashboard\DashboardResource::class,
+            'route_name' => 'sete.rest.dashboard',
+            'route_identifier_name' => 'dashboard_id',
+            'collection_name' => 'dashboard',
+            'entity_http_methods' => [
+                0 => 'GET',
+                1 => 'PATCH',
+                2 => 'PUT',
+                3 => 'DELETE',
+                4 => 'POST',
+            ],
+            'collection_http_methods' => [
+                0 => 'GET',
+                1 => 'POST',
+            ],
+            'collection_query_whitelist' => [],
+            'page_size' => 25,
+            'page_size_param' => null,
+            'entity_class' => \Sete\V1\Rest\Dashboard\DashboardEntity::class,
+            'collection_class' => \Sete\V1\Rest\Dashboard\DashboardCollection::class,
+            'service_name' => 'Dashboard',
+        ],
     ],
     'api-tools-content-negotiation' => [
         'controllers' => [
@@ -895,6 +929,7 @@ return [
             'Sete\\V1\\Rest\\Relatorios\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Normas\\Controller' => 'HalJson',
             'Sete\\V1\\Rest\\Chamados\\Controller' => 'HalJson',
+            'Sete\\V1\\Rest\\Dashboard\\Controller' => 'HalJson',
         ],
         'accept_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -1024,6 +1059,11 @@ return [
                 1 => 'application/hal+json',
                 2 => 'application/json',
             ],
+            'Sete\\V1\\Rest\\Dashboard\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/hal+json',
+                2 => 'application/json',
+            ],
         ],
         'content_type_whitelist' => [
             'Sete\\V1\\Rest\\User\\Controller' => [
@@ -1125,6 +1165,10 @@ return [
                 2 => 'application/form-data',
             ],
             'Sete\\V1\\Rest\\Chamados\\Controller' => [
+                0 => 'application/vnd.sete.v1+json',
+                1 => 'application/json',
+            ],
+            'Sete\\V1\\Rest\\Dashboard\\Controller' => [
                 0 => 'application/vnd.sete.v1+json',
                 1 => 'application/json',
             ],
@@ -1430,6 +1474,18 @@ return [
                 'entity_identifier_name' => 'id',
                 'route_name' => 'sete.rest.chamados',
                 'route_identifier_name' => 'chamados_id',
+                'is_collection' => true,
+            ],
+            \Sete\V1\Rest\Dashboard\DashboardEntity::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.dashboard',
+                'route_identifier_name' => 'dashboard_id',
+                'hydrator' => \Laminas\Hydrator\ArraySerializableHydrator::class,
+            ],
+            \Sete\V1\Rest\Dashboard\DashboardCollection::class => [
+                'entity_identifier_name' => 'id',
+                'route_name' => 'sete.rest.dashboard',
+                'route_identifier_name' => 'dashboard_id',
                 'is_collection' => true,
             ],
         ],
