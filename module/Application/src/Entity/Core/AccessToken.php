@@ -139,9 +139,6 @@ class AccessToken extends AbstractDatabasePostgres {
         $sql = "select us.codigo_cidade from api.api_access_token aat 
                     inner join sete.sete_usuarios us on aat.id_usuario = us.id_usuario 
                     where aat.access_token = '{$accessToken}'";
-                    echo $sql;
-                    
-                    exit;
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         if ($statement->execute()->count() > 0) {

@@ -54,9 +54,7 @@ class API extends AbstractResourceListener {
         if ($tipoAccessToken === $dbCoreAccessToken::TIPO_ADMINISTRATIVO) {
             return true;
         } else {
-            
             $cidadeUsuario = $dbCoreAccessToken->getCodigoCidadeUsuarioAutenticado($this->accessToken);
-            dd($cidadeUsuario, $codigoCidade);
             if ($cidadeUsuario == $codigoCidade) {
                 return true;
             } else {
