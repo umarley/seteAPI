@@ -281,5 +281,45 @@ class GraficosModel {
         $kilometragemTotal = $dbSetePGEscolas->getDadosKilometragemTotalRotas($codigoCidade);
         return $kilometragemTotal;
     }
+    
+    public function getDadosTempoRota($codigoCidade) {
+        $dbSetePGEscolas = new \Db\SetePG\SeteEscolas();
+        $arDadosTempoRota = $dbSetePGEscolas->getDadosTempoRotas($codigoCidade);
+        return $arDadosTempoRota;
+    }
+    
+    public function getDadosTempoTotalRota($codigoCidade) {
+        $dbSetePGEscolas = new \Db\SetePG\SeteEscolas();
+        $tempoTotal = $dbSetePGEscolas->getDadosTempoTotalRotas($codigoCidade);
+        return $tempoTotal;
+    }
+    
+    public function getDadosRotasPorTurno($codigoCidade) {
+        $arLabel = [];
+        $arValues = [];
+        $dbSetePGEscolas = new \Db\SetePG\SeteEscolas();
+        $arDadosRota = $dbSetePGEscolas->getQuantidadeRotasPorTurno($codigoCidade);
+        foreach ($arDadosRota as $localidade) {
+            $arLabel[] = $localidade['horario_funcionamento'];
+            $arValues[] = $localidade['qtd'];
+        }
+        $arDados['labels'] = $arLabel;
+        $arDados['values'] = $arValues;
+        return $arDados;
+    }
+    
+    public function getDadosRotasPorDificuldade($codigoCidade) {
+        $arLabel = [];
+        $arValues = [];
+        $dbSetePGEscolas = new \Db\SetePG\SeteEscolas();
+        $arDadosRota = $dbSetePGEscolas->getQuantidadeRotasPorDificuldade($codigoCidade);
+        foreach ($arDadosRota as $localidade) {
+            $arLabel[] = $localidade['dificuldade'];
+            $arValues[] = $localidade['qtd'];
+        }
+        $arDados['labels'] = $arLabel;
+        $arDados['values'] = $arValues;
+        return $arDados;
+    }
 
 }

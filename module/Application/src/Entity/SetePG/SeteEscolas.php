@@ -305,6 +305,15 @@ class SeteEscolas extends AbstractDatabasePostgres {
         return $row;
     }
     
+    public function getDadosTempoRotas($codigoCidade) {
+        $sql = "select min(tempo) as menor, avg(tempo) as media, max(tempo) as maior from sete.sete_rotas sr
+                    where sr.codigo_cidade = {$codigoCidade}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
+    }
+    
     public function getDadosKilometragemTotalRotas($codigoCidade) {
         $sql = "select sum(km) as total from sete.sete_rotas sr
                     where sr.codigo_cidade = {$codigoCidade}";
@@ -312,6 +321,69 @@ class SeteEscolas extends AbstractDatabasePostgres {
         $statement->prepare();
         $row = $statement->execute()->current();
         return $row['total'];
+    }
+    
+    public function getDadosTempoTotalRotas($codigoCidade) {
+        $sql = "select sum(tempo) as total from sete.sete_rotas sr
+                    where sr.codigo_cidade = {$codigoCidade}";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row['total'];
+    }
+    
+    public function getQuantidadeRotasPorTurno($codigoCidade) {
+        $sql = "select 
+                'Manhã' as horario_funcionamento, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.turno_matutino  = 'S'
+                union 
+                select 
+                'Tarde' as horario_funcionamento, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.turno_vespertino  = 'S'
+                union 
+                select 
+                'Noite' as horario_funcionamento, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.turno_noturno  = 'S'";
+        $arLista = [];
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        //$execute = $statement->execute();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
+    }
+    
+    public function getQuantidadeRotasPorDificuldade($codigoCidade) {
+        $sql = "select 
+                'Porteira' as dificuldade, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.da_porteira  = 'S'
+                union 
+                select 
+                'Mata-Burro' as dificuldade, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.da_mataburro  = 'S'
+                union 
+                select 
+                'Colchete' as dificuldade, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.da_colchete  = 'S'
+                union 
+                select 
+                'Atoleiro' as dificuldade, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.da_atoleiro  = 'S'
+                union 
+                select 
+                'Ponte-Rústica' as dificuldade, count(*) as qtd from sete.sete_rotas sesc where sesc.codigo_cidade = {$codigoCidade}
+                and sesc.da_ponterustica  = 'S'";
+        $arLista = [];
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        //$execute = $statement->execute();
+        $this->getResultSet($statement->execute());
+        foreach ($this->resultSet as $row) {
+            $arLista[] = $row;
+        }
+        return $arLista;
     }
 
     public function escolaExisteByCodigoMEC($codigoCidade, $codigoEntidadeMec) {

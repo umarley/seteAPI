@@ -82,6 +82,10 @@ class GraficosResource extends API {
         $arResult['data'][0] = $this->getInfosRotasPorTipo($codigoCidade);
         array_push($arResult['data'], $this->getInfosKilometragemRotas($codigoCidade));
         array_push($arResult['data'], $this->getInfosKilometragemTotalRotas($codigoCidade));
+        array_push($arResult['data'], $this->getInfosTempoRotas($codigoCidade));
+        array_push($arResult['data'], $this->getInfosTempoTotalRotas($codigoCidade));
+        array_push($arResult['data'], $this->getInfosRotasPorTurno($codigoCidade)); 
+        array_push($arResult['data'], $this->getInfosRotasPorDificuldade($codigoCidade)); 
         return $arResult;
     }
     
@@ -105,11 +109,51 @@ class GraficosResource extends API {
         return $arResposta;
     }
     
+    private function getInfosTempoRotas($codigoCidade){
+        $modelGraficos = new GraficosModel();
+        $arDados = $modelGraficos->getDadosTempoRota($codigoCidade);
+        $arResposta['nome'] = "Tempo da Viagem";
+        $arResposta['titulo'] = "Valores do menor, médio e maior tempo gasto pelas rotas";
+        $arResposta['labels'] = ['Menor', 'Média', 'Maior'];
+        $arResposta['values'] = [$arDados['menor'], $arDados['media'], $arDados['maior']];
+        return $arResposta;
+    }
+    
+    private function getInfosRotasPorTurno($codigoCidade){
+        $modelGraficos = new GraficosModel();
+        $arDados = $modelGraficos->getDadosRotasPorTurno($codigoCidade);
+        $arResposta['nome'] = "Turno";
+        $arResposta['titulo'] = "Distribuição de rotas por turno";
+        $arResposta['labels'] = $arDados['labels'];
+        $arResposta['values'] = $arDados['values'];
+        return $arResposta;
+    }
+    
+    private function getInfosRotasPorDificuldade($codigoCidade){
+        $modelGraficos = new GraficosModel();
+        $arDados = $modelGraficos->getDadosRotasPorDificuldade($codigoCidade);
+        $arResposta['nome'] = "Dificuldades Atravessadas";
+        $arResposta['titulo'] = "Quantitativo das dificuldades atravessadas pelas rotas";
+        $arResposta['labels'] = $arDados['labels'];
+        $arResposta['values'] = $arDados['values'];
+        return $arResposta;
+    }
+    
+    private function getInfosTempoTotalRotas($codigoCidade){
+        $modelGraficos = new GraficosModel();
+        $tempoTotal = $modelGraficos->getDadosTempoTotalRota($codigoCidade);
+        $arResposta['nome'] = "Tempo Total";
+        $arResposta['titulo'] = "Tempo total percorrido pela rota";
+        $arResposta['labels'] = ['Total'];
+        $arResposta['values'] = [$tempoTotal];
+        return $arResposta;
+    }
+    
     private function getInfosKilometragemTotalRotas($codigoCidade){
         $modelGraficos = new GraficosModel();
         $kilometragemTotal = $modelGraficos->getDadosKilometragemTotalRota($codigoCidade);
         $arResposta['nome'] = "Quilometragem das Rotas";
-        $arResposta['titulo'] = "Valores da menor, média e maior quilometragem das rotas";
+        $arResposta['titulo'] = "Quilometragem total percorrida pela rota";
         $arResposta['labels'] = ['Total'];
         $arResposta['values'] = [$kilometragemTotal];
         return $arResposta;
