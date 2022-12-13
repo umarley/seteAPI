@@ -214,7 +214,7 @@ class SeteEscolas extends AbstractDatabasePostgres {
     }
     
     public function getMediaIdadeDosVeiculos($codigoCidade) {
-        $sql = "select avg(extract(year from now()) - v.ano) as media_idade  from sete.sete_veiculos v where v.codigo_cidade = {$codigoCidade}";
+        $sql = "select avg(extract(year from now()) - v.ano) as media_idade  from sete.sete_veiculos v where v.codigo_cidade = {$codigoCidade} and v.ano > 1900";
         $statement = $this->AdapterBD->createStatement($sql);
         $statement->prepare();
         $row = $statement->execute()->current();

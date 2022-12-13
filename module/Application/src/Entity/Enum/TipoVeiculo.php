@@ -103,7 +103,7 @@ class TipoVeiculo {
             ['id' => self::CANOA_MOTORIZADA, 'tipo' => 'Canoa motorizada'],
             ['id' => self::CANOA_A_REMO, 'tipo' => 'Canoa a remo'],
             ['id' => self::BICICLETA, 'tipo' => 'Bicicleta'],
-            ['id' => self::OUTRO, 'tipo' => 'Bicicleta']
+            ['id' => self::OUTRO, 'tipo' => 'Outro']
         ];
     }
 
