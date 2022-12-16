@@ -88,8 +88,6 @@ class DashboardResource extends API {
                 $this->populaResposta(400, ['result' => false, 'messages' => "O parâmetro id_aluno deve ser informado!"], false);
             }*/
         }
-        
-        return new ApiProblem(405, 'The GET method has not been defined for collections');
     }
 
     /**
