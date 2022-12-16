@@ -134,7 +134,7 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
     public function getQtdAlunosPorRota($codigoCidade){ // código da cidade está direto no código!!
         $sql = "SELECT id_rota, COUNT(*) as qtd 
                 FROM sete.sete_rota_atende_aluno rota 
-                WHERE rota.codigo_cidade  = 3540606
+                WHERE rota.codigo_cidade  = '{$codigoCidade}'
                 GROUP BY id_rota
                 ORDER BY id_rota";
         $statement = $this->AdapterBD->createStatement($sql);
