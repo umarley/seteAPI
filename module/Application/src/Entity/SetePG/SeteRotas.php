@@ -193,4 +193,19 @@ class SeteRotas extends AbstractDatabasePostgres {
         return ['result' => $boResultado, 'messages' => $message];
     }
 
+    public function getDadosDashboardRotas($codigoCidade){
+        $sql = "SELECT DISTINCT 
+        (SELECT count(*) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}') as total,
+        (SELECT round(sum(km),2) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}') as km_total,
+        (SELECT ROUND(avg(km),2) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}') as km_media,
+        (SELECT ROUND(sum(tempo),2) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}') as tempo_total,
+        (SELECT ROUND(avg(tempo),2) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}') as tempo_medio,
+        (SELECT count(*) FROM sete.sete_rotas WHERE codigo_cidade = '{$codigoCidade}' and shape is not null) as com_georeferenciamento
+        FROM sete.sete_escolas WHERE codigo_cidade  = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
+    }
+
 }

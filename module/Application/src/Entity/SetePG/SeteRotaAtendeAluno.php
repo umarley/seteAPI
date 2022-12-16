@@ -131,10 +131,10 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
         return $row['qtd'];
     }
 
-    public function getQtdAlunosPorRota($codigoCidade){
+    public function getQtdAlunosPorRota($codigoCidade){ // código da cidade está direto no código!!
         $sql = "SELECT id_rota, COUNT(*) as qtd 
                 FROM sete.sete_rota_atende_aluno rota 
-                WHERE rota.codigo_cidade  = 3540606
+                WHERE rota.codigo_cidade  = '{$codigoCidade}'
                 GROUP BY id_rota
                 ORDER BY id_rota";
         $statement = $this->AdapterBD->createStatement($sql);
@@ -156,6 +156,18 @@ class SeteRotaAtendeAluno extends AbstractDatabasePostgres {
             $arLista[] = $row;
         }
         return $arLista;
+    }
+
+    public function getDadosDashboardAlunos($codigoCidade){
+        $sql = "SELECT DISTINCT 
+        (SELECT count(*) FROM sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}') as total,
+        (SELECT count(*) FROM (SELECT DISTINCT ral.id_aluno FROM sete.sete_rota_atende_aluno ral WHERE codigo_cidade  = '{$codigoCidade}') alunosrotas) AS com_rota,
+        (SELECT count(*) FROM sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}' AND loc_latitude IS NOT NULL AND loc_longitude IS NOT null) as com_georef
+        from sete.sete_alunos al WHERE al.codigo_cidade  = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
     }
 
 }
