@@ -175,4 +175,21 @@ class SeteVeiculos extends AbstractDatabasePostgres {
         return $row['qtd'];
     } 
 
+    public function getDadosDashboardVeiculos($codigoCidade){
+        $sql = "SELECT DISTINCT 
+        (SELECT count(*) FROM sete.sete_veiculos WHERE codigo_cidade = '{$codigoCidade}') AS total,
+        (SELECT count(*) FROM sete.sete_veiculos WHERE codigo_cidade = '{$codigoCidade}' AND manutencao='S') AS manutencao,
+        (SELECT count(*) FROM (SELECT DISTINCT id_veiculo FROM(SELECT DISTINCT veiculo.id_veiculo, mot.nome FROM sete.sete_motoristas mot
+            JOIN  sete.sete_rota_dirigida_por_motorista rotamot ON mot.codigo_cidade = rotamot.codigo_cidade 
+            JOIN sete.sete_rota_possui_veiculo rotaveiculo ON rotamot.codigo_cidade = rotaveiculo.codigo_cidade  
+            JOIN sete.sete_veiculos veiculo ON rotaveiculo.codigo_cidade = veiculo.codigo_cidade
+            where mot.codigo_cidade = '{$codigoCidade}') veic_mot) qnt_veic) AS com_motorista,
+        (SELECT count(*) FROM (SELECT * FROM sete.sete_veiculos WHERE codigo_cidade = '{$codigoCidade}' AND modo='1') modo) AS caminho_da_escola
+        FROM sete.sete_veiculos WHERE codigo_cidade = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
+    }
+
 }
