@@ -100,4 +100,17 @@ class SeteRotaPassaPorEscola extends AbstractDatabasePostgres {
         return ['result' => $boResultado, 'messages' => $message];
     }
 
+    public function getDadosDashboardEscolas($codigoCidade){
+        $sql = "SELECT DISTINCT
+        (SELECT count(*) FROM sete.sete_escolas WHERE codigo_cidade  = '{$codigoCidade}') AS total,
+        (SELECT count(*) FROM (SELECT DISTINCT id_escola FROM sete.sete_rota_passa_por_escolas WHERE codigo_cidade  = '{$codigoCidade}') escolasrotas) AS com_rota,
+        (SELECT count(*) FROM sete.sete_escolas WHERE codigo_cidade  = '{$codigoCidade}' AND mec_tp_localizacao=2) AS rural,
+        (SELECT count(*) FROM sete.sete_escolas WHERE codigo_cidade  = '{$codigoCidade}' AND mec_tp_localizacao=1) AS urbana
+        FROM sete.sete_escolas WHERE codigo_cidade  = '{$codigoCidade}'";
+        $statement = $this->AdapterBD->createStatement($sql);
+        $statement->prepare();
+        $row = $statement->execute()->current();
+        return $row;
+    }
+
 }
