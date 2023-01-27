@@ -5,6 +5,7 @@ namespace Sete\V1\Rest\User;
 use Sete\V1\API;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Laminas\ApiTools\Rest\AbstractResourceListener;
+use Application\Utils\HttpCode;
 
 class UserResource extends API {
     
@@ -162,7 +163,8 @@ class UserResource extends API {
             case 'sete':
                 $usuarioPodeAcessarMunicipio = $this->usuarioPodeAcessarCidade($codigoCidade);
                 if ($usuarioPodeAcessarMunicipio) {
-                    $this->populaResposta(200, $this->_model->getById($id, $codigoCidade), false);
+                    $arData = $this->_model->getById($id, $codigoCidade);
+                    $this->populaResposta(!$arData ? HttpCode::NOT_FOUND : HttpCode::OK, $arData, false);
                 } else {
                     $this->populaResposta(403, ['result' => false, 'messages' => 'Usuário sem permissão para acessar o municipio selecionado.'], false);
                 }

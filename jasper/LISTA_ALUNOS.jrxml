@@ -2,7 +2,7 @@
 <!-- Created with Jaspersoft Studio version 6.14.0.final using JasperReports Library version 6.14.0-2ab0d8625be255bf609c78e1181801213e51db8f  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LISTA_ALUNOS" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="74ee9aa9-7b1e-4b40-9281-a72751f7431a">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="postgres"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="DataAdapter.xml"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -125,7 +125,7 @@ where m.codigo_ibge  =  $P{codigo_cidade}]]>
 		<band height="114">
 			<image>
 				<reportElement x="6" y="5" width="269" height="60" uuid="9c02dd82-2664-4583-a524-abb1efd2b7ac"/>
-				<imageExpression><![CDATA["/var/www/seteAPI/jasper/images/logo-cecate2.png"]]></imageExpression>
+				<imageExpression><![CDATA["/var/www/ProjetoSETE/seteAPI/jasper/images/logo-cecate2.png"]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="285" y="20" width="320" height="30" uuid="be2f3c55-b162-4e01-bbc4-a8a88580c8c5"/>
@@ -281,7 +281,7 @@ where m.codigo_ibge  =  $P{codigo_cidade}]]>
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<image>
 				<reportElement x="1" y="0" width="799" height="74" uuid="f5036a67-3f96-4405-9143-0625793994af"/>
-				<imageExpression><![CDATA["/var/www/seteAPI/jasper/images/rodape.png"]]></imageExpression>
+				<imageExpression><![CDATA["/var/www/ProjetoSETE/seteAPI/jasper/images/rodape.png"]]></imageExpression>
 			</image>
 			<textField>
 				<reportElement x="720" y="30" width="80" height="30" uuid="76177496-aa06-47e9-a740-4d4cc0b53f66"/>

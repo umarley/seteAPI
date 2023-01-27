@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<jdbcDataAdapter class="net.sf.jasperreports.data.jdbc.JdbcDataAdapterImpl"><name>New Data Adapter 1</name><driver>org.postgresql.Driver</driver><username>postgres</username><password>834451</password><savePassword>true</savePassword><url>jdbc:postgresql://192.168.1.102:5432/sete</url><database></database><serverAddress></serverAddress><classpath>/var/www/ProjetoSETE/seteAPI/jasper/jdbc/postgresql-42.2.9.jar</classpath></jdbcDataAdapter>

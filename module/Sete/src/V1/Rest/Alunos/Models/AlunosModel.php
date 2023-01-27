@@ -1,6 +1,6 @@
 <?php
 
-namespace Sete\V1\Rest\Alunos;
+namespace Sete\V1\Rest\Alunos\Models;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

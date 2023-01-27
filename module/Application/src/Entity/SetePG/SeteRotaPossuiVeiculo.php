@@ -21,12 +21,28 @@ class SeteRotaPossuiVeiculo extends AbstractDatabasePostgres {
                 ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_rotas', 'sete')], "eta.id_rota = rot.id_rota AND eta.codigo_cidade = rot.codigo_cidade", ['*'])
                 ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
         $prepare = $sql->prepareStatementForSqlObject($select);
-        $row = $prepare->execute()->current();
-        if(!$row){
-            return [];
-        }else{
-            return $row;
+        $arLista = [];
+        $this->getResultSet($prepare->execute());        
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
         }
+        //$row = $prepare->execute()->current();
+        return $arLista;
+    }
+    
+    public function getVeiculosByRota($arIds) {
+        $sql = new Sql($this->AdapterBD);
+        $select = $sql->select(['eta' => $this->tableIdentifier])
+                ->join(['rot' => new \Laminas\Db\Sql\TableIdentifier('sete_veiculos', 'sete')], "eta.id_veiculo = rot.id_veiculo AND eta.codigo_cidade = rot.codigo_cidade", ['*'])
+                ->where("eta.codigo_cidade = {$arIds['codigo_cidade']} AND eta.id_rota = {$arIds['id_rota']}");
+        $prepare = $sql->prepareStatementForSqlObject($select);
+        $arLista = [];
+        $this->getResultSet($prepare->execute());        
+        foreach ($this->resultSet as $row){
+            $arLista[] = $row;
+        }
+        //$row = $prepare->execute()->current();
+        return $arLista;
     }
     
     public function getAlunosByEscola($codigoCidade, $idEscola){

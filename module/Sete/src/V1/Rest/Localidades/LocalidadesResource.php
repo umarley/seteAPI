@@ -4,6 +4,7 @@ namespace Sete\V1\Rest\Localidades;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Sete\V1\API;
+use Application\Utils\HttpCode;
 
 class LocalidadesResource extends API {
 
@@ -85,7 +86,7 @@ class LocalidadesResource extends API {
         if (isset($arParams['codigo_estado'])) {
             $modelLocalidade = new LocalidadesModel();
             $arMuncipios = $modelLocalidade->getTodosMunicipiosByEstado($arParams['codigo_estado']);
-            $this->populaResposta(200, $arMuncipios);
+            $this->populaResposta(empty($arMuncipios) ? HttpCode::NOT_FOUND : HttpCode::OK, $arMuncipios);
         } else {
             $this->populaResposta(400, ['result' => false, 'messages' => 'Informe o código do municipio para continuar.']);
         }

@@ -424,7 +424,7 @@ class RotasResource extends API {
         $dbRotaPossuiVeiculo = new \Db\SetePG\SeteRotaPossuiVeiculo();
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
-        $arResposta = $dbRotaPossuiVeiculo->getById($arIds);
+        $arResposta['data'] = $dbRotaPossuiVeiculo->getVeiculosByRota($arIds);
         $this->populaResposta(count($arResposta) > 0 ? 200 : 404, $arResposta, false);
     }
 

@@ -42,7 +42,7 @@ class SeteAlunos extends AbstractDatabasePostgres {
     public function getLista($municipio) {
         $sql = "select a.codigo_cidade, a.id_aluno, a.nome, cpf, a.loc_latitude, a.loc_longitude, a.nivel, a.turno, a.mec_tp_localizacao,
                     coalesce(esc.nome, 'Não Informada') as escola,
-                    case when (select count(*) from sete.sete_rota_atende_aluno sraa where sraa.codigo_cidade = a.codigo_cidade and a.id_aluno = sraa.id_aluno) > 1 then 'Sim' else 'Não' end as rota
+                    case when (select count(*) from sete.sete_rota_atende_aluno sraa where sraa.codigo_cidade = a.codigo_cidade and sraa.id_aluno = a.id_aluno) >= 1 then 'Sim' else 'Não' end as rota
                     from sete.sete_alunos a 
                     left join sete.sete_escola_tem_alunos eta on a.id_aluno = eta.id_aluno and a.codigo_cidade  = eta.codigo_cidade
                     left join sete.sete_escolas esc on esc.id_escola  = eta.id_escola and esc.codigo_cidade  = eta.codigo_cidade  
