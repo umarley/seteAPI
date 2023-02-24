@@ -26,11 +26,4 @@
 		<nature>net.sf.jasperreports.nature</nature>
 		<nature>com.jaspersoft.studio.babel.editor.rbeNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>etiqueta-correios.jrxml</name>
-			<type>1</type>
-			<location>/var/www/clube-envios/hubfrete/application/controllers/jasper/etiquetas/etiqueta-correios.jrxml</location>
-		</link>
-	</linkedResources>
 </projectDescription>

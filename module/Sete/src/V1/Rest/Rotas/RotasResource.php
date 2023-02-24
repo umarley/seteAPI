@@ -425,7 +425,7 @@ class RotasResource extends API {
         $arIds['id_rota'] = $idRota;
         $arIds['codigo_cidade'] = $codigoCidade;
         $arResposta['data'] = $dbRotaPossuiVeiculo->getVeiculosByRota($arIds);
-        $this->populaResposta(count($arResposta['data']) > 0 ? 200 : 404, $arResposta, false);
+        $this->populaResposta(count($arResposta['data']) > 0 ? 200 : 404, $arResposta['data'], false);
     }
 
     private function getShapeRota($codigoCidade, $idRota) {
