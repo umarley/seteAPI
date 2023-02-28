@@ -4,6 +4,7 @@ namespace Sete\V1\Rest\Alunos;
 
 use Laminas\ApiTools\ApiProblem\ApiProblem;
 use Sete\V1\API;
+use Sete\V1\Rest\Alunos\Models\AlunosModel;
 
 class AlunosResource extends API {
 
