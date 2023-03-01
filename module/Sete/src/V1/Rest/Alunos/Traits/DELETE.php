@@ -2,6 +2,7 @@
 
 namespace Sete\V1\Rest\Alunos\Traits;
 use Laminas\ApiTools\ApiProblem\ApiProblem;
+use Sete\V1\Rest\Alunos\Models\AlunosModel;
 
 trait DELETE {
      /**
